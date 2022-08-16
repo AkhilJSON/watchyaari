@@ -1,0 +1,203 @@
+<div fxLayout="row" fxFlexFill class="my-profile">
+  <div fxFlex="20" fxHide.xs="true" fxHide.sm="true" fxHide.md="true"></div>
+  <div
+    fxFlex.xs="100"
+    fxFlex.sm="100"
+    fxFlex.md="100"
+    fxFlex.lg="60"
+    fxFlex.gt-lg="60"
+  >
+    <mat-card>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab label="Basic Info">
+            <form *ngIf="!dataLoading" [formGroup]="profileForm">
+              <div fxLayout="column" fxLayoutAlign="space-between">
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="full-width">
+                    <input
+                      matInput
+                      placeholder="Full Name"
+                      type="text"
+                      [formControl]="profileForm.controls['fullName']"
+                    />
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="full-width">
+                    <input
+                      matInput
+                      placeholder="Email"
+                      [formControl]="profileForm.controls['email']"
+                      [readonly]="true"
+                    />
+                    <span matSuffix>
+                      <mat-icon
+                        *ngIf="profileData?.emailVerified"
+                        style="color: green;"
+                        matTooltip="Verified user"
+                        matTooltipPosition="above"
+                        >verified
+                      </mat-icon>
+                      <mat-icon
+                        *ngIf="!profileData?.emailVerified"
+                        style="color: orange;"
+                        matTooltip="Unverified user"
+                        matTooltipPosition="above"
+                        >warning
+                      </mat-icon>
+                    </span>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <div fxLayout="row" fxFlexFill>
+                    <div fxFlex="50">
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        class="btn-block btn-lg m-t-20 m-b-20"
+                        type="submit"
+                        [disabled]="updatingData"
+                        (click)="updateProfile()"
+                      >
+                        {{
+                          updatingData
+                            ? "Updating Profile ..."
+                            : "Update Profile"
+                        }}
+                      </button>
+                    </div>
+                    <div fxFlex="50" fxLayoutAlign="end center">
+                      <button
+                        *ngIf="
+                          !profileData?.emailVerified &&
+                          !profileData?.emailVerificationSent
+                        "
+                        mat-stroked-button
+                        color="primary"
+                        matTooltip="Request verification link"
+                        class="f-10"
+                        matTooltipPosition="above"
+                        (click)="verifyMyEmail()"
+                        [disabled]="sendingVerificationRequest"
+                      >
+                        Request verification link
+                      </button>
+                      <button
+                        *ngIf="
+                          !profileData?.emailVerified &&
+                          profileData?.emailVerificationSent
+                        "
+                        mat-stroked-button
+                        color="green"
+                        matTooltip="Verification link requested"
+                        class="f-10"
+                        matTooltipPosition="above"
+                      >
+                        Verification link requested
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div *ngIf="dataLoading">
+              Fetching data...
+            </div>
+          </mat-tab>
+          <mat-tab label="Change password">
+            <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+              <div fxLayout="column" fxLayoutAlign="space-between">
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="full-width">
+                    <input
+                      matInput
+                      [type]="isPasword ? 'password' : 'text'"
+                      (input)="passwordsDidNotMatch = false"
+                      placeholder="Password"
+                      autocomplete="false"
+                      [formControl]="passwordForm.controls['password']"
+                    />
+                    <span matSuffix>
+                      <mat-icon
+                        *ngIf="!isPasword"
+                        style="cursor: pointer;"
+                        (click)="isPasword = true"
+                        >visibility
+                      </mat-icon>
+                      <mat-icon
+                        *ngIf="isPasword"
+                        style="cursor: pointer;"
+                        (click)="isPasword = false"
+                        >visibility_off
+                      </mat-icon>
+                    </span>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="full-width">
+                    <input
+                      matInput
+                      [type]="isConfirmPassword ? 'password' : 'text'"
+                      placeholder="Confirm Password"
+                      (input)="passwordsDidNotMatch = false"
+                      autocomplete="false"
+                      [formControl]="passwordForm.controls['confirmPassword']"
+                    />
+                    <span matSuffix>
+                      <mat-icon
+                        *ngIf="!isConfirmPassword"
+                        style="cursor: pointer;"
+                        (click)="isConfirmPassword = true"
+                      >
+                        visibility
+                      </mat-icon>
+                      <mat-icon
+                        *ngIf="isConfirmPassword"
+                        style="cursor: pointer;"
+                        (click)="isConfirmPassword = false"
+                      >
+                        visibility_off
+                      </mat-icon>
+                    </span>
+                  </mat-form-field>
+                </div>
+
+                <small
+                  *ngIf="passwordsDidNotMatch"
+                  class="text-danger support-text"
+                  >Password & Confirm Password did not match.</small
+                >
+                <small
+                  *ngIf="
+                    passwordForm.controls['password'].invalid &&
+                    passwordForm.controls['password'].touched
+                  "
+                  class="text-danger support-text"
+                  >Password should have atleast 1 special 1 alphabet 1 numeric &
+                  length between 6-16</small
+                >
+
+                <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    class="btn-block btn-lg m-t-20 m-b-20"
+                    type="submit"
+                    [disabled]="updatingData"
+                  >
+                    Change Password
+                  </button>
+                </div>
+              </div>
+            </form>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div fxFlex="20" fxHide.xs="true" fxHide.sm="true" fxHide.md="true"></div>
+</div>

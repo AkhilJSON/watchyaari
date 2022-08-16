@@ -1,0 +1,200 @@
+<div fxLayout="column" fxFlexFill>
+  <div fxFlex="100" class="join-party-container">
+    <div fxLayout="column" fxFlexFill>
+      <div fxFlex="10" fxLayoutAlign="center center">
+        <div fxLayout="row" fxFlexFill fxLayoutGap="40px">
+          <div fxFlex="10"></div>
+          <div fxFlex="65" fxLayoutAlign="right center" class="m-l-40">
+            <form
+              [formGroup]="joinForm"
+              (ngSubmit)="joinParty()"
+              class="full-width"
+            >
+              <mat-form-field class="full-width" color="white">
+                <mat-label>Paste party URL to join...</mat-label>
+                <input
+                  matInput
+                  [formControl]="joinForm.controls['partyURL']"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+            </form>
+          </div>
+          <div
+            fxFlex="20"
+            fxHide.xs="true"
+            fxHide.sm="true"
+            fxHide.md="true"
+            fxLayoutAlign="right center"
+          >
+            <button
+              mat-raised-button
+              matTooltip="JOIN PARTY"
+              matTooltipPosition="above"
+              color="join-party"
+              type="submit"
+              class="join-party f-14"
+              (click)="joinParty()"
+            >
+              JOIN PARTY
+            </button>
+          </div>
+          <div
+            fxFlex="20"
+            fxHide.lg="true"
+            fxHide.gt-lg="true"
+            fxLayoutAlign="right center"
+          >
+            <button
+              mat-icon-button
+              matTooltip="JOIN PARTY"
+              matTooltipPosition="above"
+              color="join-party"
+              type="submit"
+              class="join-party f-14"
+              (click)="joinParty()"
+            >
+              <mat-icon class="material-icons-round">navigate_next</mat-icon>
+            </button>
+          </div>
+          <div fxFlex="10"></div>
+        </div>
+      </div>
+      <div fxFlex="90">
+        <perfect-scrollbar [config]="config">
+          <div fxLayout="column" fxFlexFill>
+            <div
+              fxFlex="10"
+              fxLayoutAlign.xs="center center"
+              fxLayoutAlign.gt-xs="start center"
+            >
+              <h1>Recent parties</h1>
+            </div>
+
+            <div fxFlex="90">
+              <!-- Recent Party List -->
+              <ng-template
+                *ngIf="
+                  !fetchingRecentList && recentList?.length && userLoggedIn
+                "
+                [ngTemplateOutlet]="recentPartyList"
+              ></ng-template>
+
+              <!-- Data Messages -->
+              <app-show-message
+                *ngIf="fetchingRecentList && userLoggedIn"
+                [message]="'Loading...'"
+              >
+              </app-show-message>
+
+              <app-show-message
+                *ngIf="
+                  !fetchingRecentList && !recentList?.length && userLoggedIn
+                "
+                [message]="'No recent parties!'"
+              ></app-show-message>
+
+              <app-show-message
+                *ngIf="!userLoggedIn"
+                [message]="'Login to view your Recent parties!'"
+              >
+              </app-show-message>
+            </div>
+          </div>
+        </perfect-scrollbar>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-progress-spinner
+  [color]="color"
+  [mode]="mode"
+  [value]="value"
+  [backdropEnabled]="true"
+  [positionGloballyCenter]="true"
+  [displayProgressSpinner]="displayProgressSpinner"
+>
+</app-progress-spinner>
+
+<ng-template #recentPartyList>
+  <div
+    fxLayout.xs="column"
+    fxLayout.gt-xs="row"
+    fxFlexFill
+    class="party-card m-5"
+    fxLayoutGap="10px"
+    *ngFor="let party of recentList"
+  >
+    <!-- Party Thumbnail -->
+    <div
+      fxFlex.xs="60"
+      fxFlex.sm="25"
+      fxFlex.gt-sm="20"
+      fxLayoutAlign="start center"
+    >
+      <img
+        class="video-thumbnail"
+        [ngClass]="isSmallScreenMode ? 'full-width' : ''"
+        src="{{ getThumbnailOfParty(party) }}"
+        alt="{{ party?.title }}"
+      />
+    </div>
+
+    <!-- Party details -->
+    <div
+      fxFlex.xs="40"
+      fxFlex.sm="75"
+      fxFlex.gt-sm="80"
+      fxLayoutAlign="start start"
+    >
+      <div fxLayout="column">
+        <div fxFlex="40" fxLayoutAlign="start center">
+          <div class="party-title controlled-text2">
+            {{ party?.title }}
+          </div>
+        </div>
+
+        <div fxFlex="20" fxLayoutAlign="start center" class="m-t-10">
+          <div
+            class="controlled-text2 all-participants"
+            [matTooltip]="party?.guests"
+            matTooltipPosition="above"
+          >
+            <span class="guests-label">Participants: </span> {{ party?.guests }}
+          </div>
+        </div>
+
+        <div fxFlex="20" fxLayoutAlign="start center" class="m-t-10">
+          <div class="controlled-text2 party-duration">
+            <span class="duration-label">Duration: </span>
+            {{ party?.partyDuration | secondsToTimeString: "number" }}
+          </div>
+        </div>
+
+        <div fxFlex="20" fxLayoutAlign="start center" class="m-t-10">
+          <button
+            *ngIf="party.status != 'ENDED'"
+            mat-icon-button
+            color="yellow"
+            class="copy-invite-url m-r-10"
+            [cdkCopyToClipboard]="copyPartyInviteURL(party._id)"
+            (click)="onCopyingInviteURL()"
+            matTooltip="COPY INVITE URL"
+            matTooltipPosition="above"
+          >
+            <mat-icon>content_copy</mat-icon>
+          </button>
+
+          <button
+            mat-stroked-button
+            color="{{ getStatusColor(party.status, 'class') }}"
+            (click)="actionButton(party.status, party._id)"
+          >
+            {{ partyLabel(party, "label") }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,456 @@
+<h2 mat-dialog-title>
+  Change Video
+</h2>
+<mat-dialog-content>
+  <div
+    fxLayout="column"
+    fxFlexFill
+    fxLayoutGap="10px"
+    class="change-video-track-container"
+  >
+    <!-- Desktop search bar -->
+    <div fxFlex="10" fxHide.xs="true" fxHide.sm="true" fxHide.md="true">
+      <div fxLayout="row">
+        <div fxFlex="5"></div>
+        <div fxFlex="90">
+          <div fxLayout="row" fxFlexFill>
+            <div *ngIf="isSearchPreview" fxFlex="15">
+              <button
+                mat-button
+                class="btn-block btn-lg m-t-20 m-b-20"
+                (click)="cancelVideoSearchPreview()"
+                matTooltip="Back"
+                matTooltipPosition="above"
+              >
+                <mat-icon>arrow_back_ios</mat-icon>
+                Back
+              </button>
+            </div>
+            <div fxFlex="12" fxLayoutAlign="center center" class="m-r-10">
+              <mat-form-field class="full-width">
+                <mat-select
+                  [(ngModel)]="selectedSearchOption"
+                  (selectionChange)="onSearchChange()"
+                >
+                  <mat-option
+                    *ngFor="let searchOption of searchOptions"
+                    [value]="searchOption"
+                  >
+                    {{ searchOption }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div
+              [fxFlex]="isSearchPreview ? 55 : 70"
+              fxLayoutAlign="center center"
+            >
+              <mat-form-field
+                *ngIf="selectedSearchOption == 'SEARCH'"
+                class="full-width"
+              >
+                <input
+                  autocomplete="off"
+                  matInput
+                  placeholder="Search videos from various platforms to launch a party..."
+                  [formControl]="searchKey"
+                  (keydown.enter)="searchVideos(false)"
+                />
+                <span matSuffix>
+                  <mat-icon
+                    style="cursor: pointer;"
+                    (click)="searchVideos(false)"
+                    >search
+                  </mat-icon>
+                </span>
+              </mat-form-field>
+              <mat-form-field
+                *ngIf="selectedSearchOption == 'URL'"
+                class="full-width"
+              >
+                <input
+                  autocomplete="off"
+                  matInput
+                  placeholder="Paste video URL..."
+                  [formControl]="searchURL"
+                  (keydown.enter)="launchByURL()"
+                />
+                <span matSuffix>
+                  <mat-icon style="cursor: pointer;" (click)="launchByURL()"
+                    >navigate_next
+                  </mat-icon>
+                </span>
+              </mat-form-field>
+            </div>
+            <div fxFlex="18" class="m-l-10" fxLayoutAlign="end center">
+              <button
+                *ngIf="selectedSearchOption == 'SEARCH'"
+                class="full-width"
+                mat-raised-button
+                color="primary"
+                class="btn-block btn-lg m-t-20 m-b-20"
+                type="submit"
+                [disabled]="!searchKey.valid"
+                (click)="searchVideos(false)"
+              >
+                Search
+              </button>
+              <button
+                *ngIf="selectedSearchOption == 'URL'"
+                class="full-width"
+                mat-raised-button
+                color="primary"
+                class="btn-block btn-lg m-t-20 m-b-20"
+                type="submit"
+                [disabled]="!searchURL.valid"
+                (click)="launchByURL()"
+              >
+                Fetch preview
+              </button>
+            </div>
+          </div>
+        </div>
+        <div fxFlex="5"></div>
+      </div>
+    </div>
+
+    <!-- Mobile search bar -->
+    <div fxFlex="5" fxHide.lg="true" fxHide.gt-lg="true">
+      <div fxLayout="column">
+        <div fxFlex="85" fxLayoutAlign="center center">
+          <div fxLayout="row" fxFlexFill>
+            <div *ngIf="isSearchPreview" fxFlex="15">
+              <button
+                mat-icon-button
+                class="btn-block btn-lg m-t-20 m-b-20"
+                (click)="cancelVideoSearchPreview()"
+                matTooltip="Back"
+                matTooltipPosition="above"
+              >
+                <mat-icon>arrow_back_ios</mat-icon>
+              </button>
+            </div>
+
+            <!-- search/url input -->
+            <div
+              [fxFlex]="isSearchPreview ? 65 : 80"
+              fxLayoutAlign="start center"
+            >
+              <mat-form-field
+                *ngIf="selectedSearchOption == 'SEARCH'"
+                class="full-width"
+              >
+                <input
+                  autocomplete="off"
+                  matInput
+                  placeholder="Search videos from various platforms to launch a party..."
+                  [formControl]="searchKey"
+                  (keydown.enter)="searchVideos(false)"
+                />
+              </mat-form-field>
+              <mat-form-field
+                *ngIf="selectedSearchOption == 'URL'"
+                class="full-width"
+              >
+                <input
+                  autocomplete="off"
+                  matInput
+                  placeholder="Paste video URL..."
+                  [formControl]="searchURL"
+                  (keydown.enter)="launchByURL()"
+                />
+              </mat-form-field>
+            </div>
+
+            <!-- search/fetch Button -->
+            <div fxFlex="20" fxLayoutAlign="center center">
+              <button
+                *ngIf="selectedSearchOption == 'SEARCH'"
+                class="full-width"
+                mat-icon-button
+                color="primary"
+                class="btn-block btn-lg m-t-20 m-b-20"
+                type="submit"
+                [disabled]="!searchKey.valid"
+                (click)="searchVideos(false)"
+              >
+                <mat-icon style="cursor: pointer;" (click)="searchVideos(false)"
+                  >search
+                </mat-icon>
+              </button>
+              <button
+                *ngIf="selectedSearchOption == 'URL'"
+                class="full-width"
+                mat-icon-button
+                color="primary"
+                class="btn-block btn-lg m-t-20 m-b-20"
+                type="submit"
+                [disabled]="!searchURL.valid"
+                (click)="launchByURL()"
+              >
+                <mat-icon style="cursor: pointer;" (click)="launchByURL()"
+                  >navigate_next
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div fxFlex="15" fxLayoutAlign="start center">
+          <mat-radio-group
+            color="primary"
+            labelPosition="after"
+            [(ngModel)]="selectedSearchOption"
+            (change)="onSearchChange()"
+          >
+            <mat-radio-button value="SEARCH">SEARCH</mat-radio-button>
+            <mat-radio-button value="URL" class="m-l-10">URL</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video list/Preview area -->
+    <div fxFlex.xs="95" fxFlex.gt-xs="95" fxFlex.lg="10" fxFlex.gt-lg="10">
+      <div fxLayout="row" fxFlexFill>
+        <div fxFlex="5"></div>
+        <div fxFlex="90">
+          <ng-template
+            *ngIf="videoSearchList?.length && selectedSearchOption == 'SEARCH'"
+            [ngTemplateOutlet]="videoList"
+          ></ng-template>
+
+          <ng-template
+            *ngIf="selectedSearchOption == 'URL'"
+            [ngTemplateOutlet]="videoPreview"
+          >
+          </ng-template>
+
+          <app-show-message
+            *ngIf="!videoSearchList?.length && !fetchingVideos"
+            [message]="'No videos found!'"
+          >
+          </app-show-message>
+          <app-show-message *ngIf="fetchingVideos" [message]="'Fetching...'">
+          </app-show-message>
+        </div>
+        <div fxFlex="5"></div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close>CLOSE</button>
+
+  <button
+    *ngIf="currentVideoId && !fetchingPreviewVideo"
+    color="black-yellow"
+    mat-raised-button
+    type="submit"
+    (click)="useThisVideo('URL')"
+  >
+    <mat-icon class="material-icons-round">play_arrow</mat-icon>
+    Use This
+  </button>
+</mat-dialog-actions>
+
+<app-progress-spinner
+  [color]="color"
+  [mode]="mode"
+  [value]="value"
+  [backdropEnabled]="true"
+  [positionGloballyCenter]="true"
+  [displayProgressSpinner]="updatingParty"
+></app-progress-spinner>
+
+<!-- Video list STARTS HERE-->
+<ng-template #videoList>
+  <perfect-scrollbar class="video-search-list-contanier">
+    <div fxLayout="column" fxFlexFill>
+      <div fxFlex="100">
+        <div
+          fxLayout="row"
+          fxFlexFill
+          class="video-result m-b-5"
+          *ngFor="let video of videoSearchList; let i = index"
+          (mouseenter)="currentHighlightedVideo = i"
+          (mouseleave)="currentHighlightedVideo = -1"
+          [class.mat-elevation-z24]="currentHighlightedVideo == i"
+          fxLayoutGap="10px"
+        >
+          <!-- Video Thumbnail -->
+          <div
+            fxFlex.xs="60"
+            fxFlex.sm="60"
+            fxFlex.md="40"
+            fxFlex.lg="35"
+            fxFlex.gt-lg="35"
+          >
+            <img
+              class="video-thumbnail"
+              src="{{ video?.snippet?.thumbnails?.medium?.url }}"
+              alt="{{ video?.snippet?.title }}"
+            />
+          </div>
+
+          <!-- Video info -->
+          <div
+            fxFlex.xs="40"
+            fxFlex.sm="55"
+            fxFlex.md="60"
+            fxFlex.lg="65"
+            fxFlex.gt-lg="65"
+          >
+            <div fxLayout="column" fxFlexFill>
+              <div fxFlex="45">
+                <div
+                  class="video-title controlled-text3"
+                  [matTooltip]="video?.snippet?.title"
+                  matTooltipPosition="above"
+                >
+                  {{ video?.snippet?.title }}
+                </div>
+              </div>
+
+              <div fxFlex="35">
+                <div
+                  class="video-details-info"
+                  fxLayout.xs="column"
+                  fxLayout.sm="row"
+                  fxLayout.gt-sm="row"
+                  fxFlexFill
+                >
+                  <div
+                    class="channel-name controlled-text1"
+                    fxFlex="50"
+                    [matTooltip]="video?.snippet?.channelTitle"
+                    matTooltipPosition="above"
+                    fxLayoutAlign="start center"
+                  >
+                    {{ video?.snippet?.channelTitle }}
+                  </div>
+
+                  <div
+                    class="published-at controlled-text1"
+                    fxFlex="50"
+                    fxLayoutAlign="start center"
+                  >
+                    {{ video?.snippet?.publishTime | date }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                fxFlex.xs="20"
+                fxFlex.sm="40"
+                fxFlex.md="40"
+                fxFlex.lg="40"
+                fxFlex.gt-lg="40"
+                fxLayoutAlign.xs="start center"
+                fxLayoutAlign.gt-xs="start center"
+                fxLayoutAlign.lg="end center"
+                fxLayoutAlign.gt-lg="end center"
+              >
+                <div fxLayout="row" fxFlexFill>
+                  <!-- Desktop preview button -->
+                  <div fxFlex="50" fxHide.xs="true">
+                    <button
+                      color="black-blue"
+                      mat-raised-button
+                      type="submit"
+                      (click)="previewThisVideo(video, '')"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                      Preview
+                    </button>
+                  </div>
+
+                  <!-- Mobile preview button -->
+                  <div
+                    fxFlex="50"
+                    fxHide.sm="true"
+                    fxHide.md="true"
+                    fxHide.lg="true"
+                    fxHide.gt-lg="true"
+                    fxLayoutAlign="start center"
+                  >
+                    <button
+                      color="primary"
+                      matTooltip="PREVIEW"
+                      matTooltipPosition="above"
+                      mat-icon-button
+                      type="submit"
+                      (click)="previewThisVideo(video, '')"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- Desktop use this button -->
+                  <div fxFlex="50" fxHide.xs="true">
+                    <button
+                      color="black-yellow"
+                      mat-raised-button
+                      type="submit"
+                      (click)="useThisVideo('SEARCH', video)"
+                    >
+                      <mat-icon class="material-icons-round"
+                        >play_arrow</mat-icon
+                      >
+                      Play this
+                    </button>
+                  </div>
+
+                  <!-- Mobile preview button -->
+                  <div
+                    fxFlex="50"
+                    fxHide.sm="true"
+                    fxHide.md="true"
+                    fxHide.lg="true"
+                    fxHide.gt-lg="true"
+                    fxLayoutAlign="start center"
+                  >
+                    <button
+                      color="yellow"
+                      matTooltip="PLAY THIS"
+                      matTooltipPosition="above"
+                      mat-icon-button
+                      type="submit"
+                      (click)="useThisVideo('SEARCH', video)"
+                    >
+                      <mat-icon class="material-icons-round"
+                        >play_arrow</mat-icon
+                      >
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </perfect-scrollbar>
+</ng-template>
+<!-- Video list ENDS HERE-->
+
+<!-- Video preview STARTS HERE-->
+<ng-template #videoPreview>
+  <mat-card class="card-container party-chat-area-card video-preview-card">
+    <div
+      *ngIf="currentVideoId"
+      [ngClass]="fetchingPreviewVideo ? 'd-none' : ''"
+    >
+      <div id="previewYoutubePlayer"></div>
+    </div>
+    <app-show-message
+      *ngIf="currentVideoId && fetchingPreviewVideo"
+      [message]="'Fetching Preview...'"
+    >
+    </app-show-message>
+
+    <app-show-message *ngIf="!currentVideoId" [message]="'No Preview!'">
+    </app-show-message>
+  </mat-card>
+</ng-template>
+<!-- Video preview ENDS HERE-->

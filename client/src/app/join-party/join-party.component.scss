@@ -1,0 +1,23 @@
+.party-card {
+  .video-thumbnail {
+    width: 200px;
+  }
+  .party-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .all-participants {
+    font-weight: 500;
+    .guests-label {
+      font-size: 16px;
+      color: #3f51b5;
+    }
+  }
+  .party-duration {
+    font-weight: 500;
+    .duration-label {
+      font-size: 16px;
+      color: #3f51b5;
+    }
+  }
+}

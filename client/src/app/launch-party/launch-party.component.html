@@ -1,0 +1,227 @@
+<div fxLayout="column" fxFlexFill>
+  <div fxFlex="100">
+    <div fxLayout="row wrap" class="m-t-40">
+      <div
+        fxFlex.gt-lg="20"
+        fxFlex.gt-md="15"
+        fxFlex.gt-xs="0"
+        fxFlex="0"
+      ></div>
+      <div fxFlex.gt-lg="60" fxFlex.gt-md="70" fxFlex.gt-xs="100" fxFlex="100">
+        <mat-card>
+          <mat-tab-group (selectedIndexChange)="switchTabs($event)">
+            <mat-tab label="Launch Now" [disabled]="launchingParty">
+              <ng-template matTabContent>
+                <mat-card-content>
+                  <div class="d-flex">
+                    <form [formGroup]="partyForm" class="m-t-10">
+                      <div fxLayout="row wrap">
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <mat-form-field class="full-width">
+                            <mat-label>Party title</mat-label>
+                            <input
+                              autocomplete="off"
+                              matInput
+                              placeholder="Bahubali 2: The conclusion with friends"
+                              [formControl]="partyForm.controls['title']"
+                            />
+                          </mat-form-field>
+                        </div>
+
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <mat-form-field class="full-width">
+                            <mat-chip-list
+                              #chipList
+                              aria-label="Guest selection"
+                            >
+                              <mat-chip
+                                *ngFor="
+                                  let guest of partyForm.controls['guests']
+                                    .value
+                                "
+                                [selectable]="true"
+                                [removable]="true"
+                                (removed)="remove(guest._id)"
+                              >
+                                {{ guest.fullName }}
+                                <mat-icon matChipRemove>cancel</mat-icon>
+                              </mat-chip>
+                              <input
+                                placeholder="Add guests to this party"
+                                #guestInput
+                                [formControl]="
+                                  partyForm.controls['guestSearch']
+                                "
+                                [matAutocomplete]="auto"
+                                [matChipInputFor]="chipList"
+                                [matChipInputSeparatorKeyCodes]="
+                                  separatorKeysCodes
+                                "
+                                (matChipInputTokenEnd)="add($event)"
+                              />
+                            </mat-chip-list>
+                            <mat-autocomplete
+                              #auto="matAutocomplete"
+                              (optionSelected)="selected($event)"
+                            >
+                              <mat-option
+                                *ngFor="let user of filteredUsers | async"
+                                [value]="user"
+                              >
+                                {{ user.fullName }}
+                              </mat-option>
+                            </mat-autocomplete>
+                          </mat-form-field>
+                        </div>
+
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <button
+                            mat-raised-button
+                            color="launch"
+                            type="submit"
+                            class="launch-party"
+                            [disabled]="launchingParty"
+                            (click)="launchParty()"
+                          >
+                            LAUNCH PARTY
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </mat-card-content>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="Schedule For Later" [disabled]="launchingParty">
+              <ng-template matTabContent>
+                <mat-card-content>
+                  <div class="d-flex">
+                    <form [formGroup]="partyForm" class="m-t-10">
+                      <div fxLayout="row wrap">
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <mat-form-field class="full-width">
+                            <mat-label>Party title</mat-label>
+                            <input
+                              autocomplete="off"
+                              matInput
+                              placeholder="Bahubali 2: The conclusion with friends"
+                              [formControl]="partyForm.controls['title']"
+                            />
+                          </mat-form-field>
+                        </div>
+
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <mat-form-field class="full-width">
+                            <input
+                              autocomplete="off"
+                              matInput
+                              placeholder="Let guests know about the party time..."
+                              [formControl]="
+                                partyForm.controls['scheduledDate']
+                              "
+                            />
+                            <span [owlDateTimeTrigger]="dt2" matSuffix>
+                              <mat-icon>calendar_today</mat-icon>
+                            </span>
+                            <input
+                              [owlDateTime]="dt2"
+                              class="schedule-button"
+                              [min]="currentTime"
+                              (dateTimeInput)="setScheuledDate($event)"
+                            />
+                            <owl-date-time #dt2></owl-date-time>
+                            <small
+                              *ngIf="
+                                !partyForm.controls['scheduledDate']?.value &&
+                                partyForm.controls['scheduledDate'].touched
+                              "
+                              class="text-danger support-text"
+                              >Party time is required</small
+                            >
+                          </mat-form-field>
+                        </div>
+
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <mat-form-field class="full-width">
+                            <mat-chip-list
+                              #chipList
+                              aria-label="Guest selection"
+                            >
+                              <mat-chip
+                                *ngFor="
+                                  let guest of partyForm.controls['guests']
+                                    .value
+                                "
+                                [selectable]="true"
+                                [removable]="true"
+                                (removed)="remove(guest._id)"
+                              >
+                                {{ guest.fullName }}
+                                <mat-icon matChipRemove>cancel</mat-icon>
+                              </mat-chip>
+                              <input
+                                placeholder="Add guests to this party"
+                                #guestInput
+                                [formControl]="
+                                  partyForm.controls['guestSearch']
+                                "
+                                [matAutocomplete]="auto"
+                                [matChipInputFor]="chipList"
+                                [matChipInputSeparatorKeyCodes]="
+                                  separatorKeysCodes
+                                "
+                                (matChipInputTokenEnd)="add($event)"
+                              />
+                            </mat-chip-list>
+                            <mat-autocomplete
+                              #auto="matAutocomplete"
+                              (optionSelected)="selected($event)"
+                            >
+                              <mat-option
+                                *ngFor="let user of filteredUsers | async"
+                                [value]="user"
+                              >
+                                {{ user.fullName }}
+                              </mat-option>
+                            </mat-autocomplete>
+                          </mat-form-field>
+                        </div>
+
+                        <div fxFlex.gt-sm="100" fxFlex="100">
+                          <button
+                            mat-raised-button
+                            color="schedule"
+                            class="launch-party"
+                            [disabled]="launchingParty"
+                            (click)="launchParty()"
+                          >
+                            SCHEDULE
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </mat-card-content>
+              </ng-template>
+            </mat-tab>
+          </mat-tab-group>
+        </mat-card>
+      </div>
+      <div
+        fxFlex.gt-lg="20"
+        fxFlex.gt-md="15"
+        fxFlex.gt-xs="0"
+        fxFlex="0"
+      ></div>
+    </div>
+  </div>
+</div>
+
+<app-progress-spinner
+  [color]="color"
+  [mode]="mode"
+  [value]="value"
+  [backdropEnabled]="true"
+  [positionGloballyCenter]="true"
+  [displayProgressSpinner]="displayProgressSpinner"
+></app-progress-spinner>

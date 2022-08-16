@@ -1,0 +1,75 @@
+<div
+  fxLayout="column"
+  class="video-result-card cursor-pointer"
+  matRipple
+  [matRippleCentered]="false"
+  (click)="createParty()"
+  fxFlexFill
+>
+  <div
+    fxFlex="75"
+    fxLayoutAlign="center center"
+    class="video-card"
+    matTooltip="Use this video for party"
+    matTooltipPosition="above"
+  >
+    <img
+      class="video-thumbnail"
+      src="{{ videoData?.snippet?.thumbnails?.medium?.url }}"
+      alt="{{ videoData?.snippet?.title }}"
+    />
+    <img class="play-icon" src="../../assets/images/yt-pl-btn.png" />
+  </div>
+  <div fxFlex="25" class="video-details">
+    <div fxLayout="row" fxFlexFill>
+      <div fxFlex="10" fxLayoutAlign="center center">
+        <button
+          class="preview-btn"
+          mat-icon-button
+          color="primary"
+          matTooltip="PREVIEW"
+          matTooltipPosition="above"
+          (click)="previewThisVideo(videoData, '')"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+      <div fxFlex="90" class="m-l-10">
+        <div fxLayout="column" fxFlexFill>
+          <div fxFlex="65">
+            <div
+              class="video-title controlled-text2"
+              [matTooltip]="videoData?.snippet?.title"
+              matTooltipPosition="above"
+            >
+              {{ videoData?.snippet?.title }}
+            </div>
+          </div>
+          <div fxFlex="35">
+            <div class="video-details-info">
+              <div
+                class="channel-name"
+                [matTooltip]="videoData?.snippet?.channelTitle"
+                matTooltipPosition="above"
+              >
+                {{ videoData?.snippet?.channelTitle | controlText: 15 }}
+              </div>
+              <span>*</span>
+              <div class="published-at">
+                {{ videoData?.snippet?.publishTime | date }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- channelId: "UCqwUrj10mAEsqezcItqvwEw"
+channelTitle: "BB Ki Vines"
+description: "Bhuvan Bam releases his 7th Single 'Heer Ranjha'. You often miss your partner, don't you? You can listen to Heer Ranjha on any streaming platform by just ..."
+liveBroadcastContent: "none"
+publishTime: "2020-07-12T06:30:02Z"
+publishedAt: "2020-07-12T06:30:02Z"
+thumbnails -->

@@ -1,0 +1,126 @@
+<div fxLayout="column" fxFlexFill>
+  <div fxFlex="100">
+    <perfect-scrollbar style="height: 200px;">
+      <div fxLayout="column" fxFlexFill>
+        <div
+          [fxFlex]="flexWeight"
+          *ngFor="let question of feedbackQuestions; let i = index"
+          (mouseenter)="currentHighlightedQuestion = i"
+          (mouseleave)="currentHighlightedQuestion = -1"
+          class="m-t-10"
+        >
+          <mat-card
+            class="card-container"
+            [class.mat-elevation-z24]="currentHighlightedQuestion == i"
+          >
+            <div fxLayout="column" fxFlexFill>
+              <h3 class="question-title">{{ question?.title }}</h3>
+              <div
+                *ngIf="question?.questionType == 'rating'"
+                fxFlex="50"
+                class="m-t-5"
+              >
+                <div
+                  fxLayout.xs="column"
+                  fxLayout.sm="column"
+                  fxLayout.md="column"
+                  fxLayout.lg="row"
+                  fxLayout.gt-lg="row"
+                  fxFlexFill
+                >
+                  <div fxFlex="30" fxLayoutAlign="start">
+                    {{ question?.lowerLimitValue }}
+                  </div>
+                  <div
+                    fxFlex="40"
+                    fxHide.xs="true"
+                    fxHide.sm="true"
+                    fxHide.md="true"
+                    fxLayoutAlign="center center"
+                  >
+                    <mat-radio-group
+                      color="primary"
+                      labelPosition="before"
+                      [(ngModel)]="question.response"
+                      (change)="triggerChangeInResponse()"
+                    >
+                      <mat-radio-button value="1">1</mat-radio-button>
+                      <mat-radio-button value="2" class="m-l-10"
+                        >2</mat-radio-button
+                      >
+                      <mat-radio-button value="3" class="m-l-10"
+                        >3</mat-radio-button
+                      >
+                      <mat-radio-button value="4" class="m-l-10"
+                        >4</mat-radio-button
+                      >
+                      <mat-radio-button value="5" class="m-l-10"
+                        >5</mat-radio-button
+                      >
+                    </mat-radio-group>
+                  </div>
+                  <div
+                    fxFlex="40"
+                    fxHide.lg="true"
+                    fxHide.gt-lg="true"
+                    fxLayoutAlign="center center"
+                  >
+                    <mat-radio-group
+                      color="primary"
+                      labelPosition="before"
+                      [(ngModel)]="question.response"
+                      (change)="triggerChangeInResponse()"
+                    >
+                      <mat-radio-button value="1" class="small-radio"
+                        >1</mat-radio-button
+                      >
+                      <mat-radio-button value="2" class="small-radio"
+                        >2</mat-radio-button
+                      >
+                      <mat-radio-button value="3" class="small-radio"
+                        >3</mat-radio-button
+                      >
+                      <mat-radio-button value="4" class="small-radio"
+                        >4</mat-radio-button
+                      >
+                      <mat-radio-button value="5" class="small-radio"
+                        >5</mat-radio-button
+                      >
+                    </mat-radio-group>
+                  </div>
+                  <div
+                    fxFlex="30"
+                    fxLayoutAlign.xs="start center"
+                    fxLayoutAlign.sm="start center"
+                    fxLayoutAlign.md="start center"
+                    fxLayoutAlign.lg="end center"
+                    fxLayoutAlign.gt-lg="end center"
+                  >
+                    {{ question?.higherLimitValue }}
+                  </div>
+                </div>
+              </div>
+              <div
+                *ngIf="question?.questionType == 'description'"
+                fxFlex="75"
+                class="m-t-5"
+              >
+                <form class="example-form">
+                  <mat-form-field class="full-width">
+                    <mat-label>Enter your response</mat-label>
+                    <textarea
+                      name="response"
+                      matInput
+                      [(ngModel)]="question.response"
+                      (input)="triggerChangeInResponse()"
+                    ></textarea>
+                  </mat-form-field>
+                </form>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </perfect-scrollbar>
+  </div>
+</div>

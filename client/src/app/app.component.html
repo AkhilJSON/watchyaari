@@ -1,0 +1,123 @@
+<div fxLayout="column" fxFlexFill style="height: 100vh;">
+  <div *ngIf="!fullScreenMode" fxFlex="10" fxLayoutAlign="center center">
+    <mat-toolbar color="black" class="topbar telative">
+      <mat-toolbar-row>
+        <div class="navbar-header">
+          <a class="navbar-brand yaari-blue" [routerLink]="'/'">
+            <b>
+              WatchYaari
+            </b>
+            <sup>[BETA]</sup>
+          </a>
+        </div>
+
+        <button
+          mat-icon-button
+          (click)="sidenav.toggle()"
+          style="color: white;"
+          fxShow="true"
+          fxHide.gt-sm="true"
+          class="m-l-5"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <nav mat-tab-nav-bar fxShow="true" fxHide.lt-md="true" class="m-l-20">
+          <a
+            mat-tab-link
+            *ngFor="let link of navLinks"
+            [routerLink]="link.link"
+            routerLinkActive
+            #rla="routerLinkActive"
+            [active]="link.index == activeLinkIndex() ? true : false"
+            style="color: white;"
+          >
+            {{ link.label }}
+          </a>
+        </nav>
+
+        <span class="example-spacer"></span>
+
+        <button
+          *ngIf="isUserLoggedIn"
+          mat-fab
+          color="primary"
+          [matMenuTriggerFor]="profile"
+          fxShow="true"
+          fxHide.lt-md="true"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #profile="matMenu" class="mymegamenu">
+          <button mat-menu-item routerLink="myAccount/profile">
+            <mat-icon>account_box</mat-icon>My Profile
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>Logout
+          </button>
+        </mat-menu>
+        <button
+          *ngIf="!isUserLoggedIn"
+          mat-stroked-button
+          color="blue-border"
+          (click)="openDialog(); sidenav.close()"
+          class="f-10"
+        >
+          Login/Signup
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+  </div>
+  <div [fxFlex]="fullScreenMode ? 100 : 90" fxLayoutAlign="center center">
+    <mat-sidenav-container fxFlexFill autosize>
+      <mat-sidenav
+        #sidenav
+        id="snav"
+        class="pl-xs"
+        [mode]="mobileQuery.matches ? 'side' : 'over'"
+        fixedTopGap="0"
+        [opened]="!mobileQuery.matches"
+        [disableClose]="mobileQuery.matches"
+        (open)="sidebarOpened = true"
+        (close)="sidebarOpened = false"
+      >
+        <button
+          *ngIf="isUserLoggedIn"
+          mat-stroked-button
+          color="primary"
+          [matMenuTriggerFor]="profile"
+          class="m-l-10 m-t-10"
+        >
+          My Account
+        </button>
+        <mat-menu #profile="matMenu" class="mymegamenu">
+          <button
+            mat-menu-item
+            (click)="sidenav.toggle()"
+            routerLink="myAccount/profile"
+          >
+            <mat-icon>account_box</mat-icon>My Profile
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>Logout
+          </button>
+        </mat-menu>
+
+        <mat-nav-list>
+          <mat-list-item
+            *ngFor="let link of navLinks"
+            [routerLink]="link.link"
+            routerLinkActive
+            #rla="routerLinkActive"
+            (click)="sidenav.toggle()"
+          >
+            <span>{{ link.label }}</span>
+          </mat-list-item>
+        </mat-nav-list>
+      </mat-sidenav>
+      <mat-sidenav-content fxFlexFill>
+        <router-outlet> </router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

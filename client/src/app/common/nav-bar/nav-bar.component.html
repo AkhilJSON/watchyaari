@@ -1,0 +1,50 @@
+<mat-toolbar color="black">
+  <mat-toolbar-row>
+    <button
+      mat-menu-item
+      (click)="removeCurrentPartySession()"
+      style="width: 10%;"
+    >
+      <mat-icon color="primary">home</mat-icon>
+    </button>
+
+    <nav mat-tab-nav-bar>
+      <a
+        mat-tab-link
+        *ngFor="let link of navLinks"
+        [routerLink]="link.link"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [active]="link.index == activeLinkIndex ? true : false"
+        style="color: white;"
+      >
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <span class="example-spacer"></span>
+
+    <button
+      *ngIf="isUserLoggedIn"
+      mat-fab
+      color="primary"
+      [matMenuTriggerFor]="profile"
+    >
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #profile="matMenu" class="mymegamenu">
+      <button mat-menu-item><mat-icon>account_box</mat-icon>My Profile</button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>Logout
+      </button>
+    </mat-menu>
+    <button
+      *ngIf="!isUserLoggedIn"
+      mat-raised-button
+      color="primary"
+      (click)="openDialog()"
+    >
+      Login / Signup
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>

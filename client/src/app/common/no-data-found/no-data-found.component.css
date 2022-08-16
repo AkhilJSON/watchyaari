@@ -1,0 +1,21 @@
+.continue {
+  cursor: pointer;
+  color: white;
+  font-weight: 500;
+  font-size: 18px;
+  text-decoration: none;
+}
+.go-back {
+  cursor: pointer;
+  color: grey;
+  font-weight: 500;
+  font-size: 18px;
+  text-decoration: none;
+}
+.refresh {
+  cursor: pointer;
+  color: blue;
+  font-weight: 500;
+  font-size: 18px;
+  text-decoration: none;
+}

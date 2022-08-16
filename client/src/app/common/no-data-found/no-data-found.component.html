@@ -1,0 +1,36 @@
+<div fxLayout="column" fxFlexFill>
+  <div fxFlex="30"></div>
+  <div fxFlex="40">
+    <div fxLayout="column" fxFlexFill>
+      <div fxFlex="50" fxLayoutAlign="center center">
+        <span [ngClass]="className">{{ message }}</span>
+      </div>
+      <div fxFlex="25" fxLayoutAlign="center center">
+        <label
+          class="continue"
+          *ngIf="
+            actionLabel?.length && actionLabel == 'ACTIVE_PARTY_LIMIT_EXCEEDED'
+          "
+          (click)="closeOtherPartySessions()"
+        >
+          Contiue
+        </label>
+        <label
+          class="go-back m-l-10"
+          *ngIf="showHomePageNavigation"
+          (click)="goback()"
+        >
+          Go back
+        </label>
+        <label
+          class="refresh m-l-10"
+          *ngIf="showHomePageNavigation"
+          (click)="reloadPage($event)"
+        >
+          Refresh
+        </label>
+      </div>
+    </div>
+  </div>
+  <div fxFlex="30"></div>
+</div>

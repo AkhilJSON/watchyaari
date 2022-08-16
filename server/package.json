@@ -1,0 +1,50 @@
+{
+  "name": "watch-party-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkhilJSON/watch-party-be.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AkhilJSON/watch-party-be/issues"
+  },
+  "homepage": "https://github.com/AkhilJSON/watch-party-be#readme",
+  "dependencies": {
+    "async": "^3.2.0",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
+    "body": "^5.1.0",
+    "btoa": "^1.2.1",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^4.0.4",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.9.11",
+    "multer": "^1.4.2",
+    "node-static": "^0.7.11",
+    "nodemon": "^2.0.3",
+    "noogger": "^0.1.8",
+    "os": "^0.1.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "path": "^0.12.7",
+    "randomstring": "^1.1.5",
+    "redis": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "socket.io-redis": "^5.2.0",
+    "socketio-auth": "^0.1.1",
+    "superagent": "^5.2.2"
+  }
+}

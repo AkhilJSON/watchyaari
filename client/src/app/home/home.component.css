@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Float four columns side by side */
+.video-column {
+  float: left;
+  width: 25%;
+  padding: 0 10px;
+  /* max-width: 340px; */
+  height: 280px;
+}
+
+/* Remove extra left and right margins, due to padding */
+.video-row {
+  /* margin: 0 -5px; */
+}
+
+.video-row {
+  margin: 0 -5px;
+}
+
+/* Clear floats after the columns */
+/* Responsive columns */
+
+.video-row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media screen and (max-width: 1200px) {
+  .video-column {
+    width: 33%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .video-column {
+    width: 50%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .video-column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}

@@ -1,0 +1,773 @@
+<div fxLayout="column" fxFlexFill class="party-area-container">
+  <div [fxFlex]="100">
+    <div
+      *ngIf="partyAreaStatus()?.message == 'ACTIVE'"
+      fxLayout.xs="column"
+      fxLayout.sm="column"
+      fxLayout.md="column"
+      fxLayout.lg="row"
+      fxLayout.gt-lg="row"
+      fxFlexFill
+    >
+      <!-- Party VIDEO PLAYER Section -->
+      <div
+        fxFlex.xs="35"
+        fxFlex.sm="45"
+        fxFlex.md="50"
+        fxFlex.lg="70"
+        fxFlex.gt-lg="70"
+        class="m-5"
+      >
+        <div fxLayout="column" fxFlexFill>
+          <!-- Video player -->
+          <div
+            [fxFlex.xs]="showMoreVideoControlOptions ? 82 : 90"
+            [fxFlex.sm]="showMoreVideoControlOptions ? 82 : 90"
+            [fxFlex.md]="showMoreVideoControlOptions ? 82 : 90"
+            [fxFlex.lg]="92"
+            [fxFlex.gt-lg]="92"
+          >
+            <mat-card class="card-container party-player-card">
+              <div
+                *ngIf="
+                  partyData?.videoId &&
+                  userSessionAuthenticated == 'authenticated'
+                "
+              >
+                <app-youtube-player
+                  [videoId]="partyData?.videoId"
+                  (onPlayerReady)="onYTPlayerReady($event)"
+                  (onPlayerStateChange)="onYTStateChange($event)"
+                >
+                </app-youtube-player>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Seek bar -->
+          <div
+            [fxFlex.xs]="showMoreVideoControlOptions ? 14 : 10"
+            [fxFlex.sm]="showMoreVideoControlOptions ? 14 : 10"
+            [fxFlex.md]="showMoreVideoControlOptions ? 14 : 10"
+            fxFlex.lg="4"
+            fxFlex.gt-lg="4"
+          >
+            <div *ngIf="!isSmallScreenMode" fxLayout="row" fxFlexFill>
+              <div fxFlex="5" fxLayoutAlign="center center">
+                <span class="f-10">{{
+                  currentSeek | secondsToTimeString
+                }}</span>
+              </div>
+              <div
+                fxFlex="90"
+                class="party-player-seekbar"
+                fxLayoutAlign="center center"
+              >
+                <!-- Video seekbar -->
+                <ng-template [ngTemplateOutlet]="videoSeekbar"></ng-template>
+              </div>
+              <div fxFlex="5" fxLayoutAlign="center center">
+                <span class="f-10">{{
+                  totalVideoDuration | secondsToTimeString
+                }}</span>
+              </div>
+            </div>
+
+            <div *ngIf="isSmallScreenMode" fxLayout="row" fxFlexFill>
+              <!-- Video duration -->
+              <div
+                fxFlex.xs="25"
+                fxFlex.gt-xs="20"
+                fxLayoutAlign="start center"
+              >
+                <span class="f-10"
+                  >{{ currentSeek | secondsToTimeString }} /
+                  {{ totalVideoDuration | secondsToTimeString }}</span
+                >
+              </div>
+
+              <!-- Video seekbar -->
+              <div
+                fxFlex.xs="35"
+                fxFlex.gt-xs="40"
+                class="party-player-seekbar"
+                fxLayoutAlign="start center"
+              >
+                <!-- Video seekbar -->
+                <ng-template [ngTemplateOutlet]="videoSeekbar"></ng-template>
+              </div>
+
+              <div fxFlex="40" class="m-l-10" fxLayoutAlign="end center">
+                <!-- Sync button -->
+                <ng-template [ngTemplateOutlet]="syncButton"></ng-template>
+
+                <!-- Manage guests button -->
+                <ng-template [ngTemplateOutlet]="addOrViewParticipants">
+                </ng-template>
+
+                <!-- Exit Party button -->
+                <ng-template [ngTemplateOutlet]="exitPartyButton"></ng-template>
+
+                <!-- Show more action buttons -->
+                <button
+                  mat-icon-button
+                  [matTooltip]="showMoreVideoControlOptions ? 'LESS' : 'MORE'"
+                  matTooltipPosition="above"
+                  (click)="
+                    showMoreVideoControlOptions = !showMoreVideoControlOptions
+                  "
+                >
+                  <mat-icon class="material-icons-round">
+                    {{
+                      showMoreVideoControlOptions
+                        ? "unfold_less"
+                        : "unfold_more"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Party controls -->
+          <div
+            *ngIf="
+              !isSmallScreenMode ||
+              (isSmallScreenMode && showMoreVideoControlOptions)
+            "
+            [ngClass]="
+              isSmallScreenMode && showMoreVideoControlOptions ? 'm-t-10 ' : ''
+            "
+            fxFlex="4"
+          >
+            <ng-template [ngTemplateOutlet]="partyControlsBlock"></ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Party CHAT AREA Section -->
+      <div
+        fxFlex.xs="65"
+        fxFlex.sm="55"
+        fxFlex.md="50"
+        fxFlex.lg="30"
+        fxFlex.gt-lg="30"
+        class="m-t-5 m-b-5"
+      >
+        <!-- Desktop Chat area -->
+        <div
+          *ngIf="!isSmallScreenMode"
+          fxLayout="column"
+          fxFlexFill
+          fxLayoutGap="5px"
+        >
+          <!-- Party Exit/End controls DESKTOP MODE-->
+          <div fxFlex.lg="5" fxFlex.gt-lg="5">
+            <mat-card class="card-container bg-black">
+              <div fxLayout="column" fxFlexFill>
+                <!-- <div *ngIf="isHostSession" class="timer">{{partyTimer}}</div> -->
+                <div fxFlex="100" fxLayoutAlign="end center">
+                  <button
+                    mat-button
+                    color="white"
+                    (click)="exitParty()"
+                    matTooltip="EXIT PARTY"
+                    matTooltipPosition="above"
+                  >
+                    <mat-icon class="material-icons-round"
+                      >exit_to_app</mat-icon
+                    >
+                    EXIT PARTY
+                  </button>
+                  <button
+                    *ngIf="isHost"
+                    mat-button
+                    color="warn"
+                    (click)="endParty()"
+                    matTooltip="END PARTY"
+                    matTooltipPosition="above"
+                  >
+                    <mat-icon class="material-icons-round"
+                      >not_interested</mat-icon
+                    >
+                    END PARTY
+                  </button>
+                </div>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Video chat block -->
+          <div
+            [fxFlex.xs]="100"
+            [fxFlex.sm]="100"
+            [fxFlex.md]="100"
+            [fxFlex.lg]="videoAreaLayout"
+            [fxFlex.gt-lg]="videoAreaLayout"
+          >
+            <ng-template [ngTemplateOutlet]="videoChatArea"></ng-template>
+          </div>
+
+          <!-- Text chat block -->
+          <div
+            fxHide.xs="true"
+            fxHide.sm="true"
+            fxHide.md="true"
+            [fxFlex]="chatAreaLayout"
+          >
+            <app-party-chat
+              *ngIf="userSessionAuthenticated == 'authenticated'"
+              [partyId]="partyId"
+              [otherParticipants]="otherParticipants()"
+              (onChatResize)="resizeTheLayout($event)"
+            >
+            </app-party-chat>
+          </div>
+        </div>
+
+        <!-- Smaller devices Chat area -->
+        <div
+          *ngIf="isSmallScreenMode"
+          fxLayout="column"
+          fxFlexFill
+          fxLayoutGap="5px"
+        >
+          <!-- If user selects video chat area -->
+          <div fxFlex="96" [ngClass]="chatPreference == 'text' ? 'd-none' : ''">
+            <ng-template [ngTemplateOutlet]="videoChatArea"></ng-template>
+          </div>
+
+          <!-- If user selects text chat area -->
+          <div
+            fxFlex="96"
+            [ngClass]="chatPreference == 'video' ? 'd-none' : ''"
+          >
+            <app-party-chat
+              *ngIf="
+                chatPreference == 'text' &&
+                userSessionAuthenticated == 'authenticated'
+              "
+              [partyId]="partyId"
+              [otherParticipants]="otherParticipants()"
+              (onChatResize)="resizeTheLayout($event)"
+            >
+            </app-party-chat>
+          </div>
+
+          <div fxFlex="4" fxLayoutAlign="center center">
+            <button
+              mat-button
+              [matTooltip]="
+                chatPreference == 'video' ? 'VIDEO CHAT' : 'TEXT CHAT'
+              "
+              matTooltipPosition="above"
+              (click)="toggleChatInSmallScreens()"
+            >
+              <mat-icon class="material-icons-round">
+                {{ chatPreference == "video" ? "chat" : "videocam" }}
+              </mat-icon>
+              SWITCH TO {{ chatPreference == "video" ? "TEXT" : "VIDEO" }} CHAT
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-show-message
+      *ngIf="partyAreaStatus()?.message != 'ACTIVE'"
+      [message]="partyAreaStatus()?.message"
+      [actionLabel]="partyAreaStatus()?.action"
+      [showHomePageNavigation]="true"
+      (onCloseOtherPartySessions)="closeOtherPartySessions($event)"
+    ></app-show-message>
+  </div>
+</div>
+
+<app-progress-spinner
+  [color]="color"
+  [mode]="mode"
+  [value]="value"
+  [backdropEnabled]="true"
+  [positionGloballyCenter]="true"
+  [displayProgressSpinner]="displayProgressSpinner"
+></app-progress-spinner>
+
+<!-- Party & video controls -->
+<ng-template #partyControlsBlock>
+  <!-- <mat-card class="card-container party-controls-card"> -->
+  <div fxLayout="row" fxFlexFill>
+    <div fxFlex="20" fxLayoutAlign="start center">
+      <!-- Play/Pause button -->
+      <button
+        *ngIf="isHost || isCoHost"
+        mat-icon-button
+        (click)="takeActionOnVideo(partyPlayerStatus?.label)"
+      >
+        <mat-icon class="material-icons-round">{{
+          partyPlayerStatus?.icon
+        }}</mat-icon>
+      </button>
+
+      <!-- Volume controls -->
+      <div
+        (mouseover)="volumeButton.showVolume = true"
+        (mouseleave)="volumeButton.showVolume = false"
+      >
+        <button
+          mat-icon-button
+          [matTooltip]="volumeButton?.label"
+          matTooltipPosition="above"
+          (click)="changeVolumeState()"
+        >
+          <mat-icon class="material-icons-round">
+            {{ volumeButton?.icon }}</mat-icon
+          >
+        </button>
+        <div
+          *ngIf="volumeButton?.showVolume"
+          fxFlex="95"
+          fxLayoutAlign="start center"
+          class="volume-horizontal-controls"
+        >
+          <mat-slider
+            thumbLabel="true"
+            color="primary"
+            [max]="100"
+            min="0"
+            step="1"
+            [(ngModel)]="volumeButton.volume"
+            (input)="changeVolume($event)"
+          >
+          </mat-slider>
+        </div>
+      </div>
+    </div>
+    <div fxFlex="80" fxLayoutAlign="end center">
+      <!-- Sync button -->
+      <ng-template
+        *ngIf="!isSmallScreenMode"
+        [ngTemplateOutlet]="syncButton"
+      ></ng-template>
+
+      <!-- Change video button -->
+      <button
+        mat-icon-button
+        color="primary"
+        class="change-video-track"
+        matTooltip="CHANGE VIDEO"
+        (click)="openChangeVideoModal()"
+        matTooltipPosition="above"
+      >
+        <mat-icon class="material-icons-round">queue</mat-icon>
+      </button>
+
+      <!-- Copy invite url button -->
+      <button
+        mat-icon-button
+        color="yellow"
+        class="copy-invite-url"
+        [cdkCopyToClipboard]="partyInviteURL"
+        (click)="onCopyingInviteURL()"
+        matTooltip="COPY INVITE URL"
+        matTooltipPosition="above"
+      >
+        <mat-icon class="material-icons-round">content_copy</mat-icon>
+      </button>
+
+      <!-- Manage guests button -->
+      <ng-template
+        *ngIf="!isSmallScreenMode"
+        [ngTemplateOutlet]="addOrViewParticipants"
+      ></ng-template>
+
+      <!-- Lock/Unlock party room button -->
+      <button
+        *ngIf="isHost"
+        mat-icon-button
+        (click)="togglePartyPrivacy()"
+        [matTooltip]="
+          partyData?.isPrivate
+            ? 'CHANGE TO PUBLIC ROOM'
+            : 'CHANGE TO PRIVATE ROOM'
+        "
+        [disabled]="updatingPartyPrivacy"
+      >
+        <mat-icon
+          class="material-icons-round"
+          *ngIf="!updatingPartyPrivacy && partyData?.isPrivate"
+          >lock
+        </mat-icon>
+        <mat-icon
+          class="material-icons-round"
+          *ngIf="!updatingPartyPrivacy && !partyData?.isPrivate"
+        >
+          lock_open</mat-icon
+        >
+        <mat-icon
+          class="material-icons-round"
+          *ngIf="updatingPartyPrivacy"
+          class="spin"
+          color="white"
+        >
+          loop</mat-icon
+        >
+      </button>
+
+      <!-- Party full screen button -->
+      <button
+        mat-icon-button
+        class="change-video-track"
+        [matTooltip]="!fullScreen ? 'ENTER FULLSCREEN' : 'EXIT FULLSCREEN'"
+        (click)="toggleFullScreen()"
+        matTooltipPosition="above"
+      >
+        <mat-icon class="material-icons-round" *ngIf="fullScreen"
+          >fullscreen_exit</mat-icon
+        >
+        <mat-icon class="material-icons-round" *ngIf="!fullScreen"
+          >fullscreen</mat-icon
+        >
+      </button>
+
+      <!-- End party button -->
+      <button
+        *ngIf="isHost && isSmallScreenMode"
+        mat-icon-button
+        color="warn"
+        (click)="endParty()"
+        matTooltip="END PARTY"
+        matTooltipPosition="above"
+      >
+        <mat-icon class="material-icons-round">not_interested</mat-icon>
+      </button>
+    </div>
+  </div>
+  <!-- </mat-card> -->
+</ng-template>
+
+<!-- Video chat area -->
+<ng-template #videoChatArea>
+  <mat-card class="card-container party-chat-area-card bg-black">
+    <mat-grid-list
+      cols="4"
+      rowHeight="fit"
+      class="party-video-chat-area-grid-list"
+    >
+      <mat-grid-tile
+        *ngFor="let participant of allParticipants; let i = index"
+        [colspan]="participant.cols"
+        [rowspan]="participant.rows"
+        (mouseover)="showVideoControls = i"
+        (mouseleave)="showVideoControls = -1"
+      >
+        <div fxLayout="column" fxFlexFill>
+          <div [fxFlex]="100" fxLayoutAlign="center center">
+            <div fxLayout="column" fxFlexFill>
+              <div
+                fxFlex="100"
+                fxLayoutAlign="center center"
+                class="video-area-card"
+              >
+                <!-- Show if video is enabled -->
+                <video
+                  *ngIf="participant?.hasVideo || participant?.hasAudio"
+                  autoplay
+                  playsinline
+                  [muted]="participant?.loggedInUser ? true : false"
+                  id="{{ participant?.userId }}"
+                  [ngClass]="
+                    (participant?.loggedInUser && !localVideoEnabled) ||
+                    (!participant?.loggedInUser &&
+                      !participant?.hasVideo &&
+                      participant?.hasAudio)
+                      ? 'd-none'
+                      : ''
+                  "
+                ></video>
+
+                <div class="name-label">
+                  <mat-icon
+                    *ngIf="!participant?.loggedInUser"
+                    [color]="participant?.online ? 'green' : 'offline'"
+                    [inline]="true"
+                    class="f-10 cursor-pointer m-r-5 material-icons-round"
+                    [matTooltip]="participant?.online ? 'ONLINE' : 'OFFLINE'"
+                    matTooltipPosition="above"
+                  >
+                    stop_circle
+                  </mat-icon>
+
+                  <!-- participant name label-->
+                  <label
+                    class="label label-light-primary"
+                    [matTooltip]="participant?.name"
+                    matTooltipPosition="above"
+                  >
+                    {{
+                      (participant?.loggedInUser ? "YOU" : participant?.name)
+                        | controlText: 8
+                    }}
+                  </label>
+
+                  <!-- Participant video/audio status label -->
+                  <label
+                    *ngIf="!participant?.loggedInUser"
+                    class="label label-custom m-l-5"
+                  >
+                    <mat-icon
+                      color="primary"
+                      [inline]="true"
+                      class="cursor-pointer material-icons-round"
+                      matTooltip="VIDEO ENABLED"
+                      matTooltipPosition="above"
+                      *ngIf="participant?.hasVideo"
+                    >
+                      videocam
+                    </mat-icon>
+                    <mat-icon
+                      color="primary"
+                      [inline]="true"
+                      class="cursor-pointer material-icons-round"
+                      matTooltip="VIDEO DISABLED"
+                      matTooltipPosition="above"
+                      *ngIf="!participant?.hasVideo"
+                    >
+                      videocam_off
+                    </mat-icon>
+                    <mat-icon
+                      color="primary"
+                      [inline]="true"
+                      class="cursor-pointer material-icons-round"
+                      matTooltip="AUDIO ENABLED"
+                      matTooltipPosition="above"
+                      *ngIf="participant?.hasAudio"
+                    >
+                      mic
+                    </mat-icon>
+                    <mat-icon
+                      color="primary"
+                      [inline]="true"
+                      class="cursor-pointer material-icons-round"
+                      matTooltip="AUDIO DISABLED"
+                      matTooltipPosition="above"
+                      *ngIf="!participant?.hasAudio"
+                    >
+                      mic_off
+                    </mat-icon>
+                  </label>
+                </div>
+
+                <div
+                  *ngIf="
+                    !participant?.hasVideo ||
+                    (participant?.loggedInUser && !localVideoEnabled)
+                  "
+                >
+                  <!-- Defaut avatar image -->
+                  <img
+                    *ngIf="
+                      (!participant?.loading &&
+                        !participant?.hasVideo &&
+                        !participant?.hasAudio) ||
+                      (participant?.loggedInUser && !localVideoEnabled)
+                    "
+                    src="../../../assets/images/default-avatar-1.png"
+                    class="video-chat-avatar"
+                  />
+
+                  <!-- Only microphone enabled image -->
+                  <mat-icon
+                    class="material-icons-round"
+                    color="primary"
+                    matTooltip="Only mic enabled"
+                    matTooltipPosition="above"
+                    *ngIf="
+                      !participant?.loading &&
+                      !participant?.hasVideo &&
+                      participant?.hasAudio
+                    "
+                  >
+                    settings_voice
+                  </mat-icon>
+                </div>
+
+                <app-show-message
+                  *ngIf="participant?.loading"
+                  style="position: absolute; top: 50%;"
+                  [message]="'Loading...'"
+                  [className]="'text-white'"
+                >
+                </app-show-message>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video/Audio options -->
+          <div
+            *ngIf="
+              participant?.loggedInUser &&
+              (showVideoControls == i ||
+                !localVideoEnabled ||
+                !localAudioEnabled)
+            "
+          >
+            <div fxLayout="row" class="video-controls-overay">
+              <!-- Wait untill the video socket is setup and socket client has authenticated to server -->
+              <div
+                *ngIf="videoBroadCastLoading"
+                fxFlex="100"
+                fxLayoutAlign="center center"
+                class="mat-white"
+              >
+                Please wait...
+              </div>
+
+              <!-- Webcam controls -->
+              <div
+                *ngIf="!videoBroadCastLoading"
+                fxFlex="50"
+                fxLayoutAlign="center center"
+              >
+                <mat-icon
+                  *ngIf="localVideoEnabled"
+                  color="primary"
+                  class="cursor-pointer material-icons-round"
+                  matTooltip="DISABLE WEBCAM"
+                  matTooltipPosition="above"
+                  (click)="configureBroadcasting(localAudioEnabled, false)"
+                >
+                  videocam
+                </mat-icon>
+                <mat-icon
+                  *ngIf="!localVideoEnabled"
+                  color="end"
+                  class="cursor-pointer material-icons-round"
+                  matTooltip="ENABLE WEBCAM"
+                  matTooltipPosition="above"
+                  (click)="configureBroadcasting(localAudioEnabled, true)"
+                >
+                  videocam_off
+                </mat-icon>
+              </div>
+
+              <!-- Microphone controls -->
+              <div
+                *ngIf="!videoBroadCastLoading"
+                fxFlex="50"
+                fxLayoutAlign="center center"
+              >
+                <mat-icon
+                  *ngIf="localAudioEnabled"
+                  color="primary"
+                  class="cursor-pointer material-icons-round"
+                  matTooltip="DISABLE MICROPHONE"
+                  matTooltipPosition="above"
+                  (click)="configureBroadcasting(false, localVideoEnabled)"
+                >
+                  mic
+                </mat-icon>
+                <mat-icon
+                  *ngIf="!localAudioEnabled"
+                  color="end"
+                  class="cursor-pointer material-icons-round"
+                  matTooltip="ENABLE MICROPHONE"
+                  matTooltipPosition="above"
+                  (click)="configureBroadcasting(true, localVideoEnabled)"
+                >
+                  mic_off
+                </mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </mat-card>
+</ng-template>
+
+<!-- Sync button -->
+<ng-template #syncButton>
+  <button
+    mat-icon-button
+    [disabled]="!enableCatchup"
+    [ngClass]="
+      !fetchingSeek ? (!enableCatchup ? 'disable-sync' : 'enable-sync') : ''
+    "
+    (click)="catchUpVideoWithFriends()"
+  >
+    <mat-icon
+      class="material-icons-round"
+      *ngIf="fetchingSeek"
+      matTooltip="SYNCING.."
+      matTooltipPosition="above"
+      color="white"
+      class="spin"
+    >
+      loop</mat-icon
+    >
+    <mat-icon
+      class="material-icons-round"
+      *ngIf="!enableCatchup && !fetchingSeek"
+      matTooltip="SYNCED WITH YAARI"
+      matTooltipPosition="above"
+    >
+      sync_disabled</mat-icon
+    >
+    <mat-icon
+      class="material-icons-round"
+      *ngIf="enableCatchup && !fetchingSeek"
+      matTooltip="CATCHUP WITH YAARI"
+      matTooltipPosition="above"
+    >
+      sync</mat-icon
+    >
+  </button>
+</ng-template>
+
+<!-- Exit party area button -->
+<ng-template #exitPartyButton>
+  <button
+    mat-icon-button
+    color="white"
+    (click)="exitParty()"
+    matTooltip="EXIT PARTY"
+    matTooltipPosition="above"
+  >
+    <mat-icon class="material-icons-round">exit_to_app</mat-icon>
+  </button>
+</ng-template>
+
+<!-- Add/View participants button -->
+<ng-template #addOrViewParticipants>
+  <button
+    mat-icon-button
+    color="primary"
+    color="green"
+    class="invite-more"
+    [matTooltip]="isHost ? 'Manage Guests' : 'View Participants'"
+    matTooltipPosition="above"
+    (click)="openInviteGuestsModal()"
+  >
+    <mat-icon class="material-icons-round">{{
+      isHost ? "person_add" : "account_box"
+    }}</mat-icon>
+  </button>
+</ng-template>
+
+<!-- Video seekbar -->
+<ng-template #videoSeekbar>
+  <mat-slider
+    class="seek-bar"
+    color="primary"
+    [max]="totalVideoDuration"
+    min="0"
+    step="0.1"
+    [tickInterval]="getSliderTickInterval()"
+    [(ngModel)]="currentSeek"
+    thumbLabel="true"
+    [displayWith]="currentSeekDisplayVal"
+    (input)="stopSeeking($event)"
+    (change)="seekVideo($event)"
+  >
+  </mat-slider>
+</ng-template>

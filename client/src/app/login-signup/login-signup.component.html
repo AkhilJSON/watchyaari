@@ -1,0 +1,249 @@
+<div>
+  <div mat-dialog-content>
+    <mat-tab-group [selectedIndex]="modalData.defaultTab">
+      <mat-tab label="Login">
+        <ng-template matTabContent>
+          <mat-card>
+            <mat-card-content>
+              <form [formGroup]="loginForm" (ngSubmit)="authenticate()">
+                <div fxLayout="column" fxLayoutAlign="space-between">
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        placeholder="Email"
+                        [formControl]="loginForm.controls['email']"
+                        (input)="passwordNotMatched = false"
+                      />
+                    </mat-form-field>
+                  </div>
+
+                  <small
+                    *ngIf="
+                      loginForm.controls['email'].hasError('required') &&
+                      loginForm.controls['email'].touched
+                    "
+                    class="text-danger support-text"
+                    >Email is required.</small
+                  >
+
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        [type]="isPasword ? 'password' : 'text'"
+                        placeholder="Password"
+                        (input)="passwordNotMatched = false"
+                        [formControl]="loginForm.controls['password']"
+                      />
+                      <span matSuffix>
+                        <mat-icon
+                          *ngIf="!isPasword"
+                          style="cursor: pointer;"
+                          (click)="isPasword = true"
+                          >visibility
+                        </mat-icon>
+                        <mat-icon
+                          *ngIf="isPasword"
+                          style="cursor: pointer;"
+                          (click)="isPasword = false"
+                          >visibility_off
+                        </mat-icon>
+                      </span>
+                    </mat-form-field>
+                  </div>
+                  <small
+                    *ngIf="
+                      loginForm.controls['password'].hasError('required') &&
+                      loginForm.controls['password'].touched
+                    "
+                    class="text-danger support-text"
+                    >Password is required.</small
+                  >
+                  <small
+                    *ngIf="passwordNotMatched"
+                    class="text-danger support-text"
+                    >Incorrect email or password</small
+                  >
+
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      class="btn-block btn-lg m-t-20 m-b-20"
+                      type="submit"
+                      [disabled]="!loginForm.valid || loadingAuth"
+                    >
+                      {{ loadingAuth ? "Logging in..." : "Login" }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Sign-up">
+        <ng-template matTabContent>
+          <mat-card>
+            <mat-card-content>
+              <form [formGroup]="signupForm" (ngSubmit)="register()">
+                <div fxLayout="column" fxLayoutAlign="space-between">
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        placeholder="Full Name"
+                        type="text"
+                        [formControl]="signupForm.controls['fullName']"
+                        autocomplete="off"
+                      />
+                    </mat-form-field>
+                  </div>
+
+                  <small
+                    *ngIf="
+                      (signupForm.controls['fullName'].hasError('required') ||
+                        signupForm.controls['fullName'].hasError('empty')) &&
+                      signupForm.controls['fullName'].touched
+                    "
+                    class="text-danger support-text"
+                    >Name is required</small
+                  >
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        placeholder="Email"
+                        [formControl]="signupForm.controls['email']"
+                        (input)="
+                          emailAlreadyExists = false; showInvalidEmail = false
+                        "
+                      />
+                    </mat-form-field>
+                  </div>
+
+                  <small
+                    *ngIf="showInvalidEmail"
+                    class="text-danger support-text"
+                    >Enter valid email id.</small
+                  >
+                  <small
+                    *ngIf="emailAlreadyExists"
+                    class="text-danger support-text"
+                    >Email already exists.</small
+                  >
+
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        [type]="isPasword ? 'password' : 'text'"
+                        placeholder="Password"
+                        (input)="
+                          passwordNotMatched = false;
+                          showInvalidPassword = false
+                        "
+                        [formControl]="signupForm.controls['password']"
+                      />
+                      <span matSuffix>
+                        <mat-icon
+                          *ngIf="!isPasword"
+                          style="cursor: pointer;"
+                          (click)="isPasword = true"
+                          >visibility
+                        </mat-icon>
+                        <mat-icon
+                          *ngIf="isPasword"
+                          style="cursor: pointer;"
+                          (click)="isPasword = false"
+                          >visibility_off
+                        </mat-icon>
+                      </span>
+                    </mat-form-field>
+                  </div>
+
+                  <small
+                    *ngIf="showInvalidPassword"
+                    class="text-danger support-text"
+                    >Password should contain atleast 1 special character, 1
+                    alphabet, 1 numeric & length between 6-16</small
+                  >
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      class="btn-block btn-lg m-t-20 m-b-20"
+                      type="submit"
+                      [disabled]="loadingAuth"
+                    >
+                      {{ loadingAuth ? "Signing up..." : "Sign-up" }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Forgot Password">
+        <ng-template matTabContent>
+          <mat-card>
+            <mat-card-content>
+              <form
+                [formGroup]="forgotPasswordForm"
+                (ngSubmit)="forgotPassword()"
+              >
+                <div fxLayout="column" fxLayoutAlign="space-between">
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field class="full-width">
+                      <input
+                        matInput
+                        placeholder="Email"
+                        [formControl]="forgotPasswordForm.controls['email']"
+                        (input)="userNotFound = false; alreadyRequested = false"
+                      />
+                    </mat-form-field>
+                  </div>
+
+                  <small
+                    *ngIf="
+                      forgotPasswordForm.controls['email'].hasError(
+                        'required'
+                      ) && forgotPasswordForm.controls['email'].touched
+                    "
+                    class="text-danger support-text"
+                    >Email is required.</small
+                  >
+
+                  <small *ngIf="userNotFound" class="text-danger support-text"
+                    >Incorrect email or password</small
+                  >
+
+                  <small
+                    *ngIf="alreadyRequested"
+                    class="text-danger support-text"
+                    >Already requested, Please check your Inbox or spam
+                    folder.</small
+                  >
+
+                  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      class="btn-block btn-lg m-t-20 m-b-20"
+                      type="submit"
+                      [disabled]="!forgotPasswordForm.valid || loadingAuth"
+                    >
+                      {{ loadingAuth ? "Submitting..." : "Submit" }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

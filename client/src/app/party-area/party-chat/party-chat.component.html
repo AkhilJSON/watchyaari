@@ -1,0 +1,186 @@
+<mat-card class="card-container party-chat-area-card part-chat-container">
+  <div
+    fxLayout.xs="row"
+    fxLayout.sm="row"
+    fxLayout.md="row"
+    fxLayout.lg="column"
+    fxLayout.gt-lg="column"
+    fxFlexFill
+  >
+    <!-- Chat header -->
+    <div fxFlex="5" fxHide.xs="true" fxHide.sm="true" fxHide.md="true">
+      <div fxLayout="row" fxFlexFill>
+        <div
+          fxFlex="95"
+          *ngIf="isChatAreaMinimised"
+          class="cursor-pointer"
+          fxLayoutAlign="center center"
+          (click)="toggleChat()"
+        >
+          OPEN CHAT AREA
+        </div>
+        <div
+          [fxFlex]="isChatAreaMinimised ? 5 : 100"
+          fxLayoutAlign="end center"
+        >
+          <button
+            *ngIf="!isChatAreaMinimised"
+            mat-button
+            (click)="toggleChat()"
+            matTooltip="Minimize"
+            matTooltipPosition="above"
+          >
+            <mat-icon class="material-icons-round"
+              >keyboard_arrow_down</mat-icon
+            >
+          </button>
+          <button
+            *ngIf="isChatAreaMinimised"
+            mat-button
+            (click)="toggleChat()"
+            matTooltip="Maximize"
+            matTooltipPosition="above"
+          >
+            <mat-icon class="material-icons-round">keyboard_arrow_up</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat area -->
+    <div
+      fxFlex.xs="100"
+      fxFlex.sm="100"
+      fxFlex.md="100"
+      fxFlex.lg="95"
+      fxFlex.gt-lg="95"
+    >
+      <div fxLayout="column" fxFlexFill>
+        <div
+          *ngIf="chatAreaContainer.historyArea"
+          [fxFlex]="chatAreaContainer.historyArea"
+        >
+          <perfect-scrollbar
+            *ngIf="chatHistory?.length"
+            [config]="config"
+            class="chat-middle-box party-chat-perfect-scroll"
+          >
+            <div *ngFor="let chat of chatHistory; let i = index">
+              <div class="chat-list date" *ngIf="showDate(chat.cAt, i)">
+                <div class="chat-block bg-info">
+                  <p class="message-text date-text f-12">
+                    {{ showDate(chat.cAt, i) }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="chat-list"
+                [ngClass]="loggedInUserdId == chat.userId ? 'even' : 'odd'"
+              >
+                <div
+                  class="chat-message"
+                  [ngClass]="
+                    loggedInUserdId == chat.userId ? 'm-r-10' : 'm-l-10'
+                  "
+                >
+                  <div
+                    class="chat-block"
+                    [ngClass]="
+                      loggedInUserdId == chat.userId ? '' : 'bg-light-info'
+                    "
+                  >
+                    <div>
+                      <div *ngIf="showUserName(chat.userId, i)">
+                        <h3 class="message-text text-muted">
+                          {{ chat.userName }}
+                        </h3>
+                      </div>
+                      <div fxLayout="row" fxFlexFill fxLayoutGap="10px">
+                        <div fxFlex="85" fxLayoutAlign="center center">
+                          <p
+                            class="chat-user-name m-l-10"
+                            [innerHTML]="chat.message"
+                          ></p>
+                        </div>
+                        <div fxFlex="15" fxLayoutAlign="center center">
+                          <span class="chat-date">{{
+                            chat.cAt | moment: "24hourFormat"
+                          }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </perfect-scrollbar>
+          <app-show-message
+            *ngIf="!chatHistory?.length && !loadingChat"
+            [message]="'You have not started a conversation yet.'"
+            [className]="'f-10'"
+          ></app-show-message>
+          <app-show-message
+            *ngIf="loadingChat"
+            [message]="'Loading...'"
+          ></app-show-message>
+        </div>
+        <div
+          *ngIf="chatAreaContainer.messsageArea"
+          [fxFlex]="chatAreaContainer.messsageArea"
+          class="party-chat-message-area-container"
+        >
+          <div fxLayout="row" fxFlexFill>
+            <div
+              fxFlex="8"
+              fxHide.xs="true"
+              fxHide.sm="true"
+              fxHide.md="true"
+              fxLayoutAlign="center center"
+              class="m-r-5"
+            >
+              <div class="emoji-chat-area-wrapper">
+                <div class="toolbar emoji-toolbar-container">
+                  <button
+                    class="ql-emoji"
+                    aria-label="Emoji'showUserName"
+                  ></button>
+                </div>
+              </div>
+              <button mat-icon-button aria-label="Emoji'showUserName">
+                <mat-icon class="material-icons-round" *ngIf="!toggleEmoji()"
+                  >mood</mat-icon
+                >
+                <mat-icon class="material-icons-round" *ngIf="toggleEmoji()"
+                  >cancel</mat-icon
+                >
+              </button>
+            </div>
+            <div
+              fxFlex.xs="88"
+              fxFlex.sm="88"
+              fxFlex.md="88"
+              fxFlex.lg="80"
+              fxFlex.gt-lg="80"
+              class="party-chat-compose-area"
+            >
+              <quill-editor
+                theme="snow"
+                [(ngModel)]="chatText"
+                placeholder=""
+                [modules]="quillConfig"
+                (keydown.enter)="sendChat()"
+                (onEditorChanged)="quilEditorChange($event)"
+              >
+              </quill-editor>
+            </div>
+            <div fxFlex="12" fxLayoutAlign="center center">
+              <button mat-icon-button aria-label="Send" (click)="sendChat()">
+                <mat-icon class="material-icons-round">send</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>

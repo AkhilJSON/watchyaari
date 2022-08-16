@@ -1,0 +1,17 @@
+.video-result {
+  .video-thumbnail {
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-details-info {
+    .channel-name {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .published-at {
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+.video-result-card {
+  .card-layout {
+    display: flex;
+    float: left;
+  }
+  .video-card {
+    position: relative;
+    .play-icon {
+      opacity: 0;
+      height: 100px;
+      position: absolute;
+      top: 40px;
+      left: 87px;
+    }
+    &:hover {
+      .video-thumbnail {
+        opacity: 0.5;
+      }
+      .play-icon {
+        opacity: 1;
+      }
+    }
+  }
+  .video-details {
+    .video-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      font-weight: 500;
+      font-size: 14px;
+      font-weight: 500;
+      max-width: 80%;
+      word-break: break-word;
+      text-transform: capitalize;
+      font-family: sans-serif;
+    }
+
+    .video-details-info {
+      display: flex;
+      align-items: center;
+      .channel-name {
+        font-weight: bold;
+        text-decoration: underline;
+        padding-right: 8px;
+      }
+      .published-at {
+        font-size: 12px;
+        font-weight: 400;
+        padding-left: 8px;
+      }
+    }
+  }
+}

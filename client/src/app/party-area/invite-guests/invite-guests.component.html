@@ -1,0 +1,263 @@
+<h2 mat-dialog-title>
+  {{ modalData?.isHost ? "Manage Guests" : "View participants" }}
+  <mat-icon *ngIf="modalData?.isHost" matSuffix>build_circle</mat-icon>
+</h2>
+<mat-dialog-content>
+  <div fxLayout="column" fxFlexFill class="guests-management-container">
+    <div fxLayout="column" fxFlexFill>
+      <div *ngIf="modalData?.isHost" fxFlex="10">
+        <form [formGroup]="guestsForm">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-sm="100" fxFlex="100">
+              <mat-form-field class="full-width">
+                <input
+                  type="text"
+                  placeholder="Search people & add as guests to this party"
+                  matInput
+                  [formControl]="guestsForm.controls['guestSearch']"
+                  [matAutocomplete]="auto"
+                />
+                <mat-autocomplete
+                  #auto="matAutocomplete"
+                  (optionSelected)="selected($event)"
+                >
+                  <mat-option
+                    *ngFor="let user of filteredUsers | async"
+                    [value]="user"
+                  >
+                    {{ user.fullName }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div [fxFlex]="!modalData?.isHost ? 100 : 90">
+        <!-- Host's edit list (Host alone has permission to modify guest list) STARTS HERE-->
+        <div *ngIf="modalData?.isHost" fxLayout="column" fxFlexFill>
+          <mat-tab-group>
+            <!-- Active users tab STARTS HERE-->
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span
+                  [matBadge]="guestsForm?.controls?.guests?.value?.length"
+                  matBadgeOverlap="false"
+                  >Active Users</span
+                >
+              </ng-template>
+              <ng-template matTabContent>
+                <perfect-scrollbar>
+                  <ng-template
+                    [ngTemplateOutlet]="activeGuestList"
+                  ></ng-template>
+                </perfect-scrollbar>
+              </ng-template>
+            </mat-tab>
+            <!-- Active users tab ENDS HERE-->
+
+            <!-- Blocked users tab STARTS HERE-->
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span
+                  [matBadge]="blockedUsers?.length ? blockedUsers?.length : '0'"
+                  matBadgeOverlap="false"
+                  matTooltip="Blocked/Removed users cannot have access to the party, unblock & add again to give access."
+                  matTooltipPosition="above"
+                  >Blocked Users</span
+                >
+              </ng-template>
+              <ng-template matTabContent>
+                <perfect-scrollbar
+                  *ngIf="!fetchingBlockedUsers && blockedUsers?.length"
+                >
+                  <div class="comment-widgets user-list-container">
+                    <div
+                      class="d-flex flex-row comment-row"
+                      *ngFor="let guest of blockedUsers"
+                    >
+                      <div>
+                        <span class="round">
+                          <ngx-avatar
+                            mat-list-avatar
+                            [round]="true"
+                            size="30"
+                            [name]="guest.fullName"
+                            matTooltip="{{ guest.fullName }}"
+                            matTooltipPosition="above"
+                          >
+                          </ngx-avatar>
+                        </span>
+                      </div>
+                      <div class="comment-text w-100">
+                        <h3
+                          class="m-0"
+                          [matTooltip]="guest?.fullName"
+                          matTooltipPosition="above"
+                        >
+                          {{ guest?.fullName | controlText: 20 }}
+                        </h3>
+                        <div fxLayout="column" fxFlexFill>
+                          <div fxFlex="100">
+                            <button
+                              mat-button
+                              color="primary"
+                              class="p-0"
+                              matTooltip="Unblocked users can be added back to active users"
+                              matTooltipPosition="above"
+                              (click)="unblockUser(guest._id)"
+                            >
+                              <mat-icon class="icon-text-button-align">
+                                undo
+                              </mat-icon>
+                              <span class="f-10">
+                                UNBLOCK USER
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </perfect-scrollbar>
+                <app-show-message
+                  *ngIf="fetchingBlockedUsers"
+                  [message]="'Loading...'"
+                >
+                </app-show-message>
+                <app-show-message
+                  *ngIf="!fetchingBlockedUsers && !blockedUsers?.length"
+                  [message]="'No blocked users.'"
+                >
+                </app-show-message>
+              </ng-template>
+            </mat-tab>
+            <!-- Blocked users tab ENDS HERE-->
+          </mat-tab-group>
+        </div>
+        <!-- Host's edit list (Host alone has permission to modify guest list) ENDS HERE-->
+
+        <!-- guests's/co-host's read list STARTS HERE-->
+        <div *ngIf="!modalData?.isHost" fxLayout="column" fxFlexFill>
+          <ng-template [ngTemplateOutlet]="activeGuestList"></ng-template>
+        </div>
+        <!-- guests's/co-host's read list ENDS HERE-->
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close>CLOSE</button>
+</mat-dialog-actions>
+
+<app-progress-spinner
+  [color]="color"
+  [mode]="mode"
+  [value]="value"
+  [backdropEnabled]="true"
+  [positionGloballyCenter]="true"
+  [displayProgressSpinner]="updatingParty"
+></app-progress-spinner>
+
+<!-- Active guests list block reusable code for both guest view & host view STARTS HERE-->
+<ng-template #activeGuestList>
+  <div class="comment-widgets user-list-container">
+    <div
+      class="d-flex flex-row comment-row"
+      *ngFor="let guest of guestsForm.controls['guests'].value"
+    >
+      <div>
+        <span class="round">
+          <ngx-avatar
+            mat-list-avatar
+            [round]="true"
+            size="30"
+            [name]="guest.fullName"
+            matTooltip="{{ guest.fullName }}"
+            matTooltipPosition="above"
+          >
+          </ngx-avatar>
+        </span>
+      </div>
+      <div class="comment-text w-100">
+        <h3
+          class="m-0"
+          [matTooltip]="guest?.fullName"
+          matTooltipPosition="above"
+        >
+          {{ guest?.fullName | controlText: 20 }}
+          <label class="label label-light-success m-l-5" *ngIf="guest.self"
+            >YOU</label
+          >
+          <label
+            *ngIf="guest.isHost"
+            class="label label-light-info m-l-5 f-10 cursor-pointer"
+            matTooltip="HOST has full access to control the party."
+            matTooltipPosition="above"
+            >HOST</label
+          >
+          <label
+            *ngIf="guest.isCoHost"
+            class="label label-purple m-l-5 f-10 cursor-pointer"
+            matTooltip="CO-HOST can play/pause/seek/change video."
+            matTooltipPosition="above"
+            >CO-HOST</label
+          >
+        </h3>
+        <div fxLayout="column" fxFlexFill>
+          <div fxFlex="100">
+            <div *ngIf="!guest.isHost && modalData?.isHost" matLine>
+              <button
+                *ngIf="!guest.isHost && !guest.isCoHost"
+                class="p-0"
+                mat-button
+                color="primary"
+                matTooltip="CO-HOST can play/pause/seek & change video."
+                matTooltipPosition="above"
+                (click)="updateCoHosts(guest.guestId, guest.fullName, true)"
+              >
+                <mat-icon class="icon-text-button-align">
+                  person_add_alt_1
+                </mat-icon>
+                <span class="f-10">
+                  ADD AS CO-HOST
+                </span>
+              </button>
+              <button
+                *ngIf="!guest.isHost && guest.isCoHost"
+                class="p-0"
+                mat-button
+                color="primary"
+                matTooltip="REMOVE CO-HOST ROLE"
+                matTooltipPosition="above"
+                (click)="updateCoHosts(guest.guestId, guest.fullName, false)"
+              >
+                <mat-icon class="icon-text-button-align">
+                  person_remove_alt_1
+                </mat-icon>
+                <span class="f-10">
+                  REMOVE CO-HOST ROLE
+                </span>
+              </button>
+
+              <button
+                *ngIf="!guest.isHost"
+                mat-icon-button
+                color="warn"
+                (click)="remove(guest._id)"
+              >
+                <mat-icon
+                  matTooltip="REMOVE/BLOCK user to revoke access to the party. Blocked users cannot have access to the party unless unblocked."
+                  matTooltipPosition="above"
+                  >delete
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- Active guests list block reusable code for both guest view & host view ENDS HERE -->

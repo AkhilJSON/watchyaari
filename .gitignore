@@ -1,0 +1,29 @@
+# server
+# node_modules
+server/node_modules/
+
+# System Files
+server/.DS_Store
+server/Thumbs.db
+
+# logs
+server/logs
+
+# env
+server/.env
+
+## client
+# node_modules
+client/node_modules/
+
+# compiled output
+client/dist
+client/tmp
+client/out-tsc
+
+# System Files
+client/.DS_Store
+client/Thumbs.db
+
+
+.DS_Store
