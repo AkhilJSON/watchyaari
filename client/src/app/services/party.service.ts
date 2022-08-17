@@ -108,15 +108,4 @@ export class PartyService {
   togglePartyPrivacy(body: any) {
     return this.http.post(environment.common + 'tglePrtPrvcy', body);
   }
-
-  getFeedbackQuestions(body: any) {
-    return this.http.post(
-      environment.baseURL + 'secure/admin/getFeedbackQuestions',
-      body
-    );
-  }
-
-  submitFeedbackResponse(body: any) {
-    return this.http.post(environment.common + 'submitFeedbackResponse', body);
-  }
 }

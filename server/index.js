@@ -29,7 +29,6 @@ nLog.init(nlogParams);
 var routes = require('./routes/index');
 var commonRoutes = require('./routes/common');
 var profileRoutes = require('./routes/profile');
-var adminRoutes = require('./routes/admin');
 
 
 var signalling = require('./controllers/signalling');
@@ -98,7 +97,6 @@ app.use(passport.session());
 app.use('/', routes);
 app.use('/common', commonRoutes);
 app.use('/profile', profileRoutes);
-app.use('/secure/admin', adminRoutes);
 
 // View Engine
 app.set('views', path.join(__dirname, 'views'));

@@ -69,11 +69,6 @@ router.post('/updCohs', passport.authenticate('user', {
 }), partyController.updateCoHosts);
 
 
-router.post('/submitFeedbackResponse', passport.authenticate('user', {
-    session: false
-}), partyController.submitFeedbackResponse);
-
-
 router.post('/launchParty', passport.authenticate('user', {
     session: false
 }), partyController.launchParty);

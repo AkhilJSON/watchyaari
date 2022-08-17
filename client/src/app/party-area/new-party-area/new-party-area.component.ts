@@ -38,7 +38,6 @@ import { PartyService } from '../../services/party.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeVideoTrackComponent } from '../change-video-track/change-video-track.component';
 import { InviteGuestsComponent } from '../invite-guests/invite-guests.component';
-import { WarningModalComponent } from '../warning-modal/warning-modal.component';
 import { GlobalConstants } from 'src/app/common/global-constants';
 
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -119,10 +118,6 @@ export class NewPartyAreaComponent
   speakingIcon: any = 'volume_mute';
 
   //################### animations related declarations <ENDS HERE>###################
-
-  //###################Feedback questions related declarations <STARTS HERE>###################
-  feedbackQuestions: any = [];
-  //###################Feedback questions related declarations <ENDS HERE>###################
 
   //###################Spinner related declarations <STARTS HERE>###################
   color = 'primary';
@@ -310,9 +305,6 @@ export class NewPartyAreaComponent
     this.isExternalRequestToPlayPause = false;
 
     this.ss.setFullScreenMode(this.fullScreen);
-
-    //Get feedback questions
-    this.getFeedbackQuestions();
 
     //###################Media Query <STARTS HERE>###################
     this.breakpointObserver
@@ -869,26 +861,6 @@ export class NewPartyAreaComponent
     }
   }
 
-  getFeedbackQuestions() {
-    this.partyService
-      .getFeedbackQuestions({
-        feedbackType: 'party',
-        isActive: true,
-      })
-      .subscribe((resposne: any) => {
-        if (resposne.Success) {
-          this.feedbackQuestions = resposne.questions || [];
-          this.feedbackQuestions = _.map(
-            this.feedbackQuestions,
-            (question: any) => {
-              question.response = '';
-              return question;
-            }
-          );
-        }
-      });
-  }
-
   openSnackBar(
     message: any,
     action: any,
@@ -1222,44 +1194,10 @@ export class NewPartyAreaComponent
 
   exitParty() {
     let _self = this;
-    const dialogRef = this.dialog.open(WarningModalComponent, {
-      width: '1000px',
-      autoFocus: false,
-      data: {
-        message: `Are you sure you wish to exit to the dashboard? You can rejoin this party later.`,
-        actionText: 'EXIT PARTY',
-        actionColor: 'primary',
-        feedbackQuestions: this.feedbackQuestions,
-      },
-    });
-
-    let modalResource = dialogRef.afterClosed().subscribe((result: any) => {
-      //Save feedback response
-      if (result && result.feedbackResponse) {
-        this.displayProgressSpinner = true;
-        this.partyService
-          .submitFeedbackResponse({
-            partyId: this.partyData._id,
-            feedbackResponse: result.feedbackResponse,
-          })
-          .subscribe((res: any) => {
-            this.displayProgressSpinner = false;
-            postHandler();
-          });
-      } else {
-        postHandler();
-      }
-
-      function postHandler() {
-        if (result && result.yes) {
-          _self.ss.setFullScreenMode(false);
-          setTimeout(() => {
-            _self.router.navigateByUrl('/joinParty');
-          }, 0);
-        }
-      }
-    });
-    this.subscription.add(modalResource);
+    _self.ss.setFullScreenMode(false);
+    setTimeout(() => {
+      _self.router.navigateByUrl('/joinParty');
+    }, 0);
   }
 
   togglePartyPrivacy() {
@@ -1299,60 +1237,26 @@ export class NewPartyAreaComponent
       return;
     }
 
-    const dialogRef = this.dialog.open(WarningModalComponent, {
-      width: '1000px',
-      autoFocus: false,
-      data: {
-        message: `Are you sure you want to end this party? It will end permanently for all users.`,
-        actionText: 'END PARTY',
-        actionColor: 'warn',
-        feedbackQuestions: this.feedbackQuestions,
-      },
-    });
+    let endParty = {
+      _id: _self.partyData._id,
+      endedOn: new Date().getTime(),
+      isEnded: true,
+      endedBy: _self.loggedInUserdId,
+      status: 'ENDED',
+    };
+    _self.partyData = _.assignIn(_self.partyData, endParty);
+    _self.socket.emit('END_PARTY', JSON.stringify(endParty));
+    _self.closeAllConnections();
 
-    let modalResource = dialogRef.afterClosed().subscribe((result: any) => {
-      //Save feedback response
-      if (result && result.feedbackResponse) {
-        this.displayProgressSpinner = true;
-        this.partyService
-          .submitFeedbackResponse({
-            partyId: this.partyData._id,
-            feedbackResponse: result.feedbackResponse,
-          })
-          .subscribe((res: any) => {
-            this.displayProgressSpinner = false;
-            postHandler();
-          });
-      } else {
-        postHandler();
-      }
-
-      function postHandler() {
-        if (result && result.yes) {
-          let endParty = {
-            _id: _self.partyData._id,
-            endedOn: new Date().getTime(),
-            isEnded: true,
-            endedBy: _self.loggedInUserdId,
-            status: 'ENDED',
-          };
-          _self.partyData = _.assignIn(_self.partyData, endParty);
-          _self.socket.emit('END_PARTY', JSON.stringify(endParty));
-          _self.closeAllConnections();
-
-          _self.cs.removeItem('crntPrtyId', '/', null);
-          _.each(_self.cs.keys(), (key) => {
-            if (key.indexOf('_scktId_') == 0) {
-              _self.cs.removeItem(key, '/', null);
-            }
-          });
-          setTimeout(() => {
-            _self.router.navigateByUrl('/');
-          }, 0);
-        }
+    _self.cs.removeItem('crntPrtyId', '/', null);
+    _.each(_self.cs.keys(), (key) => {
+      if (key.indexOf('_scktId_') == 0) {
+        _self.cs.removeItem(key, '/', null);
       }
     });
-    this.subscription.add(modalResource);
+    setTimeout(() => {
+      _self.router.navigateByUrl('/');
+    }, 0);
   }
 
   partStartsIn() {

@@ -23,8 +23,6 @@ import { YoutubePlayerComponent } from './youtube-player/youtube-player.componen
 import { ChangeVideoTrackComponent } from './change-video-track/change-video-track.component';
 import { ProgressSpinnerComponent } from '../progress-spinner/progress-spinner.component';
 import { InviteGuestsComponent } from './invite-guests/invite-guests.component';
-import { WarningModalComponent } from './warning-modal/warning-modal.component';
-import { PartyFeedbackComponent } from './party-feedback/party-feedback.component';
 
 //Pipes
 
@@ -41,8 +39,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     YoutubePlayerComponent,
     ChangeVideoTrackComponent,
     InviteGuestsComponent,
-    WarningModalComponent,
-    PartyFeedbackComponent,
   ],
   imports: [
     PartyRoutingModule,
