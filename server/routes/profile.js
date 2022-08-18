@@ -1,9 +1,12 @@
+// packages
 var express = require("express");
-var router = express.Router();
 var passport = require("passport");
 
+// controllers
 var profileController = require("../controllers/profile");
 var userLoginAuthController = require("../controllers/common/userLoginAuth");
+
+var router = express.Router();
 
 router.post(
     "/updateProfile",

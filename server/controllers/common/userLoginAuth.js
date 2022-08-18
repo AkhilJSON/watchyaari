@@ -1,21 +1,21 @@
-var User = require("../../models/common/user");
-var Party = require("../../models/common/party");
-var Guest = require("../../models/common/guest");
-var EmailService = require("../../controllers/common/emailService");
-
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-
-var Helper = require("../helper");
-
-const mongoose = require("mongoose");
+// packages
 var jwt = require("jsonwebtoken");
 var _ = require("lodash");
 var randomstring = require("randomstring");
-
 var jwtDecode = require("jwt-decode");
-
 let nLog = require("noogger");
+const mongoose = require("mongoose");
+
+// models
+var User = require("../../models/common/user");
+var Party = require("../../models/common/party");
+var Guest = require("../../models/common/guest");
+
+// services
+var EmailService = require("../../controllers/common/emailService");
+
+// helpers
+var Helper = require("../helper");
 
 exports.userRegistration = async function (req, res) {
     try {

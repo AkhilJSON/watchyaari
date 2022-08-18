@@ -1,9 +1,6 @@
-var partyController = require("./party");
-
+// packages
 const _ = require("lodash");
-
 const btoa = require("btoa");
-let nLog = require("noogger");
 
 exports.videoAudioSocketHandling = async function (socket, io) {
     try {

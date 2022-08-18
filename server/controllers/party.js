@@ -1,21 +1,21 @@
-var Party = require("../models/common/party");
-
-var User = require("../models/common/user");
-
-var HomePageVideos = require("../models/data/homePageVideos");
-
-var Guest = require("../models/common/guest");
-
-var UserLoginAuth = require("./common/userLoginAuth");
-
-var Helper = require("./helper");
-
+//packages
 const mongoose = require("mongoose");
 const superagent = require("superagent");
 var _ = require("lodash");
-const redis = require("../config/redis");
-
 let nLog = require("noogger");
+
+// models
+var Party = require("../models/common/party");
+var User = require("../models/common/user");
+var HomePageVideos = require("../models/data/homePageVideos");
+var Guest = require("../models/common/guest");
+
+// controllers
+var UserLoginAuth = require("./common/userLoginAuth");
+
+// helpers
+var Helper = require("./helper");
+const redis = require("../config/redis");
 
 let mongoId = mongoose.Types.ObjectId;
 exports.joinParty = async function (req, res) {

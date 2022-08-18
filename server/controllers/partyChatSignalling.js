@@ -1,8 +1,10 @@
+// packages
 var os = require("os");
-var Chat = require("../models/common/chat");
-
 const mongoose = require("mongoose");
 const _ = require("lodash");
+
+// models
+var Chat = require("../models/common/chat");
 
 exports.partyChatSocketHandling = async function (socket, io) {
     try {

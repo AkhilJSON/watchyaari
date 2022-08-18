@@ -1,11 +1,11 @@
+// packages
+var _ = require("lodash");
+
+// models
 var User = require("../models/common/user");
 
-var UserLoginAuth = require("./common/userLoginAuth");
-
+// helpers
 var Helper = require("./helper");
-
-const mongoose = require("mongoose");
-var _ = require("lodash");
 
 exports.updateProfile = async function (req, res) {
     try {

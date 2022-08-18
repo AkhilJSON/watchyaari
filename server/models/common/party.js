@@ -1,11 +1,13 @@
 // Schema of party
-
 "use strict";
+// packages
 var mongoose = require("mongoose");
 var Promise = require("bluebird");
 Promise.promisifyAll(mongoose);
-var mongoose = require("mongoose");
+
+// constants
 let GLOBAL_CONSTANTS = require("../../config/constants");
+
 var partySchema = new mongoose.Schema(
     {
         title: {

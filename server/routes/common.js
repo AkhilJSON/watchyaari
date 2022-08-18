@@ -1,10 +1,13 @@
+// packages
 var express = require("express");
-var router = express.Router();
 var passport = require("passport");
 
+// controllers
 var commonController = require("../controllers/common/userLoginAuth");
 var chatController = require("../controllers/chat");
 var partyController = require("../controllers/party");
+
+var router = express.Router();
 
 router.post("/userRegistration", commonController.userRegistration);
 

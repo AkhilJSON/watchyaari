@@ -1,10 +1,11 @@
+// packages
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-
-const User = require("../models/common/user");
-
 const mongoose = require("mongoose");
 const _ = require("lodash");
+
+// models
+const User = require("../models/common/user");
 
 // Setup work and export for the JWT passport strategy
 module.exports = function (passport) {

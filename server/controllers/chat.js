@@ -1,9 +1,12 @@
+// packages
+const mongoose = require("mongoose");
+const _ = require("lodash");
+
+// models
 var Chat = require("../models/common/chat");
 
+// helpers
 var Helper = require("./helper");
-
-const mongoose = require("mongoose");
-var _ = require("lodash");
 
 exports.getChatHistory = async function (req, res) {
     try {

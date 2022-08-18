@@ -1,11 +1,13 @@
 // Schema of user, USER is the collection of every single user
 
 "use strict";
+// packages
 var mongoose = require("mongoose");
 var Promise = require("bluebird");
-Promise.promisifyAll(mongoose);
-var mongoose = require("mongoose");
 var bcrypt = require("bcryptjs");
+
+Promise.promisifyAll(mongoose);
+
 var userSchema = new mongoose.Schema(
     {
         fullName: {

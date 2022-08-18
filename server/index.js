@@ -1,3 +1,4 @@
+//packages
 require("dotenv").config();
 var express = require("express");
 var bodyParser = require("body-parser");
@@ -8,12 +9,22 @@ var _ = require("lodash");
 var mongoose = require("mongoose");
 var passport = require("passport");
 var nLog = require("noogger");
-
-//Socket
 const io = require("socket.io")();
 const adapter = require("socket.io-redis");
-
 const cors = require("cors");
+
+// routes
+var routes = require("./routes/index");
+var commonRoutes = require("./routes/common");
+var profileRoutes = require("./routes/profile");
+
+// controllers
+var signalling = require("./controllers/signalling");
+var videoAudioStreamSignalling = require("./controllers/videoAudioStreamSignalling");
+var partyChatSignalling = require("./controllers/partyChatSignalling");
+
+// others
+var sockAuthentication = require("./config/socket-authentication");
 
 //logger configurations
 var nlogParams = {
@@ -25,16 +36,6 @@ var nlogParams = {
     outputPath: "logs/",
 };
 nLog.init(nlogParams);
-
-var routes = require("./routes/index");
-var commonRoutes = require("./routes/common");
-var profileRoutes = require("./routes/profile");
-
-var signalling = require("./controllers/signalling");
-var videoAudioStreamSignalling = require("./controllers/videoAudioStreamSignalling");
-var partyChatSignalling = require("./controllers/partyChatSignalling");
-
-var sockAuthentication = require("./config/socket-authentication");
 
 var app = express();
 var server = http.createServer(app);

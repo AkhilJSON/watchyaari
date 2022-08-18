@@ -1,6 +1,9 @@
-var userLoginAuth = require("../controllers/common/userLoginAuth");
+// packages
 const redis = require("./redis");
 const socketAuth = require("socketio-auth");
+
+// controllers
+var userLoginAuth = require("../controllers/common/userLoginAuth");
 
 exports.socketAauthentication = function (nameSpaceIo, usersKey = "users") {
     socketAuth(nameSpaceIo, {

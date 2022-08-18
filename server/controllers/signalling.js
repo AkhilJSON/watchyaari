@@ -1,16 +1,20 @@
+// packages
 var os = require("os");
-var Party = require("../models/common/party");
 var moment = require("moment");
-var commonController = require("./common/userLoginAuth");
-
 const mongoose = require("mongoose");
 const _ = require("lodash");
+let nLog = require("noogger");
 
+// helpers
 const redis = require("../config/redis");
 const Helper = require("./helper");
 const Constants = require("../config/constants");
 
-let nLog = require("noogger");
+// models
+var Party = require("../models/common/party");
+
+// controllers
+var commonController = require("./common/userLoginAuth");
 
 exports.socketHandling = async function (socket, io) {
     try {
