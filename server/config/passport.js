@@ -1,14 +1,14 @@
 // packages
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-const mongoose = require("mongoose");
-const _ = require("lodash");
+import { Strategy as JwtStrategy } from "passport-jwt";
+import { ExtractJwt } from "passport-jwt";
+import mongoose from "mongoose";
+import _ from "lodash";
 
 // models
-const User = require("../models/common/user");
+import User from "../models/common/user.js";
 
 // Setup work and export for the JWT passport strategy
-module.exports = function (passport) {
+export default function (passport) {
     var opts = {};
     opts.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
     opts.secretOrKey = process.env.SECRET_KEY;
@@ -42,4 +42,4 @@ module.exports = function (passport) {
             });
         })
     );
-};
+}

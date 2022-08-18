@@ -1,24 +1,25 @@
 //packages
-const mongoose = require("mongoose");
-const superagent = require("superagent");
-var _ = require("lodash");
-let nLog = require("noogger");
+import mongoose from "mongoose";
+import superagent from "superagent";
+import _ from "lodash";
+import nLog from "noogger";
 
 // models
-var Party = require("../models/common/party");
-var User = require("../models/common/user");
-var HomePageVideos = require("../models/data/homePageVideos");
-var Guest = require("../models/common/guest");
+import Party from "../models/common/party.js";
+import User from "../models/common/user.js";
+import HomePageVideos from "../models/data/homePageVideos.js";
+import Guest from "../models/common/guest.js";
 
 // controllers
-var UserLoginAuth = require("./common/userLoginAuth");
+import * as UserLoginAuth from "./common/userLoginAuth.js";
 
 // helpers
-var Helper = require("./helper");
-const redis = require("../config/redis");
+import Helper from "./helper.js";
+import redis from "../config/redis.js";
 
 let mongoId = mongoose.Types.ObjectId;
-exports.joinParty = async function (req, res) {
+
+export async function joinParty(req, res) {
     try {
         let body = req.body;
 
@@ -49,9 +50,9 @@ exports.joinParty = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.getRecentPartyList = async function (req, res) {
+export async function getRecentPartyList(req, res) {
     try {
         let partyData = await Party.aggregate([
             {
@@ -123,9 +124,9 @@ exports.getRecentPartyList = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.getUpcomingPartyList = async function (req, res) {
+export async function getUpcomingPartyList(req, res) {
     try {
         let partyData = await Party.aggregate([
             {
@@ -154,9 +155,9 @@ exports.getUpcomingPartyList = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.fetchUsers = async function (req, res) {
+export async function fetchUsers(req, res) {
     try {
         let { search, skip, limit } = req.body || {};
         let regexp = generateRegex(search);
@@ -219,9 +220,9 @@ exports.fetchUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.fetchBlockedUsers = async function (req, res) {
+export async function fetchBlockedUsers(req, res) {
     try {
         let { partyId } = req.body || {};
         let partyData = await Party.findById(mongoose.Types.ObjectId(partyId), "_id removedUsers").populate({
@@ -239,9 +240,9 @@ exports.fetchBlockedUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.unBlockUsers = async function (req, res) {
+export async function unBlockUsers(req, res) {
     try {
         let { partyId, userId } = req.body || {};
 
@@ -264,9 +265,9 @@ exports.unBlockUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.updateCoHosts = async function (req, res) {
+export async function updateCoHosts(req, res) {
     try {
         let { guestId, add } = req.body || {};
 
@@ -283,9 +284,9 @@ exports.updateCoHosts = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.launchParty = async function (req, res) {
+export async function launchParty(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -390,9 +391,9 @@ exports.launchParty = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.searchVideos = async function (req, res) {
+export async function searchVideos(req, res) {
     try {
         let body = req.body;
         //body.userMeta contains userId
@@ -464,9 +465,9 @@ exports.searchVideos = async function (req, res) {
         // Helper.catchException(JSON.stringify(e), res)
         nLog.error(JSON.stringify(e));
     }
-};
+}
 
-exports.trendVideos = async function (req, res) {
+export async function trendVideos(req, res) {
     try {
         let body = req.body;
         //body.userMeta contains userId
@@ -494,9 +495,9 @@ exports.trendVideos = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.updateVideoInTheParty = async function (req, res) {
+export async function updateVideoInTheParty(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -543,9 +544,9 @@ exports.updateVideoInTheParty = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.inviteGuestsInTheParty = async function (req, res) {
+export async function inviteGuestsInTheParty(req, res) {
     try {
         let body = req.body;
         if (!body) {
@@ -626,9 +627,9 @@ exports.inviteGuestsInTheParty = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.togglePartyPrivacy = async function (req, res) {
+export async function togglePartyPrivacy(req, res) {
     try {
         let body = req.body;
         if (!body) {
@@ -652,7 +653,7 @@ exports.togglePartyPrivacy = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function generateRegex(query = "", options) {
     if (!query) {

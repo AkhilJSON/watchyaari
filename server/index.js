@@ -1,30 +1,37 @@
 //packages
-require("dotenv").config();
-var express = require("express");
-var bodyParser = require("body-parser");
-var http = require("http");
-var path = require("path");
-var exphbs = require("express-handlebars");
-var _ = require("lodash");
-var mongoose = require("mongoose");
-var passport = require("passport");
-var nLog = require("noogger");
-const io = require("socket.io")();
-const adapter = require("socket.io-redis");
-const cors = require("cors");
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+import path from "path";
+import url from "url";
+import exphbs from "express-handlebars";
+import _ from "lodash";
+import mongoose from "mongoose";
+import passport from "passport";
+import nLog from "noogger";
+import io from "socket.io";
+import adapter from "socket.io-redis";
+import cors from "cors";
 
 // routes
-var routes = require("./routes/index");
-var commonRoutes = require("./routes/common");
-var profileRoutes = require("./routes/profile");
+import routes from "./routes/index.js";
+import commonRoutes from "./routes/common.js";
+import profileRoutes from "./routes/profile.js";
 
 // controllers
-var signalling = require("./controllers/signalling");
-var videoAudioStreamSignalling = require("./controllers/videoAudioStreamSignalling");
-var partyChatSignalling = require("./controllers/partyChatSignalling");
+import socketHandling from "./controllers/signalling.js";
+import videoAudioSocketHandling from "./controllers/videoAudioStreamSignalling.js";
+import partyChatSocketHandling from "./controllers/partyChatSignalling.js";
 
 // others
-var sockAuthentication = require("./config/socket-authentication");
+import { socketAauthentication } from "./config/socket-authentication.js";
+
+dotenv.config();
+const socketIo = io();
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 //logger configurations
 var nlogParams = {
@@ -85,7 +92,8 @@ app.use(
 );
 
 // passport startegy
-require("./config/passport")(passport);
+import passportConfig from "./config/passport.js";
+passportConfig(passport);
 
 // Initialize passport for use
 app.use(passport.initialize());
@@ -111,35 +119,35 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 // Set Port
 app.set("port", process.env.PORT || 80);
 
-// var io = socketIO.listen(server);
-io.attach(server);
-io.adapter(redisAdapter);
+// var io = socketsocketIo.listen(server);
+socketIo.attach(server);
+socketIo.adapter(redisAdapter);
 
-const partySync = io.of("/partySync");
-const videoAudioStream = io.of("/videoAudioStream");
-const partyChat = io.of("/partyChat");
+const partySync = socketIo.of("/partySync");
+const videoAudioStream = socketIo.of("/videoAudioStream");
+const partyChat = socketIo.of("/partyChat");
 
-sockAuthentication.socketAauthentication(partySync);
-sockAuthentication.socketAauthentication(videoAudioStream, "videostreamusers");
+socketAauthentication(partySync);
+socketAauthentication(videoAudioStream, "videostreamusers");
 // sockAuthentication.socketAauthentication(partyChat, "chatusers");
 
-/* io.on('connection', function (socket) {
+/* socketIo.on('connection', function (socket) {
     console.log("DEFAULT CONNECTION....", )
 }); */
 
 partySync.on("connection", function (socket) {
     // console.log("#partySync::", JSON.stringify(socket.handshake.query))
-    signalling.socketHandling(socket, io);
+    socketHandling(socket, io);
 });
 
 videoAudioStream.on("connection", function (socket) {
     // console.log("#videoAudioStream::", JSON.stringify(socket.handshake.query))
-    videoAudioStreamSignalling.videoAudioSocketHandling(socket, io);
+    videoAudioSocketHandling(socket, io);
 });
 
 partyChat.on("connection", function (socket) {
     // console.log("#partyChat::", JSON.stringify(socket.handshake.query))
-    partyChatSignalling.partyChatSocketHandling(socket, io);
+    partyChatSocketHandling(socket, io);
 });
 
 server.listen(app.get("port"), function () {

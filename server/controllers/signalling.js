@@ -1,22 +1,22 @@
 // packages
-var os = require("os");
-var moment = require("moment");
-const mongoose = require("mongoose");
-const _ = require("lodash");
-let nLog = require("noogger");
+import os from "os";
+import moment from "moment";
+import mongoose from "mongoose";
+import _ from "lodash";
+import nLog from "noogger";
 
 // helpers
-const redis = require("../config/redis");
-const Helper = require("./helper");
-const Constants = require("../config/constants");
+import redis from "../config/redis.js";
+import Helper from "./helper.js";
+import * as Constants from "../config/constants.js";
 
 // models
-var Party = require("../models/common/party");
+import Party from "../models/common/party.js";
 
 // controllers
-var commonController = require("./common/userLoginAuth");
+import * as commonController from "./common/userLoginAuth.js";
 
-exports.socketHandling = async function (socket, io) {
+export default async function socketHandling(socket, io) {
     try {
         // convenience function to log server messages on the client
         let partyId = socket.handshake.query && socket.handshake.query.partyId;
@@ -240,7 +240,7 @@ exports.socketHandling = async function (socket, io) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, partySyncKey) {
     function log() {

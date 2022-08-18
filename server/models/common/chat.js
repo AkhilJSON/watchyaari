@@ -1,19 +1,19 @@
-// Schema of Chat
+/* // Schema of Chat
 "use strict";
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import mongoose, { Schema, model } from "mongoose";
+import { promisifyAll } from "bluebird";
 
-Promise.promisifyAll(mongoose);
+promisifyAll(mongoose);
 
-var chatSchema = new mongoose.Schema(
+var chatSchema = new Schema(
     {
         partyId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Party",
         },
         userId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
         },
         message: {
@@ -30,5 +30,6 @@ var chatSchema = new mongoose.Schema(
     { versionKey: false }
 );
 
-var Chat = mongoose.model("Chat", chatSchema);
-module.exports = Chat;
+var Chat = model("Chat", chatSchema); */
+const Chat = {};
+export default Chat;

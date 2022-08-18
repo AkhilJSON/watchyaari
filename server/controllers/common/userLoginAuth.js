@@ -1,23 +1,23 @@
 // packages
-var jwt = require("jsonwebtoken");
-var _ = require("lodash");
-var randomstring = require("randomstring");
-var jwtDecode = require("jwt-decode");
-let nLog = require("noogger");
-const mongoose = require("mongoose");
+import jwt from "jsonwebtoken";
+import _ from "lodash";
+import randomstring from "randomstring";
+import jwtDecode from "jwt-decode";
+import nLog from "noogger";
+import mongoose from "mongoose";
 
 // models
-var User = require("../../models/common/user");
-var Party = require("../../models/common/party");
-var Guest = require("../../models/common/guest");
+import UserRepository from "../../models/common/user.js";
+import Party from "../../models/common/party.js";
+import Guest from "../../models/common/guest.js";
 
 // services
-var EmailService = require("../../controllers/common/emailService");
+import EmailService from "../../controllers/common/emailService.js";
 
 // helpers
-var Helper = require("../helper");
+import Helper from "../helper.js";
 
-exports.userRegistration = async function (req, res) {
+export async function userRegistration(req, res) {
     try {
         let Body = req.body;
         createUserValidations(Body, res);
@@ -25,7 +25,7 @@ exports.userRegistration = async function (req, res) {
         // Body['createdBy'] = req.user._id;
         // Body['modifiedBy'] = req.user._id;
 
-        let userCheck = await User.findOne({
+        let userCheck = await UserRepository.findOne({
             $and: [{ email: Body.email }, { isDeleted: false }],
         });
 
@@ -75,17 +75,17 @@ exports.userRegistration = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.verifyMyEmail = async function (req, res) {
+export async function verifyMyEmail(req, res) {
     await sendEmailVerificationLinkToUser(req.user);
     return res.json({
         Success: true,
         Message: "Sent",
     });
-};
+}
 
-exports.forgotPassword = async function (req, res) {
+export async function forgotPassword(req, res) {
     try {
         let body = req.body;
 
@@ -118,9 +118,9 @@ exports.forgotPassword = async function (req, res) {
             Message: "Invalid user",
         });
     }
-};
+}
 
-exports.resetPassword = async function (req, res) {
+export async function resetPassword(req, res) {
     try {
         let body = req.body;
 
@@ -161,9 +161,9 @@ exports.resetPassword = async function (req, res) {
             Message: "Invalid verification token",
         });
     }
-};
+}
 
-exports.verifyResetPasswordLink = async function (req, res) {
+export async function verifyResetPasswordLink(req, res) {
     try {
         let body = req.body;
         let token = body.token || null;
@@ -211,9 +211,9 @@ exports.verifyResetPasswordLink = async function (req, res) {
             Message: "Invalid verification token",
         });
     }
-};
+}
 
-exports.verifyUserEmail = async function (req, res) {
+export async function verifyUserEmail(req, res) {
     try {
         let body = req.body;
         let token = body.token || null;
@@ -270,9 +270,9 @@ exports.verifyUserEmail = async function (req, res) {
             Message: "Invalid verification token",
         });
     }
-};
+}
 
-exports.createUserManually = async function (req, res) {
+export async function createUserManually(req, res) {
     try {
         let Body = req.body;
         createUserValidations(Body, res);
@@ -298,9 +298,9 @@ exports.createUserManually = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.userAuthentication = async function (req, res) {
+export async function userAuthentication(req, res) {
     try {
         let Body = req.body;
 
@@ -370,9 +370,9 @@ exports.userAuthentication = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.getPartyDetails = async function (req, res) {
+export async function getPartyDetails(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -433,17 +433,17 @@ exports.getPartyDetails = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.createGuestWithPartyId = async function (guestData) {
+export async function createGuestWithPartyId(guestData) {
     return createGuest(guestData);
-};
+}
 
-exports.getVideoIdByURL = function (domain, videoURL) {
+export const getVideoIdByURL = function (domain, videoURL) {
     return getVideoId(domain, videoURL);
 };
 
-exports.verifyUser = function (token) {
+export const verifyUser = function (token) {
     return new Promise((resolve, reject) => {
         var decoded = jwtDecode(token);
         User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
@@ -459,7 +459,7 @@ exports.verifyUser = function (token) {
     });
 };
 
-exports.getUserDetails = async function (req, res) {
+export async function getUserDetails(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -477,7 +477,7 @@ exports.getUserDetails = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function giveAuthTokenForLoggedInUser(val) {
     let temp = Object.assign(val, {

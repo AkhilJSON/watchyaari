@@ -1,6 +1,6 @@
-// Schema of user, USER is the collection of every single user
+// await UserRepository.createIndex()
 
-"use strict";
+/* 
 // packages
 var mongoose = require("mongoose");
 var Promise = require("bluebird");
@@ -107,3 +107,6 @@ userSchema.methods.comparePassword = function (pw, cb) {
 
 var user = mongoose.model("User", userSchema);
 module.exports = user;
+ */
+const User = {};
+export default User;

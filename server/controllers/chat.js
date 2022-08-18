@@ -1,14 +1,14 @@
 // packages
-const mongoose = require("mongoose");
-const _ = require("lodash");
+import mongoose from "mongoose";
+import _ from "lodash";
 
 // models
-var Chat = require("../models/common/chat");
+import Chat from "../models/common/chat.js";
 
 // helpers
-var Helper = require("./helper");
+import Helper from "./helper.js";
 
-exports.getChatHistory = async function (req, res) {
+export async function getChatHistory(req, res) {
     try {
         let body = req.body;
 
@@ -37,4 +37,4 @@ exports.getChatHistory = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}

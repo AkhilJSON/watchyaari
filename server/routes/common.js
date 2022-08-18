@@ -1,17 +1,31 @@
 // packages
-var express = require("express");
-var passport = require("passport");
+import { Router } from "express";
+import passport from "passport";
 
 // controllers
-var commonController = require("../controllers/common/userLoginAuth");
-var chatController = require("../controllers/chat");
-var partyController = require("../controllers/party");
+import { userRegistration } from "../controllers/common/userLoginAuth.js";
+import { getChatHistory } from "../controllers/chat.js";
+import {
+    joinParty,
+    getRecentPartyList,
+    getUpcomingPartyList,
+    togglePartyPrivacy,
+    fetchUsers,
+    fetchBlockedUsers,
+    unBlockUsers,
+    updateCoHosts,
+    launchParty,
+    updateVideoInTheParty,
+    inviteGuestsInTheParty,
+    searchVideos,
+    trendVideos,
+} from "../controllers/party.js";
 
-var router = express.Router();
+var router = Router();
 
-router.post("/userRegistration", commonController.userRegistration);
+router.post("/userRegistration", userRegistration);
 
-router.post("/createUserManually", commonController.createUserManually);
+/* router.post("/createUserManually", commonController.createUserManually);
 
 router.post("/userAuthentication", commonController.userAuthentication);
 
@@ -25,7 +39,7 @@ router.post("/resetPasswordLink", commonController.verifyResetPasswordLink);
 
 router.post(
     "/getPartyDetails",
-    passport.authenticate("user", {
+    passport.passport.authenticate("user", {
         session: false,
     }),
     commonController.getPartyDetails
@@ -33,18 +47,18 @@ router.post(
 
 router.post(
     "/getUserDetails",
-    passport.authenticate("user", {
+    passport.passport.authenticate("user", {
         session: false,
     }),
     commonController.getUserDetails
-);
+); */
 
 router.post(
     "/getChatHistory",
     passport.authenticate("user", {
         session: false,
     }),
-    chatController.getChatHistory
+    getChatHistory
 );
 
 router.post(
@@ -52,7 +66,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.joinParty
+    joinParty
 );
 
 router.post(
@@ -60,7 +74,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.getRecentPartyList
+    getRecentPartyList
 );
 
 router.post(
@@ -68,7 +82,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.getUpcomingPartyList
+    getUpcomingPartyList
 );
 
 router.post(
@@ -76,7 +90,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.togglePartyPrivacy
+    togglePartyPrivacy
 );
 
 router.post(
@@ -84,7 +98,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.fetchUsers
+    fetchUsers
 );
 
 router.post(
@@ -92,7 +106,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.fetchBlockedUsers
+    fetchBlockedUsers
 );
 
 router.post(
@@ -100,7 +114,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.unBlockUsers
+    unBlockUsers
 );
 
 router.post(
@@ -108,7 +122,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.updateCoHosts
+    updateCoHosts
 );
 
 router.post(
@@ -116,7 +130,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.launchParty
+    launchParty
 );
 
 router.post(
@@ -124,7 +138,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.updateVideoInTheParty
+    updateVideoInTheParty
 );
 
 router.post(
@@ -132,10 +146,10 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.inviteGuestsInTheParty
+    inviteGuestsInTheParty
 );
 
-router.post("/serchVids", partyController.searchVideos);
-router.post("/trendVids", partyController.trendVideos);
+router.post("/serchVids", searchVideos);
+router.post("/trendVids", trendVideos);
 
-module.exports = router;
+export default router;

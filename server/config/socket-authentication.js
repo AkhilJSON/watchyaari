@@ -1,11 +1,13 @@
 // packages
-const redis = require("./redis");
-const socketAuth = require("socketio-auth");
+import socketAuth from "socketio-auth";
+
+// config
+import redis from "./redis.js";
 
 // controllers
-var userLoginAuth = require("../controllers/common/userLoginAuth");
+import * as userLoginAuth from "../controllers/common/userLoginAuth.js";
 
-exports.socketAauthentication = function (nameSpaceIo, usersKey = "users") {
+export function socketAauthentication(nameSpaceIo, usersKey = "users") {
     socketAuth(nameSpaceIo, {
         authenticate: async (socket, data, callback) => {
             const token = data.token;
@@ -36,4 +38,4 @@ exports.socketAauthentication = function (nameSpaceIo, usersKey = "users") {
         },
         timeout: "none",
     });
-};
+}

@@ -1,19 +1,19 @@
-// Schema of Guest
+/* // Schema of Guest
 "use strict";
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import mongoose, { Schema, model } from "mongoose";
+import { promisifyAll } from "bluebird";
 
-Promise.promisifyAll(mongoose);
+promisifyAll(mongoose);
 
-var guestSchema = new mongoose.Schema(
+var guestSchema = new Schema(
     {
         partyId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Party",
         },
         userId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
         },
         isCoHost: {
@@ -23,5 +23,7 @@ var guestSchema = new mongoose.Schema(
     { versionKey: false }
 );
 
-var Guest = mongoose.model("Guest", guestSchema);
-module.exports = Guest;
+var Guest = model("Guest", guestSchema);
+ */
+const Guest = {};
+export default Guest;

@@ -1,8 +1,8 @@
 // packages
-const _ = require("lodash");
-let nLog = require("noogger");
+import _ from "lodash";
+import nLog from "noogger";
 
-exports.catchException = function (exception, res) {
+function catchException(exception, res) {
     console.log("e::", JSON.stringify(exception));
     nLog.error(JSON.stringify(exception));
     return res.json({
@@ -10,9 +10,9 @@ exports.catchException = function (exception, res) {
         Message: "exception",
         Reason: exception,
     });
-};
+}
 
-exports.checkIfExists = function (array, key, value) {
+function checkIfExists(array, key, value) {
     if (_.isArray(array)) {
         let index = _.findIndex(array, function (o) {
             return o[key] == value;
@@ -20,4 +20,9 @@ exports.checkIfExists = function (array, key, value) {
         return index >= 0 ? true : false;
     }
     return false;
+}
+
+export default {
+    catchException,
+    checkIfExists,
 };

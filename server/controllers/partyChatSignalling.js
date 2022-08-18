@@ -1,12 +1,10 @@
 // packages
-var os = require("os");
-const mongoose = require("mongoose");
-const _ = require("lodash");
+import mongoose from "mongoose";
 
 // models
-var Chat = require("../models/common/chat");
+import Chat from "../models/common/chat.js";
 
-exports.partyChatSocketHandling = async function (socket, io) {
+export default async function partyChatSocketHandling(socket, io) {
     try {
         let partyId = socket.handshake.query && socket.handshake.query.partyId;
 
@@ -33,7 +31,7 @@ exports.partyChatSocketHandling = async function (socket, io) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function log() {
     var array = ["Message from server:"];

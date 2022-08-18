@@ -1,4 +1,4 @@
-exports.PLAYER_STATUS = {
+export const PLAYER_STATUS = {
     unstarted: -1,
     ended: 0,
     playing: 1,
@@ -7,11 +7,11 @@ exports.PLAYER_STATUS = {
     video_cued: 5,
 };
 
-exports.PARTY_STATUS = {
+export const PARTY_STATUS = {
     PAUSE: 1,
     RESUME: 2,
 };
 
-exports.DEFAULT_MAX_GUESTS_ALLOWED = 4;
-exports.DEFAULT_CHECK_IF_LAG_SYNC_INTERVAL = 10000;
-exports.DEFAULT_PARTY_DURATION_SYNC_INTERVAL = 10000;
+export const DEFAULT_MAX_GUESTS_ALLOWED = 4;
+export const DEFAULT_CHECK_IF_LAG_SYNC_INTERVAL = 10000;
+export const DEFAULT_PARTY_DURATION_SYNC_INTERVAL = 10000;

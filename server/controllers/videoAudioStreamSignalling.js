@@ -1,8 +1,8 @@
 // packages
-const _ = require("lodash");
-const btoa = require("btoa");
+import _ from "lodash";
+import btoa from "btoa";
 
-exports.videoAudioSocketHandling = async function (socket, io) {
+export default async function videoAudioSocketHandling(socket, io) {
     try {
         let partyId = socket.handshake.query && socket.handshake.query.partyId;
 
@@ -75,7 +75,7 @@ exports.videoAudioSocketHandling = async function (socket, io) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function log() {
     var array = ["Message from server:"];

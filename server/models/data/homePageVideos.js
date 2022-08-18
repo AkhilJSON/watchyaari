@@ -1,13 +1,13 @@
-// Schema of Home page videos
+/* // Schema of Home page videos
 
 "use strict";
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import mongoose, { Schema, model } from "mongoose";
+import { promisifyAll } from "bluebird";
 
-Promise.promisifyAll(mongoose);
+promisifyAll(mongoose);
 
-var homePageVideosSchema = new mongoose.Schema(
+var homePageVideosSchema = new Schema(
     {
         data: {
             type: String,
@@ -19,5 +19,6 @@ var homePageVideosSchema = new mongoose.Schema(
     { versionKey: false }
 );
 
-var HomePageVideo = mongoose.model("HomePageVideo", homePageVideosSchema);
-module.exports = HomePageVideo;
+var HomePageVideo = model("HomePageVideo", homePageVideosSchema); */
+const HomePageVideo = {};
+export default HomePageVideo;

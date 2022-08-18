@@ -1,14 +1,14 @@
-// Schema of party
+/* // Schema of party
 "use strict";
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
-Promise.promisifyAll(mongoose);
+import mongoose, { Schema, model } from "mongoose";
+import { promisifyAll } from "bluebird";
+promisifyAll(mongoose);
 
 // constants
-let GLOBAL_CONSTANTS = require("../../config/constants");
+import { DEFAULT_MAX_GUESTS_ALLOWED } from "../../config/constants.js";
 
-var partySchema = new mongoose.Schema(
+var partySchema = new Schema(
     {
         title: {
             type: String,
@@ -24,19 +24,19 @@ var partySchema = new mongoose.Schema(
         },
         guests: [
             {
-                type: mongoose.Schema.Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: "Guest",
             },
         ],
         guestUserIds: [
             {
-                type: mongoose.Schema.Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: "User",
             },
         ],
         removedUsers: [
             {
-                type: mongoose.Schema.Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: "User",
             },
         ],
@@ -54,11 +54,11 @@ var partySchema = new mongoose.Schema(
             default: false,
         },
         endedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
         },
         hostedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
         },
         isDeleted: {
@@ -66,7 +66,7 @@ var partySchema = new mongoose.Schema(
         },
         modifiedOn: { type: Date },
         modifiedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
         },
         status: {
@@ -109,14 +109,14 @@ var partySchema = new mongoose.Schema(
                     type: Date,
                 },
                 mBy: {
-                    type: mongoose.Schema.Types.ObjectId,
+                    type: Schema.Types.ObjectId,
                     ref: "User",
                 },
             },
         ],
         maxGuestsAllowed: {
             type: Number,
-            default: GLOBAL_CONSTANTS.DEFAULT_MAX_GUESTS_ALLOWED,
+            default: DEFAULT_MAX_GUESTS_ALLOWED,
         },
         isPrivate: {
             type: Boolean,
@@ -130,5 +130,6 @@ var partySchema = new mongoose.Schema(
     { versionKey: false }
 );
 
-var Party = mongoose.model("Party", partySchema);
-module.exports = Party;
+var Party = model("Party", partySchema); */
+const Party = {};
+export default Party;
