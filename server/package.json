@@ -42,6 +42,7 @@
         "path": "^0.12.7",
         "randomstring": "^1.1.5",
         "redis": "^3.0.2",
+        "redis-om": "^0.3.6",
         "socket.io": "^2.3.0",
         "socket.io-redis": "^5.2.0",
         "socketio-auth": "^0.1.1",
