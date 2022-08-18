@@ -2,18 +2,16 @@ import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-
+import * as moment from 'moment/moment';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 
 // services
-import { LoginAuthService } from '../services/login-auth.service';
-import { PartyService } from '../services/party.service';
-
-import * as moment from 'moment/moment';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CustomValidator } from '../common/custom-validator';
+import { LoginAuthService } from '../../services/login-auth.service';
+import { PartyService } from '../../services/party.service';
+import { CustomValidator } from '../../common/custom-validator';
 import { ProfileService } from '../my-account/profile.service';
-import { SharedService } from '../services/shared.service';
+import { SharedService } from '../../services/shared.service';
 
 export interface LoginSignupModalData {
   defaultTab: 0;

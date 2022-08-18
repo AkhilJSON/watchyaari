@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { PartyService } from '../services/party.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { LoginSignupComponent } from '../login-signup/login-signup.component';
+import { LoginSignupComponent } from '../account/login-signup/login-signup.component';
 
 @Component({
   selector: 'video-results-card',

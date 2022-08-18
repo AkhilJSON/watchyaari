@@ -25,13 +25,13 @@ import { Interceptor } from './services/interceptor.service';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { LoginSignupComponent } from './login-signup/login-signup.component';
+import { LoginSignupComponent } from './account/login-signup/login-signup.component';
 import { LaunchPartyComponent } from './launch-party/launch-party.component';
 import { JoinPartyComponent } from './join-party/join-party.component';
 import { SpinnerComponent } from './common/spinner/spinner.component';
 import { VideoResultsCardComponent } from './video-results-card/video-results-card.component';
-import { VerifyEmailComponent } from './verify-email/verify-email.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { VerifyEmailComponent } from './account/verify-email/verify-email.component';
+import { ResetPasswordComponent } from './account/reset-password/reset-password.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { ProfileComponent } from './profile/profile.component';
 
-import { AuthGuardService } from '../services/auth-guard.service';
+import { AuthGuardService } from '../../services/auth-guard.service';
 
 export const MyAccountRoutes: Routes = [
   {

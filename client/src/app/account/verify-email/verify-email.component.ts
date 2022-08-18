@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { Subscription } from 'rxjs';
-import { LoginAuthService } from '../services/login-auth.service';
+import { LoginAuthService } from '../../services/login-auth.service';
 
 @Component({
   selector: 'app-verify-email',

@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CustomValidator } from '../common/custom-validator';
+import { CustomValidator } from '../../common/custom-validator';
 
 import { Subscription } from 'rxjs';
-import { LoginAuthService } from '../services/login-auth.service';
+import { LoginAuthService } from '../../services/login-auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-reset-password',

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { CustomValidator } from '../../common/custom-validator';
+import { CustomValidator } from '../../../common/custom-validator';
 import { ProfileService } from '../profile.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoginAuthService } from 'src/app/services/login-auth.service';

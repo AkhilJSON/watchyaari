@@ -10,7 +10,7 @@ import { PartyService } from './party.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 import * as _ from 'lodash';
-import { ProfileService } from '../my-account/profile.service';
+import { ProfileService } from '../account/my-account/profile.service';
 
 @Injectable({
   providedIn: 'root',

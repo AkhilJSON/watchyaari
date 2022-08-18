@@ -10,7 +10,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { LoginSignupComponent } from '../login-signup/login-signup.component';
+import { LoginSignupComponent } from '../account/login-signup/login-signup.component';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 

@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { JoinPartyComponent } from './join-party/join-party.component';
 import { LaunchPartyComponent } from './launch-party/launch-party.component';
-import { VerifyEmailComponent } from './verify-email/verify-email.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { VerifyEmailComponent } from './account/verify-email/verify-email.component';
+import { ResetPasswordComponent } from './account/reset-password/reset-password.component';
 
 import { AuthGuardService } from './services/auth-guard.service';
 
@@ -39,7 +39,7 @@ export const AppRoutes: Routes = [
   {
     path: 'myAccount',
     loadChildren: () =>
-      import('./my-account/my-account.module').then((m) => m.MyAccountModule),
+      import('./account/my-account/my-account.module').then((m) => m.MyAccountModule),
   },
   {
     path: '**',

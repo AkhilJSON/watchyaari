@@ -14,7 +14,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { LoginSignupComponent } from './login-signup/login-signup.component';
+import { LoginSignupComponent } from './account/login-signup/login-signup.component';
 import { LoginAuthService } from './services/login-auth.service';
 import { SharedService } from './services/shared.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -29,7 +29,7 @@ import {
 import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
-import { ProfileService } from './my-account/profile.service';
+import { ProfileService } from './account/my-account/profile.service';
 
 import { environment } from '../environments/environment';
 @Component({

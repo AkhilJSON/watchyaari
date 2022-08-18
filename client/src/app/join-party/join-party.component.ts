@@ -14,7 +14,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Subscription } from 'rxjs';
 
 import { CustomValidator } from '../common/custom-validator';
-import { LoginSignupComponent } from '../login-signup/login-signup.component';
+import { LoginSignupComponent } from '../account/login-signup/login-signup.component';
 
 import * as moment from 'moment/moment';
 

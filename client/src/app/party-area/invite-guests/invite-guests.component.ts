@@ -40,7 +40,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SharedService } from 'src/app/services/shared.service';
 
 import { GlobalConstants } from '../../common/global-constants';
-import { ProfileService } from 'src/app/my-account/profile.service';
+import { ProfileService } from 'src/app/account/my-account/profile.service';
 
 export interface InviteGuestsModalData {
   socket: any;

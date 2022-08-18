@@ -5,7 +5,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 import { MyAccountRoutingModule } from './my-account-routing.module';
 
-import { RequiredMaterialModule } from '../required-material.module';
+import { RequiredMaterialModule } from '../../required-material.module';
 
 //components
 import { ProfileComponent } from './profile/profile.component';
