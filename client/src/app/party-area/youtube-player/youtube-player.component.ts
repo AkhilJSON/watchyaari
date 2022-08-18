@@ -11,8 +11,9 @@ import {
     OnChanges,
     OnDestroy,
 } from "@angular/core";
-
 import { DOCUMENT } from "@angular/common";
+
+// services
 import { SharedService } from "../../services/shared.service";
 
 declare var YT: any;

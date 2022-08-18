@@ -1,15 +1,16 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { ActivatedRoute, Router } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { JwtHelperService } from "@auth0/angular-jwt";
+import * as _ from "lodash";
+
+// env
 import { environment } from "../../environments/environment";
 
+// services
 import { CookieService } from "./cookie.service";
 import { SharedService } from "./shared.service";
 import { PartyService } from "./party.service";
-
-import { JwtHelperService } from "@auth0/angular-jwt";
-
-import * as _ from "lodash";
 import { ProfileService } from "../account/my-account/profile.service";
 
 @Injectable({

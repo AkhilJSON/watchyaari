@@ -1,31 +1,20 @@
-import {
-    Component,
-    OnInit,
-    OnDestroy,
-    ViewChild,
-    ElementRef,
-    AfterViewInit,
-    ChangeDetectorRef,
-    Inject,
-} from "@angular/core";
+import { Component, OnInit, ViewChild, Inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from "@angular/material/dialog";
-
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-
-import { Subscription } from "rxjs";
-import { Observable } from "rxjs";
+import { Subscription, Observable } from "rxjs";
 import { map, startWith, debounceTime, tap, switchMap, finalize } from "rxjs/operators";
-
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { PartyService } from "src/app/services/party.service";
-
 import * as _ from "lodash";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { SharedService } from "src/app/services/shared.service";
 
+// constants
 import { GlobalConstants } from "../../common/global-constants";
+
+// services
+import { PartyService } from "src/app/services/party.service";
+import { SharedService } from "src/app/services/shared.service";
 import { ProfileService } from "src/app/account/my-account/profile.service";
 
 export interface InviteGuestsModalData {

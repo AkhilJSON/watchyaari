@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { map, startWith } from "rxjs/operators";
 import { empty } from "rxjs";
 
+// env
 import { environment } from "../../environments/environment";
+
+// constants
 import { MediaPlayerConstants } from "../common/media-player-constants";
 
 @Injectable({

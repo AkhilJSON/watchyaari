@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnDestroy } from "@angular/core";
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from "@angular/core";
 
 @Component({
     selector: "app-video-audio-chat-area",

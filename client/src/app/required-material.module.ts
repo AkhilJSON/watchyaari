@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
@@ -27,9 +26,11 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatBadgeModule } from "@angular/material/badge";
 import { MatRadioModule } from "@angular/material/radio";
 
+// components
 import { NoDataFoundComponent } from "./common/no-data-found/no-data-found.component";
 import { AvatarComponent } from "./common/avatar/avatar.component";
 
+// pipes
 import { SecondsToTimeStringPipe } from "./pipes/seconds-to-time-string.pipe";
 import { MomentPipe } from "./pipes/moment.pipe";
 import { ControlTextPipe } from "./pipes/control-text.pipe";

@@ -1,30 +1,21 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { LoginSignupComponent } from "../account/login-signup/login-signup.component";
 import { Router } from "@angular/router";
 import { FormControl, Validators } from "@angular/forms";
-
+import { MatSnackBar } from "@angular/material/snack-bar";
+import * as _ from "lodash";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { Subscription } from "rxjs";
+import { PerfectScrollbarConfigInterface } from "ngx-perfect-scrollbar";
 
-import {
-    PerfectScrollbarConfigInterface,
-    PerfectScrollbarComponent,
-    PerfectScrollbarDirective,
-} from "ngx-perfect-scrollbar";
-
+// services
 import { SharedService } from "../services/shared.service";
 import { LoginAuthService } from "../services/login-auth.service";
 import { PartyService } from "../services/party.service";
-import { MatSnackBar } from "@angular/material/snack-bar";
 
-import { SampleVideoData } from "../common/sample-data";
-
-import { VideoSourceConstants } from "../common/video-source";
+// constatnts
 import { MediaPlayerConstants } from "../common/media-player-constants";
-
-import { environment } from "../../environments/environment";
-import * as _ from "lodash";
-import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 
 declare var YT: any;
 @Component({

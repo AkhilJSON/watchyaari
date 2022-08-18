@@ -1,29 +1,18 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    ViewChild,
-    HostListener,
-    Directive,
-    AfterViewInit,
-    OnInit,
-} from "@angular/core";
+import { ChangeDetectorRef, Component, AfterViewInit, OnInit } from "@angular/core";
 import { Meta, Title } from "@angular/platform-browser";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { LoginSignupComponent } from "./account/login-signup/login-signup.component";
+import { Router } from "@angular/router";
+import { MediaMatcher, Breakpoints, BreakpointObserver } from "@angular/cdk/layout";
+import { Subscription } from "rxjs";
+import * as _ from "lodash";
+
+// services
 import { LoginAuthService } from "./services/login-auth.service";
 import { SharedService } from "./services/shared.service";
-import { Router, ActivatedRoute } from "@angular/router";
 import { CookieService } from "src/app/services/cookie.service";
-
-import { MediaMatcher, Breakpoints, BreakpointObserver } from "@angular/cdk/layout";
-
-import { Subscription } from "rxjs";
-
-import * as _ from "lodash";
 import { ProfileService } from "./account/my-account/profile.service";
 
-import { environment } from "../environments/environment";
 @Component({
     selector: "app-root",
     templateUrl: "./app.component.html",

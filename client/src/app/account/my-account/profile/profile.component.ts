@@ -1,11 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-
 import { CustomValidator } from "../../../common/custom-validator";
-import { ProfileService } from "../profile.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { LoginAuthService } from "src/app/services/login-auth.service";
 import { Router } from "@angular/router";
+
+// services
+import { ProfileService } from "../profile.service";
+import { LoginAuthService } from "src/app/services/login-auth.service";
 import { SharedService } from "src/app/services/shared.service";
 
 @Component({

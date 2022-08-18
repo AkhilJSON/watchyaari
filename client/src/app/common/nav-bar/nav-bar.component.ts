@@ -1,14 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { LoginSignupComponent } from "../../login-signup/login-signup.component";
+import { MatDialog } from "@angular/material/dialog";
+import { Router, ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
+import * as _ from "lodash";
+
+// components
+import { LoginSignupComponent } from "../../account/login-signup/login-signup.component";
+
+// services
 import { LoginAuthService } from "../../services/login-auth.service";
 import { SharedService } from "../../services/shared.service";
-import { Router, ActivatedRoute } from "@angular/router";
 import { CookieService } from "src/app/services/cookie.service";
-
-import { Subscription } from "rxjs";
-
-import * as _ from "lodash";
 
 @Component({
     selector: "app-nav-bar",

@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
-import { CanActivate, Route, Router, RouterStateSnapshot } from "@angular/router";
+import { Router, RouterStateSnapshot } from "@angular/router";
 
+// services
 import { LoginAuthService } from "./login-auth.service";
 import { CookieService } from "./cookie.service";
 import { PartyService } from "./party.service";

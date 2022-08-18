@@ -1,29 +1,29 @@
 import { Component, OnInit, Input, ViewChild, AfterViewInit, OnDestroy, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { CookieService } from "../../services/cookie.service";
-import { PartyService } from "../../services/party.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatCardModule } from "@angular/material/card";
 import {
     PerfectScrollbarConfigInterface,
     PerfectScrollbarComponent,
     PerfectScrollbarDirective,
 } from "ngx-perfect-scrollbar";
-
 import * as moment from "moment/moment";
-
 import { Subscription } from "rxjs";
-
 import { SocketIOClient } from "socket.io-client";
 import * as io from "socket.io-client";
-
-import { environment } from "../../../environments/environment";
-import { ChatService } from "../../services/chat.service";
-
 import * as _ from "lodash";
-import { QuillInitializeService } from "../../services/quill-initialize.service";
+
+// env
+import { environment } from "../../../environments/environment";
+
+// other
 import "quill-mention";
 import "quill-emoji";
+
+// services
+import { ChatService } from "../../services/chat.service";
+import { QuillInitializeService } from "../../services/quill-initialize.service";
+import { CookieService } from "../../services/cookie.service";
+import { PartyService } from "../../services/party.service";
 
 @Component({
     selector: "app-party-chat",

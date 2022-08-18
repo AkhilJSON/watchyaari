@@ -1,5 +1,7 @@
 import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
+import { RouterModule } from "@angular/router";
+
+// routes
 import { MyAccountRoutes } from "./my-account.routing";
 
 @NgModule({

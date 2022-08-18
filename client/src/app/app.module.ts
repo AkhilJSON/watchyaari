@@ -1,28 +1,29 @@
 import { BrowserModule, Meta, Title } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
+
+// modules
+import { AppRoutingModule } from "./app-routing.module";
+import { JwtModule } from "@auth0/angular-jwt";
+import { PerfectScrollbarModule } from "ngx-perfect-scrollbar";
 import { ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-
-import { AppRoutingModule } from "./app-routing.module";
-
-import { JwtModule } from "@auth0/angular-jwt";
-
-import { RequiredMaterialModule } from "./required-material.module";
-
-import { AppOverlayModule } from "./overlay/overlay.module";
-import { ProgressSpinnerModule } from "./progress-spinner/progress-spinner.module";
-import { ProgressSpinnerComponent } from "./progress-spinner/progress-spinner.component";
-
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from "ng-pick-datetime";
 
-import { PerfectScrollbarModule } from "ngx-perfect-scrollbar";
+// custom modules
+import { ProgressSpinnerModule } from "./progress-spinner/progress-spinner.module";
+import { RequiredMaterialModule } from "./required-material.module";
+import { AppOverlayModule } from "./overlay/overlay.module";
+
+// other
 import { PERFECT_SCROLLBAR_CONFIG } from "ngx-perfect-scrollbar";
 import { PerfectScrollbarConfigInterface } from "ngx-perfect-scrollbar";
 
-import { HTTP_INTERCEPTORS } from "@angular/common/http";
+// services
 import { Interceptor } from "./services/interceptor.service";
 
+// components
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginSignupComponent } from "./account/login-signup/login-signup.component";
@@ -32,6 +33,7 @@ import { SpinnerComponent } from "./common/spinner/spinner.component";
 import { VideoResultsCardComponent } from "./video-results-card/video-results-card.component";
 import { VerifyEmailComponent } from "./account/verify-email/verify-email.component";
 import { ResetPasswordComponent } from "./account/reset-password/reset-password.component";
+import { ProgressSpinnerComponent } from "./progress-spinner/progress-spinner.component";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     suppressScrollX: true,

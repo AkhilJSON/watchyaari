@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, Inject, ViewEncapsulation } from "@angular/core";
+import { Component, Input, ViewEncapsulation } from "@angular/core";
 
 @Component({
     selector: "app-spinner",

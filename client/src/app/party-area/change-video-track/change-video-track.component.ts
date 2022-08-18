@@ -1,13 +1,11 @@
 import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { FormControl, Validators } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Subscription } from "rxjs";
-
-import { SampleVideoData } from "../../common/sample-data";
-
-import { environment } from "../../../environments/environment";
 import * as _ from "lodash";
+
+// services
 import { PartyService } from "src/app/services/party.service";
 import { MediaPlayerConstants } from "../../common/media-player-constants";
 import { SharedService } from "src/app/services/shared.service";

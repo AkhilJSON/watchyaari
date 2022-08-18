@@ -2,25 +2,19 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, Cha
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-import { CustomValidator } from "../common/custom-validator";
-
+import { Router, ActivatedRoute } from "@angular/router";
+import { JwtHelperService } from "@auth0/angular-jwt";
+import { Subscription, Observable } from "rxjs";
+import { map, startWith, debounceTime, tap, switchMap, finalize } from "rxjs/operators";
+import * as _ from "lodash";
+import * as moment from "moment/moment";
+import { COMMA, ENTER } from "@angular/cdk/keycodes";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
+// services
 import { PartyService } from "../services/party.service";
 import { CookieService } from "../services/cookie.service";
 import { SharedService } from "../services/shared.service";
-
-import { Router, ActivatedRoute } from "@angular/router";
-import { JwtHelperService } from "@auth0/angular-jwt";
-
-import { Subscription } from "rxjs";
-import { Observable } from "rxjs";
-import { map, startWith, debounceTime, tap, switchMap, finalize } from "rxjs/operators";
-
-import * as _ from "lodash";
-import * as moment from "moment/moment";
-
-import { COMMA, ENTER } from "@angular/cdk/keycodes";
 
 @Component({
     selector: "app-launch-party",

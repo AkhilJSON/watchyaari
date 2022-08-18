@@ -1,7 +1,6 @@
 import {
     Component,
     OnInit,
-    ElementRef,
     AfterViewInit,
     Inject,
     OnDestroy,
@@ -13,42 +12,35 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { SocketIOClient } from "socket.io-client";
 import * as io from "socket.io-client";
 import { Meta, Title } from "@angular/platform-browser";
-
 import { Subscription } from "rxjs";
-
-import { SharedService } from "../../services/shared.service";
-import { CookieService } from "../../services/cookie.service";
-
 import { DOCUMENT } from "@angular/common";
-
 import { JwtHelperService } from "@auth0/angular-jwt";
-
 import * as moment from "moment";
-
 import * as _ from "lodash";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialog } from "@angular/material/dialog";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 
-import { LoginAuthService } from "../../services/login-auth.service";
-import { PlayerControlsService } from "../../services/player-controls.service";
-
+// env
 import { environment } from "../../../environments/environment";
 
+// constants
 import { MediaPlayerConstants } from "../../common/media-player-constants";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { PartyService } from "../../services/party.service";
-import { MatDialog } from "@angular/material/dialog";
-import { ChangeVideoTrackComponent } from "../change-video-track/change-video-track.component";
-import { InviteGuestsComponent } from "../invite-guests/invite-guests.component";
 import { GlobalConstants } from "src/app/common/global-constants";
 
-import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
+// components
+import { ChangeVideoTrackComponent } from "../change-video-track/change-video-track.component";
+import { InviteGuestsComponent } from "../invite-guests/invite-guests.component";
+
+// services
+import { SharedService } from "../../services/shared.service";
+import { CookieService } from "../../services/cookie.service";
+import { LoginAuthService } from "../../services/login-auth.service";
+import { PlayerControlsService } from "../../services/player-controls.service";
+import { PartyService } from "../../services/party.service";
 
 declare var YT: any;
 declare var adapter: any;
-
-/* interface Player extends YT.Player {
-  videoId?: string | undefined;
-} */
-
 @Component({
     selector: "app-new-party-area",
     templateUrl: "./new-party-area.component.html",

@@ -1,11 +1,17 @@
 import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from "@angular/core";
-import { VideoSourceConstants } from "../common/video-source";
-import { LoginAuthService } from "../services/login-auth.service";
 import { Subscription } from "rxjs";
-import { PartyService } from "../services/party.service";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
+
+// constants
+import { VideoSourceConstants } from "../common/video-source";
+
+// components
 import { LoginSignupComponent } from "../account/login-signup/login-signup.component";
+
+// services
+import { LoginAuthService } from "../services/login-auth.service";
+import { PartyService } from "../services/party.service";
 
 @Component({
     selector: "video-results-card",

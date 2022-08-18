@@ -1,10 +1,11 @@
+// modules
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule } from "@angular/forms";
-import { HttpClientModule, HttpClient } from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 
+// custom modules
 import { MyAccountRoutingModule } from "./my-account-routing.module";
-
 import { RequiredMaterialModule } from "../../required-material.module";
 
 //components

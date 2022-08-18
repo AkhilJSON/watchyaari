@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
-import { OverlayService, AppOverlayConfig } from "./overlay.service";
+// services
 export { OverlayService, AppOverlayConfig } from "./overlay.service";
 @NgModule({
     declarations: [],

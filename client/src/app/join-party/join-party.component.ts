@@ -3,21 +3,19 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router, ActivatedRoute } from "@angular/router";
 import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
-
-import { Subscription } from "rxjs";
-
-import { CustomValidator } from "../common/custom-validator";
-import { LoginSignupComponent } from "../account/login-signup/login-signup.component";
-
 import * as moment from "moment/moment";
-
+import { Subscription } from "rxjs";
 import {
     PerfectScrollbarConfigInterface,
     PerfectScrollbarComponent,
     PerfectScrollbarDirective,
 } from "ngx-perfect-scrollbar";
+
+// components
+import { LoginSignupComponent } from "../account/login-signup/login-signup.component";
+
+// services
 import { PartyService } from "../services/party.service";
-import { LoginAuthService } from "../services/login-auth.service";
 import { MatDialog } from "@angular/material/dialog";
 import { SharedService } from "../services/shared.service";
 

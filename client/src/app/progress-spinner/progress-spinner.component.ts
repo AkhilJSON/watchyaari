@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ViewChild, TemplateRef, ViewContainerRef, DoCheck, OnDestroy } from "@angular/core";
 import { ProgressSpinnerMode } from "@angular/material/progress-spinner";
 import { ThemePalette } from "@angular/material/core";
-
 import { OverlayRef } from "@angular/cdk/overlay";
 
+// custom modules
 import { OverlayService, AppOverlayConfig } from "../overlay/overlay.module";
 
 @Component({

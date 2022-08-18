@@ -1,11 +1,14 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router, ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
+import { MatSnackBar } from "@angular/material/snack-bar";
+
+// other
 import { CustomValidator } from "../../common/custom-validator";
 
-import { Subscription } from "rxjs";
+// services
 import { LoginAuthService } from "../../services/login-auth.service";
-import { MatSnackBar } from "@angular/material/snack-bar";
 @Component({
     selector: "app-reset-password",
     templateUrl: "./reset-password.component.html",
