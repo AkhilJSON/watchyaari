@@ -20,8 +20,6 @@ router.post('/resetPassword', commonController.resetPassword);
 
 router.post('/resetPasswordLink', commonController.verifyResetPasswordLink);
 
-
-
 router.post('/getPartyDetails', passport.authenticate('user', {
     session: false
 }), commonController.getPartyDetails);

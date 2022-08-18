@@ -8,8 +8,6 @@ var Guest = require('../models/common/guest');
 
 var UserLoginAuth = require('./common/userLoginAuth');
 
-var PartyMetrics = require('../models/common/partyMetrics');
-
 var Helper = require('./helper');
 
 const mongoose = require('mongoose');
@@ -352,9 +350,6 @@ exports.launchParty = async function (req, res) {
             }
         }
 
-        //create party metrics document
-        // new PartyMetrics({ partyId: partyData._id }).save();
-
         if (body._id) {
             delete partyData._id;
             await Party.updateOne({ _id: mongoose.Types.ObjectId(body._id) }, { $set: partyData });
@@ -656,66 +651,6 @@ exports.togglePartyPrivacy = async function (req, res) {
         Helper.catchException(JSON.stringify(e), res)
     }
 }
-
-exports.saveTransportPolicyMetrics = async function ({ metricsData = null, partyId = null }) {
-    try {
-        if (!partyId || !metricsData) {
-            return;
-        }
-        partyId = mongoId(partyId);
-
-        let partyMetricsData = await PartyMetrics.findOne({ partyId });
-        if (!partyMetricsData) {
-            partyMetricsData = new PartyMetrics();
-            partyMetricsData.partyId = partyId;
-
-            let guestInfo = {
-                userId: mongoId(metricsData.userId),
-                iceTransportPolicy: [
-                    {
-                        peerId: mongoId(metricsData.peerId),
-                        transportPolicy: metricsData.transportPolicy,
-                        address: metricsData.address
-                    }
-                ]
-            };
-            partyMetricsData['guestInfo'] = [guestInfo];
-
-            await partyMetricsData.save();
-        } else {
-            let userDataExists = _.find(partyMetricsData.guestInfo || [], { userId: mongoId(metricsData.userId) });
-            if (userDataExists) {
-                await PartyMetrics.update({ partyId, 'guestInfo.userId': mongoId(metricsData.userId) }, {
-                    $addToSet: {
-                        'guestInfo.$.iceTransportPolicy': {
-                            peerId: mongoId(metricsData.peerId),
-                            transportPolicy: metricsData.transportPolicy,
-                            address: metricsData.address
-                        }
-                    }
-                })
-            } else {
-                await PartyMetrics.update({ partyId }, {
-                    $addToSet: {
-                        guestInfo: {
-                            userId: mongoId(metricsData.userId),
-                            iceTransportPolicy: [
-                                {
-                                    peerId: mongoId(metricsData.peerId),
-                                    transportPolicy: metricsData.transportPolicy,
-                                    address: metricsData.address
-                                }
-                            ]
-                        }
-                    }
-                })
-            }
-        }
-    } catch (e) {
-        console.log("e::", e)
-    }
-}
-
 
 function generateRegex(query = "", options) {
     if (!query) {

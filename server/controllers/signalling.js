@@ -1,6 +1,5 @@
 var os = require('os');
 var Party = require('../models/common/party');
-var PartyMetrics = require('../models/common/partyMetrics');
 var moment = require('moment');
 var commonController = require('./common/userLoginAuth');
 
@@ -58,20 +57,7 @@ exports.socketHandling = async function (socket, io) {
                         await Party.update({ _id: mongoose.Types.ObjectId(partyId) }, { $set: updateObj });
 
 
-                        //Update video chat connection details in party metrics
-                        redis.get(videoChatConnectionKey, (err, value) => {
-                            PartyMetrics.findOneAndUpdate({ partyId: mongoose.Types.ObjectId(partyId) }, {
-                                $set: {
-                                    partyId: mongoose.Types.ObjectId(partyId),
-                                    connectionDetails: value
-                                }
-                            }, { upsert: true })
-                                .then((val) => { })
-                                .catch((e) => { nLog.error(e) })
-
-                            redis.delAsync(videoChatConnectionKey);
-                        })
-
+                        redis.delAsync(videoChatConnectionKey);
                     }
 
                     if (Helper.checkIfExists(partySync.users, 'userId', socket.user._id)) {

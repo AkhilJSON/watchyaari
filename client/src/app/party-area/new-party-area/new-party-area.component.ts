@@ -686,15 +686,6 @@ export class NewPartyAreaComponent
       );
       this.updateParticipantsData(userId, { loading: false });
 
-      //Send signal to save metrics
-      /* let metricsData = {
-        userId: this.loggedInUserdId,
-        peerId: userId,
-        transportPolicy: candidate.type,
-        address: candidate.address
-      };
-      this.videoAudioSocket.emit("SAVE_TRANSPORT_POLICY_METRICS", metricsData); */
-
       //Update connection related data
       this.rtcConnectionUpdate();
     });

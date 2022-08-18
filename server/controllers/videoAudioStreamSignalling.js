@@ -67,11 +67,6 @@ exports.videoAudioSocketHandling = async function (socket, io) {
             socket.user && socket.to(partyId).emit("broadcastData", socket.user._id, data);
         })
 
-        //save party metrics in partymetrics collection
-        socket.on('SAVE_TRANSPORT_POLICY_METRICS', (metricsData) => {
-            partyController.saveTransportPolicyMetrics({ metricsData, partyId });
-        })
-
         socket.on("disconnect", () => {
             // console.log("\n disconnect", "\n");
             socket.user && socket.to(partyId).emit("disconnectPeer", socket.id, socket.user._id);
