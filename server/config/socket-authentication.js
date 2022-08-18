@@ -1,29 +1,28 @@
-var userLoginAuth = require('../controllers/common/userLoginAuth');
-const redis = require('./redis');
-const socketAuth = require('socketio-auth');
+var userLoginAuth = require("../controllers/common/userLoginAuth");
+const redis = require("./redis");
+const socketAuth = require("socketio-auth");
 
-exports.socketAauthentication = function(nameSpaceIo, usersKey="users"){
+exports.socketAauthentication = function (nameSpaceIo, usersKey = "users") {
     socketAuth(nameSpaceIo, {
         authenticate: async (socket, data, callback) => {
             const token = data.token;
             try {
                 const user = await userLoginAuth.verifyUser(token);
-                const canConnect = await redis
-                    .setAsync(`${usersKey}:${user._id}`, socket.id, 'NX', 'EX', 30);
+                const canConnect = await redis.setAsync(`${usersKey}:${user._id}`, socket.id, "NX", "EX", 30);
                 if (!canConnect) {
-                    return callback({ message: 'ALREADY_LOGGED_IN' });
+                    return callback({ message: "ALREADY_LOGGED_IN" });
                 }
-    
+
                 socket.user = user;
                 return callback(null, true);
             } catch (e) {
-                return callback({ message: 'UNAUTHORIZED' });
+                return callback({ message: "UNAUTHORIZED" });
             }
         },
         postAuthenticate: async (socket) => {
-            socket.conn.on('packet', async (packet) => {
-                if (socket.auth && packet.type === 'ping') {
-                    await redis.setAsync(`${usersKey}:${socket.user._id}`, socket.id, 'XX', 'EX', 30);
+            socket.conn.on("packet", async (packet) => {
+                if (socket.auth && packet.type === "ping") {
+                    await redis.setAsync(`${usersKey}:${socket.user._id}`, socket.id, "XX", "EX", 30);
                 }
             });
         },
@@ -32,6 +31,6 @@ exports.socketAauthentication = function(nameSpaceIo, usersKey="users"){
                 await redis.delAsync(`${usersKey}:${socket.user._id}`);
             }
         },
-        timeout: 'none'
-    })
-}
+        timeout: "none",
+    });
+};

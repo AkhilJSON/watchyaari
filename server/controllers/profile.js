@@ -1,12 +1,11 @@
-var User = require('../models/common/user');
+var User = require("../models/common/user");
 
-var UserLoginAuth = require('./common/userLoginAuth');
+var UserLoginAuth = require("./common/userLoginAuth");
 
-var Helper = require('./helper');
+var Helper = require("./helper");
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 var _ = require("lodash");
-
 
 exports.updateProfile = async function (req, res) {
     try {
@@ -15,18 +14,17 @@ exports.updateProfile = async function (req, res) {
         let userData = await User.findById(user._id);
         userData = _.assignIn(userData, req.body);
 
-        await userData.save()
+        await userData.save();
         return res.json({
             Success: true,
-            message: 'OK',
-            code: 200
-        })
+            message: "OK",
+            code: 200,
+        });
     } catch (e) {
-        console.log(e)
-        Helper.catchException(JSON.stringify(e), res)
+        console.log(e);
+        Helper.catchException(JSON.stringify(e), res);
     }
-}
-
+};
 
 exports.fetchProfile = async function (req, res) {
     try {
@@ -34,12 +32,12 @@ exports.fetchProfile = async function (req, res) {
 
         return res.json({
             Success: true,
-            message: 'OK',
+            message: "OK",
             code: 200,
-            data: user
-        })
+            data: user,
+        });
     } catch (e) {
-        console.log(e)
-        Helper.catchException(JSON.stringify(e), res)
+        console.log(e);
+        Helper.catchException(JSON.stringify(e), res);
     }
-}
+};
