@@ -1,8 +1,8 @@
 export const environment = {
-  production: true,
-  baseURL: 'https://api.watchyaari.com/',
-  common: 'https://api.watchyaari.com/common/',
-  defaultSocketConnection: 'https://api.watchyaari.com',
+  production: false,
+  baseURL: 'http://localhost:3000/',
+  common: 'http://localhost:3000/common/',
+  defaultSocketConnection: 'http://localhost:3000',
   mediaStreamConstraints: {
     firefox: {
       video: {
