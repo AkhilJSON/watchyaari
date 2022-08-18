@@ -1,24 +1,17 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule, HttpClient } from "@angular/common/http";
 
-import { MyAccountRoutingModule } from './my-account-routing.module';
+import { MyAccountRoutingModule } from "./my-account-routing.module";
 
-import { RequiredMaterialModule } from '../../required-material.module';
+import { RequiredMaterialModule } from "../../required-material.module";
 
 //components
-import { ProfileComponent } from './profile/profile.component';
+import { ProfileComponent } from "./profile/profile.component";
 
 @NgModule({
-  declarations: [ProfileComponent],
-  imports: [
-    CommonModule,
-    MyAccountRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-
-    RequiredMaterialModule,
-  ],
+    declarations: [ProfileComponent],
+    imports: [CommonModule, MyAccountRoutingModule, ReactiveFormsModule, HttpClientModule, RequiredMaterialModule],
 })
 export class MyAccountModule {}

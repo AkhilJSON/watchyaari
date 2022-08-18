@@ -1,15 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from "@angular/core";
 
 @Component({
-  selector: 'app-avatar',
-  templateUrl: './avatar.component.html',
-  styleUrls: ['./avatar.component.css'],
+    selector: "app-avatar",
+    templateUrl: "./avatar.component.html",
+    styleUrls: ["./avatar.component.css"],
 })
 export class AvatarComponent implements OnInit {
-  @Input() avatarName: any;
-  @Input() styling: any;
+    @Input() avatarName: any;
+    @Input() styling: any;
 
-  constructor() {}
+    constructor() {}
 
-  ngOnInit(): void {}
+    ngOnInit(): void {}
 }

@@ -1,35 +1,35 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 
 @Component({
-  selector: 'app-show-message',
-  templateUrl: './no-data-found.component.html',
-  styleUrls: ['./no-data-found.component.css'],
+    selector: "app-show-message",
+    templateUrl: "./no-data-found.component.html",
+    styleUrls: ["./no-data-found.component.css"],
 })
 export class NoDataFoundComponent implements OnInit {
-  @Input() public maxHeight = '500px';
-  @Input() public message = 'No data found!';
-  @Input() public className = '';
-  @Input() public showHomePageNavigation = false;
-  @Input() public actionLabel = '';
+    @Input() public maxHeight = "500px";
+    @Input() public message = "No data found!";
+    @Input() public className = "";
+    @Input() public showHomePageNavigation = false;
+    @Input() public actionLabel = "";
 
-  @Output() onCloseOtherPartySessions = new EventEmitter<{
-    closeOtherSessions: any;
-  }>();
+    @Output() onCloseOtherPartySessions = new EventEmitter<{
+        closeOtherSessions: any;
+    }>();
 
-  constructor() {}
+    constructor() {}
 
-  ngOnInit(): void {}
+    ngOnInit(): void {}
 
-  reloadPage(event: any) {
-    event.preventDefault();
-    window.location.reload();
-  }
+    reloadPage(event: any) {
+        event.preventDefault();
+        window.location.reload();
+    }
 
-  goback() {
-    window.location.href = '';
-  }
+    goback() {
+        window.location.href = "";
+    }
 
-  closeOtherPartySessions() {
-    this.onCloseOtherPartySessions.emit({ closeOtherSessions: true });
-  }
+    closeOtherPartySessions() {
+        this.onCloseOtherPartySessions.emit({ closeOtherSessions: true });
+    }
 }

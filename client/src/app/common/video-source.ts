@@ -1,3 +1,3 @@
 export class VideoSourceConstants {
-  public static YOUTUBE: any = 'YOUTUBE';
+    public static YOUTUBE: any = "YOUTUBE";
 }

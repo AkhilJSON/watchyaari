@@ -1,81 +1,77 @@
-import { Injectable } from '@angular/core';
-import { MediaPlayerConstants } from '../common/media-player-constants';
+import { Injectable } from "@angular/core";
+import { MediaPlayerConstants } from "../common/media-player-constants";
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: "root",
 })
 export class PlayerControlsService {
-  constructor() {}
+    constructor() {}
 
-  changeVolume(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        if (data.status == 'MUTE') {
-          data.player.mute();
+    changeVolume(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                if (data.status == "MUTE") {
+                    data.player.mute();
+                }
+                if (data.status == "UN_MUTE") {
+                    data.player.unMute();
+                    data.player.setVolume(MediaPlayerConstants.DEFAULT_VOLUME);
+                }
+                if (data.status == "CHANGE") {
+                    data.player.setVolume(data.volume);
+                }
+                break;
         }
-        if (data.status == 'UN_MUTE') {
-          data.player.unMute();
-          data.player.setVolume(MediaPlayerConstants.DEFAULT_VOLUME);
+    }
+
+    playVideo(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                data.player.playVideo();
+                break;
         }
-        if (data.status == 'CHANGE') {
-          data.player.setVolume(data.volume);
+    }
+
+    pauseVideo(playerType: any, data: any) {
+        if (data.status != MediaPlayerConstants.PLAYER_STATUS.playing) {
+            return;
         }
-        break;
+        switch (playerType) {
+            case "youtube":
+                data.player.pauseVideo();
+                break;
+        }
     }
-  }
 
-  playVideo(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        data.player.playVideo();
-        break;
+    stopVideo(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                data.player.stopVideo();
+                break;
+        }
     }
-  }
 
-  pauseVideo(playerType: any, data: any) {
-    if (data.status != MediaPlayerConstants.PLAYER_STATUS.playing) {
-      return;
+    seekTo(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                data.player.seekTo(data.seekTo);
+                break;
+        }
     }
-    switch (playerType) {
-      case 'youtube':
-        data.player.pauseVideo();
-        break;
-    }
-  }
 
-  stopVideo(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        data.player.stopVideo();
-        break;
+    getDuration(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                return data.player && data.player.getDuration ? data.player.getDuration() : 0.0;
+                break;
+        }
     }
-  }
 
-  seekTo(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        data.player.seekTo(data.seekTo);
-        break;
+    getCurrentTime(playerType: any, data: any) {
+        switch (playerType) {
+            case "youtube":
+                return data.player && data.player.getCurrentTime ? data.player.getCurrentTime() : 0.0;
+                break;
+        }
     }
-  }
-
-  getDuration(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        return data.player && data.player.getDuration
-          ? data.player.getDuration()
-          : 0.0;
-        break;
-    }
-  }
-
-  getCurrentTime(playerType: any, data: any) {
-    switch (playerType) {
-      case 'youtube':
-        return data.player && data.player.getCurrentTime
-          ? data.player.getCurrentTime()
-          : 0.0;
-        break;
-    }
-  }
 }

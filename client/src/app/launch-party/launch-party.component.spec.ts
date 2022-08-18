@@ -1,24 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { LaunchPartyComponent } from './launch-party.component';
+import { LaunchPartyComponent } from "./launch-party.component";
 
-describe('LaunchPartyComponent', () => {
-  let component: LaunchPartyComponent;
-  let fixture: ComponentFixture<LaunchPartyComponent>;
+describe("LaunchPartyComponent", () => {
+    let component: LaunchPartyComponent;
+    let fixture: ComponentFixture<LaunchPartyComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [LaunchPartyComponent],
-    }).compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [LaunchPartyComponent],
+        }).compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LaunchPartyComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(LaunchPartyComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

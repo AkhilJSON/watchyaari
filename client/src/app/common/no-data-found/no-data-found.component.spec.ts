@@ -1,24 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { NoDataFoundComponent } from './no-data-found.component';
+import { NoDataFoundComponent } from "./no-data-found.component";
 
-describe('NoDataFoundComponent', () => {
-  let component: NoDataFoundComponent;
-  let fixture: ComponentFixture<NoDataFoundComponent>;
+describe("NoDataFoundComponent", () => {
+    let component: NoDataFoundComponent;
+    let fixture: ComponentFixture<NoDataFoundComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [NoDataFoundComponent],
-    }).compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [NoDataFoundComponent],
+        }).compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(NoDataFoundComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(NoDataFoundComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });
