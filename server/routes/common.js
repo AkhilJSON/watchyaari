@@ -11,7 +11,7 @@ import {
     resetPassword,
     verifyResetPasswordLink,
     getUserDetails,
-    getPartyDetails
+    getPartyDetails,
 } from "../controllers/common/userLoginAuth.js";
 import { getChatHistory } from "../controllers/chat.js";
 import {

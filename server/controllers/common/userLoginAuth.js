@@ -16,6 +16,7 @@ import * as EmailService from "../../controllers/common/emailService.js";
 
 // helpers
 import Helper from "../helper.js";
+import GuestRepository from "../../models/common/guest.js";
 
 /**
  *
@@ -219,37 +220,34 @@ export async function resetPassword(req, res) {
     try {
         let body = req.body;
 
-        User.findOne({ entityId: body.uid }, async function (err, user) {
-            if (err) {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-            if (user) {
-                if (user.passwordResetCode) {
-                    user.passwordResetCode = "";
-                    user.password = body.password;
-                    await user.save();
+        let user = await UserRepository.fetch(body.uid);
 
-                    nLog.info(`${user.entityId} reset successfully`);
-                    return res.json({
-                        Success: true,
-                        Message: "Ok",
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "Invalid user",
-                    });
-                }
-            } else {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-        });
+        if (!user?.entityId) {
+            return res.json({
+                Success: false,
+                Message: "User not Found",
+            });
+        }
+
+        if (user.passwordResetCode) {
+            const encryptedPassword = await Helper.generateEncryptedCode(body.password);
+
+            user.passwordResetCode = "";
+            user.password = encryptedPassword;
+
+            await UserRepository.save(user);
+
+            nLog.info(`${user.entityId} reset successfully`);
+            return res.json({
+                Success: true,
+                Message: "Ok",
+            });
+        } else {
+            return res.json({
+                Success: false,
+                Message: "Invalid user",
+            });
+        }
     } catch (e) {
         return res.json({
             Success: false,
@@ -270,36 +268,30 @@ export async function verifyResetPasswordLink(req, res) {
             });
         }
 
-        var decoded = jwtDecode(token);
-        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
-            if (err) {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-            if (user) {
-                if (user.passwordResetCode) {
-                    nLog.info(`${user.entityId} password reset successfully`);
+        let decoded = jwtDecode(token),
+            user = await UserRepository.fetch(decoded.entityId);
 
-                    return res.json({
-                        Success: true,
-                        Message: "Ok",
-                        uid: user.entityId,
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "Invalid request",
-                    });
-                }
-            } else {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-        });
+        if (!user?.entityId) {
+            return res.json({
+                Success: false,
+                Message: "User not Found",
+            });
+        }
+
+        if (user.passwordResetCode) {
+            nLog.info(`${user.entityId} password reset successfully`);
+
+            return res.json({
+                Success: true,
+                Message: "Ok",
+                uid: user.entityId,
+            });
+        } else {
+            return res.json({
+                Success: false,
+                Message: "Invalid request",
+            });
+        }
     } catch (e) {
         return res.json({
             Success: false,
@@ -410,19 +402,8 @@ export async function getPartyDetails(req, res) {
             });
         }
 
-        let partyData = await Party.findById(
-            mongoose.Types.ObjectId(body.partyId),
-            "-videoListHistory -removedUsers"
-        ).populate({
-            path: "guests",
-            model: "Guest",
-            select: "-partyId",
-            populate: {
-                path: "userId",
-                model: "User",
-                select: "entityId fullName",
-            },
-        });
+        let partyData = await PartyRepository.fetch(body.partyId)
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
         if (!partyData) {
             return res.json({
@@ -579,33 +560,41 @@ function getVideoId(domain, videoURL) {
     }
 }
 
+/**
+ * returns Guest data, creates if doesn't exists
+ * @param {*} data
+ * @param {*} res
+ * @returns
+ */
 function createGuest(data, res) {
     return new Promise(async (resolve, reject) => {
         if (!data.entityId || !data.partyId) {
             resolve(null);
             return;
         }
-        let guestData = await Guest.findOne({
-            partyId: mongoose.Types.ObjectId(data.partyId),
-            userId: mongoose.Types.ObjectId(data.entityId),
-        });
+
+        let guestData = await GuestRepository.search()
+            .where("partyId")
+            .equals(data.partyId)
+            .and("userId")
+            .equals(data.entityId)
+            .returnFirst();
+
+        // Return existing
         if (guestData && guestData.entityId) {
             guestData = JSON.parse(JSON.stringify(guestData));
             guestData.alreadyJoined = true;
             resolve(guestData);
             return;
         }
-        guestData = new Guest();
-        guestData.partyId = mongoose.Types.ObjectId(data.partyId);
+
+        // Create new Guest
+        guestData = {};
+        guestData.partyId = data.partyId;
         guestData.userId = data.entityId;
-        guestData
-            .save()
-            .then((val) => {
-                resolve(val);
-            })
-            .catch((err) => {
-                resolve(null);
-            });
+        await GuestRepository.createAndSave(guestData);
+
+        resolve(guestData);
     });
 }
 

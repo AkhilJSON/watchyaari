@@ -53,9 +53,33 @@ async function compareEncryptedCode(code, encryptedCode) {
     }
 }
 
+/**
+ * Returns populated party data
+ * @param {*} partyDetails 
+ * @returns populated party data
+ */
+async function populateGuestDataOfParty(partyDetails){
+    try {
+        _.each(partyDetails?.guests, async (guestId) => {
+            // populate Guest
+            guestId = await GuestRepository.fetch(guestId);
+
+            // populate User
+            if (guestId?.userId) {
+                guestId.userId = await UserRepository.fetch(guestId?.userId);
+            }
+        });
+
+        return partyDetails;
+    } catch (error) {
+        return null;
+    }
+}
+
 export default {
     catchException,
     checkIfExists,
     generateEncryptedCode,
     compareEncryptedCode,
+    populateGuestDataOfParty
 };

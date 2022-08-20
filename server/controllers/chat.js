@@ -8,6 +8,13 @@ import ChatRepository from "../models/common/chat.js";
 // helpers
 import Helper from "./helper.js";
 
+/**
+ * Returns chat history of a specific party
+ * @param {*} req
+ * @param {String} req.body.partyId
+ * @param {*} res
+ * @returns Chat history
+ */
 export async function getChatHistory(req, res) {
     try {
         let body = req.body;
@@ -19,13 +26,11 @@ export async function getChatHistory(req, res) {
             });
         }
 
-        let chatHistory = await Chat.find(
-            { partyId: mongoose.Types.ObjectId(body.partyId) },
-            "message userName cAt userId"
-        )
-            .sort({ cAt: -1 })
-            .skip(body.skip || 0);
-        // .limit(body.limit || 10)
+        let chatHistory = await ChatRepository.search()
+            .where(partyId)
+            .is.equalTo(body?.partyId)
+            .sortBy("cAt", "DESC")
+            .returnAll();
 
         return res.json({
             Success: true,
