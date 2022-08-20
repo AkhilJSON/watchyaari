@@ -21,9 +21,15 @@ const partySchema = new Schema(Party, {
     description: {
         type: "string",
     },
-    guests: "string[]",
-    guestUserIds: "string[]",
-    removedUsers: "string[]",
+    guests: {
+        type: "string[]"
+    },
+    guestUserIds: {
+        type: "string[]"
+    },
+    removedUsers: {
+        type: "string[]"
+    },
     startedOn: {
         type: "date",
     },
@@ -37,12 +43,10 @@ const partySchema = new Schema(Party, {
         type: "boolean", // default: false,
     },
     endedBy: {
-        type: "string",
-        ref: "User",
+        type: "string", // ref: "User",
     },
     hostedBy: {
-        type: "string",
-        ref: "User",
+        type: "string", // ref: "User",
     },
     isDeleted: {
         type: "boolean",
@@ -73,22 +77,6 @@ const partySchema = new Schema(Party, {
     initialisedAt: {
         type: "date", // default: "date".now,
     },
-    /* videoListHistory: [
-        {
-            videoId: {
-                type: "string",
-            },
-            videoSource: {
-                type: "string", //YOUTUBE
-            },
-            mAt: {
-                type: "date",
-            },
-            mBy: {
-                type: "string", // ref: "User",
-            },
-        },
-    ], */
     maxGuestsAllowed: {
         type: "number", // default: DEFAULT_MAX_GUESTS_ALLOWED,
     },
