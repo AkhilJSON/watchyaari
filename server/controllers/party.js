@@ -5,10 +5,10 @@ import _ from "lodash";
 import nLog from "noogger";
 
 // models
-import Party from "../models/common/party.js";
-import User from "../models/common/user.js";
+import PartyRepository from "../models/common/party.js";
+import UserRepository from "../models/common/user.js";
 import UserHomePageVideosRepository from "../models/data/homePageVideos.js";
-import Guest from "../models/common/guest.js";
+import GuestRepository from "../models/common/guest.js";
 
 // controllers
 import * as UserLoginAuth from "./common/userLoginAuth.js";

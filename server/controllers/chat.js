@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import _ from "lodash";
 
 // models
-import Chat from "../models/common/chat.js";
+import ChatRepository from "../models/common/chat.js";
 
 // helpers
 import Helper from "./helper.js";

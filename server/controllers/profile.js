@@ -2,7 +2,7 @@
 import _ from "lodash";
 
 // models
-import User from "../models/common/user.js";
+import UserRepository from "../models/common/user.js";
 
 // helpers
 import Helper from "./helper.js";

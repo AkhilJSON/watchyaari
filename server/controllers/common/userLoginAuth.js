@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 // models
 import UserRepository from "../../models/common/user.js";
-import Party from "../../models/common/party.js";
+import PartyRepository from "../../models/common/party.js";
 import Guest from "../../models/common/guest.js";
 
 // services

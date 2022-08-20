@@ -11,7 +11,7 @@ import Helper from "./helper.js";
 import * as Constants from "../config/constants.js";
 
 // models
-import Party from "../models/common/party.js";
+import PartyRepository from "../models/common/party.js";
 
 // controllers
 import * as commonController from "./common/userLoginAuth.js";

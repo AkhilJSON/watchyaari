@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 // models
-import Chat from "../models/common/chat.js";
+import ChatRepository from "../models/common/chat.js";
 
 export default async function partyChatSocketHandling(socket, io) {
     try {
