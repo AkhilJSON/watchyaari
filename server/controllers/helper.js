@@ -55,10 +55,10 @@ async function compareEncryptedCode(code, encryptedCode) {
 
 /**
  * Returns populated party data
- * @param {*} partyDetails 
+ * @param {*} partyDetails
  * @returns populated party data
  */
-async function populateGuestDataOfParty(partyDetails){
+async function populateGuestDataOfParty(partyDetails) {
     try {
         _.each(partyDetails?.guests, async (guestId) => {
             // populate Guest
@@ -81,5 +81,5 @@ export default {
     checkIfExists,
     generateEncryptedCode,
     compareEncryptedCode,
-    populateGuestDataOfParty
+    populateGuestDataOfParty,
 };

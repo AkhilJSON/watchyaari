@@ -27,7 +27,7 @@ export async function getChatHistory(req, res) {
         }
 
         let chatHistory = await ChatRepository.search()
-            .where(partyId)
+            .where("partyId")
             .is.equalTo(body?.partyId)
             .sortBy("cAt", "DESC")
             .returnAll();

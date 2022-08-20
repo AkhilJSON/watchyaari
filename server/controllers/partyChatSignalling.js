@@ -17,10 +17,8 @@ export default async function partyChatSocketHandling(socket, io) {
             // console.log("SEND_MESSAGE");
             socket.to(partyId).emit("COPY_MESSAGE", messageData);
             let chat = JSON.parse(messageData);
-            chat.partyId = mongoose.Types.ObjectId(chat.partyId);
-            chat.userId = mongoose.Types.ObjectId(chat.userId);
 
-            new Chat(chat).save();
+            ChatRepository.createAndSave(chat);
         });
 
         socket.on("disconnect", () => {

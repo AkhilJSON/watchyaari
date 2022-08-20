@@ -402,7 +402,7 @@ export async function getPartyDetails(req, res) {
             });
         }
 
-        let partyData = await PartyRepository.fetch(body.partyId)
+        let partyData = await PartyRepository.fetch(body.partyId);
         partyData = await Helper.populateGuestDataOfParty(partyData);
 
         if (!partyData) {
@@ -447,20 +447,10 @@ export const getVideoIdByURL = function (domain, videoURL) {
     return getVideoId(domain, videoURL);
 };
 
-export const verifyUser = function (token) {
-    return new Promise((resolve, reject) => {
-        var decoded = jwtDecode(token);
-        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
-            if (err) {
-                return reject("USER_NOT_FOUND");
-            }
-            if (user) {
-                return resolve(user);
-            } else {
-                return reject("USER_NOT_FOUND");
-            }
-        });
-    });
+export const verifyUser = async function (token) {
+    let decoded = jwtDecode(token),
+        user = await UserRepository.fetch(decoded.entityId);
+    return user;
 };
 
 export async function getUserDetails(req, res) {

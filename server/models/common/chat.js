@@ -13,7 +13,7 @@ const chatSchema = new Schema(Chat, {
     userId: { type: "string" },
     message: { type: "string" },
     userName: { type: "string" },
-    cAt: { type: "date" },
+    cAt: { type: "date", sortable: true },
 });
 
 const ChatRepository = client.fetchRepository(chatSchema);

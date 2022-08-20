@@ -13,7 +13,13 @@ export function socketAauthentication(nameSpaceIo, usersKey = "users") {
             const token = data.token;
             try {
                 const user = await userLoginAuth.verifyUser(token);
+
+                if (!user?.entityId) {
+                    return callback({ message: "UNAUTHORIZED" });
+                }
+
                 const canConnect = await redis.setAsync(`${usersKey}:${user.entityId}`, socket.id, "NX", "EX", 30);
+
                 if (!canConnect) {
                     return callback({ message: "ALREADY_LOGGED_IN" });
                 }
