@@ -440,7 +440,7 @@ export async function getPartyDetails(req, res) {
 }
 
 export async function createGuestWithPartyId(guestData) {
-    return createGuest(guestData);
+    return await createGuest(guestData);
 }
 
 export const getVideoIdByURL = function (domain, videoURL) {
@@ -556,36 +556,33 @@ function getVideoId(domain, videoURL) {
  * @param {*} res
  * @returns
  */
-function createGuest(data, res) {
-    return new Promise(async (resolve, reject) => {
-        if (!data.entityId || !data.partyId) {
-            resolve(null);
-            return;
-        }
+async function createGuest(data, res) {
+    if (!data.entityId || !data.partyId) {
+        resolve(null);
+        return;
+    }
 
-        let guestData = await GuestRepository.search()
-            .where("partyId")
-            .equals(data.partyId)
-            .and("userId")
-            .equals(data.entityId)
-            .returnFirst();
+    let guestData = await GuestRepository.search()
+        .where("partyId")
+        .equals(data.partyId)
+        .and("userId")
+        .equals(data.entityId)
+        .returnFirst();
 
-        // Return existing
-        if (guestData && guestData.entityId) {
-            guestData = JSON.parse(JSON.stringify(guestData));
-            guestData.alreadyJoined = true;
-            resolve(guestData);
-            return;
-        }
+    // Return existing
+    if (guestData && guestData.entityId) {
+        guestData = JSON.parse(JSON.stringify(guestData));
+        guestData.alreadyJoined = true;
+        return guestData;
+    }
 
-        // Create new Guest
-        guestData = {};
-        guestData.partyId = data.partyId;
-        guestData.userId = data.entityId;
-        await GuestRepository.createAndSave(guestData);
+    // Create new Guest
+    guestData = {};
+    guestData.partyId = data.partyId;
+    guestData.userId = data.entityId;
+    guestData = await GuestRepository.createAndSave(guestData);
 
-        resolve(guestData);
-    });
+    return guestData;
 }
 
 function sendEmailVerificationLinkToUser(user) {

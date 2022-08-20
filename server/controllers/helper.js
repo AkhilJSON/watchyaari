@@ -3,6 +3,10 @@ import _ from "lodash";
 import nLog from "noogger";
 import bcrypt from "bcryptjs";
 
+// models
+import GuestRepository from "../models/common/guest.js";
+import UserRepository from "../models/common/user.js";
+
 function catchException(exception, res) {
     console.log("e::", JSON.stringify(exception));
     nLog.error(JSON.stringify(exception));
@@ -60,15 +64,21 @@ async function compareEncryptedCode(code, encryptedCode) {
  */
 async function populateGuestDataOfParty(partyDetails) {
     try {
-        _.each(partyDetails?.guests, async (guestId) => {
+        partyDetails = partyDetails.toJSON();
+
+        for(let i=0; i<partyDetails?.guests?.length; i++){
             // populate Guest
-            guestId = await GuestRepository.fetch(guestId);
+            let guest = partyDetails?.guests?.[i],
+            guestDetails = await GuestRepository.fetch(guest);
+            guestDetails = guestDetails.toJSON();
 
             // populate User
-            if (guestId?.userId) {
-                guestId.userId = await UserRepository.fetch(guestId?.userId);
+            if (guestDetails?.userId) {
+                guestDetails.userId = await UserRepository.fetch(guestDetails?.userId);
             }
-        });
+
+            partyDetails.guests[i] = guestDetails;
+        }
 
         return partyDetails;
     } catch (error) {

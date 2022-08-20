@@ -31,14 +31,8 @@ export async function joinParty(req, res) {
             });
         }
 
-        let partyData = await Party.findById(
-            mongoose.Types.ObjectId(body.partyId),
-            "-videoListHistory -removedUsers"
-        ).populate({
-            path: "guests",
-            model: "Guest",
-            select: "-partyId",
-        });
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
         nLog.info(`${req.user.entityId} joined party ${partyData.entityId}`);
         return res.json({
@@ -229,11 +223,21 @@ export async function fetchUsers(req, res) {
 export async function fetchBlockedUsers(req, res) {
     try {
         let { partyId } = req.body || {};
-        let partyData = await Party.findById(mongoose.Types.ObjectId(partyId), "entityId removedUsers").populate({
-            path: "removedUsers",
-            model: "User",
-            select: "entityId fullName",
-        });
+        let partyData = await PartyRepository.fetch(partyId);
+
+        for(let i=0; i<partyData?.removedUsers?.length; i++){
+            // populate Guest
+            let user = partyData?.removedUsers?.[i],
+            userDetails = await UserRepository.fetch(user);
+            userDetails = userDetails.toJSON();
+            userDetails = _.pick(userDetails, [
+                "entityId",
+                "fullName"
+            ])
+
+            partyData.guests[i] = userDetails;
+        }
+        
         return res.json({
             Success: true,
             message: "OK",
@@ -308,10 +312,13 @@ export async function launchParty(req, res) {
 
         let partyData = null;
         let guestInfo = null;
+
+        // Joing existing party
         if (body.entityId) {
             partyData = (await PartyRepository.fetch(body.entityId)) || {};
             partyData.cAt = new Date().getTime();
         } else {
+            // Launching new party
             partyData = await PartyRepository.createAndSave({
                 cAt: Date.now(),
                 maxGuestsAllowed: Constants.DEFAULT_MAX_GUESTS_ALLOWED,
