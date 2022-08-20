@@ -85,8 +85,8 @@ export class VideoResultsCardComponent implements OnInit, OnDestroy {
             this.onLaunchingParty.emit({ startLoading: false });
             setTimeout(() => {
                 if (res && res.data) {
-                    if (res.data.videoId && res.data._id) {
-                        this.router.navigateByUrl("partyArea/" + res.data._id);
+                    if (res.data.videoId && res.data.entityId) {
+                        this.router.navigateByUrl("partyArea/" + res.data.entityId);
                     }
                 }
             }, 0);

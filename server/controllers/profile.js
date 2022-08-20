@@ -11,7 +11,7 @@ export async function updateProfile(req, res) {
     try {
         let user = req.user;
 
-        let userData = await User.findById(user._id);
+        let userData = await User.findById(user.entityId);
         userData = _.assignIn(userData, req.body);
 
         await userData.save();

@@ -39,7 +39,7 @@ export async function joinParty(req, res) {
             select: "-partyId",
         });
 
-        nLog.info(`${req.user._id} joined party ${partyData._id}`);
+        nLog.info(`${req.user.entityId} joined party ${partyData.entityId}`);
         return res.json({
             Success: true,
             message: "OK",
@@ -59,8 +59,8 @@ export async function getRecentPartyList(req, res) {
                 $match: {
                     status: { $in: ["CREATED", "ACTIVE", "IN-ACTIVE", "ENDED"] },
                     $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user._id)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user._id) },
+                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user.entityId)] } },
+                        { hostedBy: mongoose.Types.ObjectId(req.user.entityId) },
                     ],
                 },
             },
@@ -74,14 +74,14 @@ export async function getRecentPartyList(req, res) {
                                 $expr: {
                                     $and: [
                                         {
-                                            $or: [{ $in: ["$_id", "$$userIds"] }, { $eq: ["$_id", "$$createdBy"] }],
+                                            $or: [{ $in: ["$entityId", "$$userIds"] }, { $eq: ["$entityId", "$$createdBy"] }],
                                         },
-                                        { $ne: ["$_id", req.user._id] },
+                                        { $ne: ["$entityId", req.user.entityId] },
                                     ],
                                 },
                             },
                         },
-                        { $project: { _id: 0, fullName: 1 } },
+                        { $project: { entityId: 0, fullName: 1 } },
                     ],
                     as: "guestData",
                 },
@@ -133,8 +133,8 @@ export async function getUpcomingPartyList(req, res) {
                 $match: {
                     status: { $in: ["SCHEDULED"] },
                     $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user._id)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user._id) },
+                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user.entityId)] } },
+                        { hostedBy: mongoose.Types.ObjectId(req.user.entityId) },
                     ],
                 },
             },
@@ -166,7 +166,7 @@ export async function fetchUsers(req, res) {
             (await User.aggregate([
                 {
                     $project: {
-                        _id: 1,
+                        entityId: 1,
                         fullName: 1,
                         email: 1,
                     },
@@ -177,7 +177,7 @@ export async function fetchUsers(req, res) {
                             { email: { $regex: regexp, $options: "i" } },
                             { fullName: { $regex: regexp, $options: "i" } },
                         ],
-                        _id: { $ne: req.user._id },
+                        entityId: { $ne: req.user.entityId },
                     },
                 },
                 {
@@ -225,10 +225,10 @@ export async function fetchUsers(req, res) {
 export async function fetchBlockedUsers(req, res) {
     try {
         let { partyId } = req.body || {};
-        let partyData = await Party.findById(mongoose.Types.ObjectId(partyId), "_id removedUsers").populate({
+        let partyData = await Party.findById(mongoose.Types.ObjectId(partyId), "entityId removedUsers").populate({
             path: "removedUsers",
             model: "User",
-            select: "_id fullName",
+            select: "entityId fullName",
         });
         return res.json({
             Success: true,
@@ -248,7 +248,7 @@ export async function unBlockUsers(req, res) {
 
         partyId = mongoose.Types.ObjectId(partyId);
         let updateRes = await Party.updateOne(
-            { _id: partyId },
+            { entityId: partyId },
             {
                 $pull: {
                     removedUsers: { $in: [userId] },
@@ -273,7 +273,7 @@ export async function updateCoHosts(req, res) {
 
         guestId = mongoose.Types.ObjectId(guestId);
 
-        let updateRes = await Guest.findOneAndUpdate({ _id: guestId }, { isCoHost: add });
+        let updateRes = await Guest.findOneAndUpdate({ entityId: guestId }, { isCoHost: add });
 
         return res.json({
             Success: true,
@@ -304,23 +304,23 @@ export async function launchParty(req, res) {
 
         let partyData = null;
         let guestInfo = null;
-        if (body._id) {
-            partyData = (await Party.findById(mongoose.Types.ObjectId(body._id))) || {};
+        if (body.entityId) {
+            partyData = (await Party.findById(mongoose.Types.ObjectId(body.entityId))) || {};
             partyData.cAt = new Date().getTime();
         } else {
             partyData = new Party();
             let guestData = user;
-            guestData.partyId = partyData._id;
+            guestData.partyId = partyData.entityId;
             partyData.cAt = new Date().getTime();
 
             guestInfo = await UserLoginAuth.createGuestWithPartyId(guestData, res);
-            if (guestInfo && guestInfo._id) {
-                partyData.guests = [mongoose.Types.ObjectId(guestInfo._id)];
+            if (guestInfo && guestInfo.entityId) {
+                partyData.guests = [mongoose.Types.ObjectId(guestInfo.entityId)];
             }
             guestsInfo.push(guestInfo);
             partyData.videoId = body.videoId;
             partyData.videoSource = body.videoSource;
-            partyData.hostedBy = mongoose.Types.ObjectId(user._id);
+            partyData.hostedBy = mongoose.Types.ObjectId(user.entityId);
         }
         partyData.status = body.status;
         partyData.mode = body.mode;
@@ -332,35 +332,35 @@ export async function launchParty(req, res) {
 
         if (body.guests && body.guests.length) {
             for (let index = 0; index < body.guests.length; index++) {
-                let guestUserId = body.guests[index]._id;
+                let guestUserId = body.guests[index].entityId;
                 let guestData = await UserLoginAuth.createGuestWithPartyId({
-                    _id: guestUserId,
-                    partyId: partyData._id,
+                    entityId: guestUserId,
+                    partyId: partyData.entityId,
                 });
-                partyData.guests.push(mongoose.Types.ObjectId(guestData._id));
+                partyData.guests.push(mongoose.Types.ObjectId(guestData.entityId));
                 partyData.guestUserIds.push(guestUserId);
                 guestsInfo.push(guestData);
             }
         }
 
-        if (body._id) {
-            delete partyData._id;
-            await Party.updateOne({ _id: mongoose.Types.ObjectId(body._id) }, { $set: partyData });
+        if (body.entityId) {
+            delete partyData.entityId;
+            await Party.updateOne({ entityId: mongoose.Types.ObjectId(body.entityId) }, { $set: partyData });
             let partyDetails =
-                (await Party.findById(mongoose.Types.ObjectId(body._id), "-videoListHistory -removedUsers").populate({
+                (await Party.findById(mongoose.Types.ObjectId(body.entityId), "-videoListHistory -removedUsers").populate({
                     path: "guests",
                     model: "Guest",
                     select: "-partyId",
                     populate: {
                         path: "userId",
                         model: "User",
-                        select: "_id fullName email",
+                        select: "entityId fullName email",
                     },
                 })) || {};
             let responseData = JSON.parse(JSON.stringify(partyDetails));
             responseData.isHost = true;
 
-            nLog.info(`${partyDetails._id} launched party`);
+            nLog.info(`${partyDetails.entityId} launched party`);
             return res.json({
                 Success: true,
                 Message: "DONE",
@@ -374,7 +374,7 @@ export async function launchParty(req, res) {
                     responseData.guests = guestInfo;
                     responseData.isHost = true;
 
-                    nLog.info(`${partyData._id} launched party`);
+                    nLog.info(`${partyData.entityId} launched party`);
                     return res.json({
                         Success: true,
                         Message: "DONE",
@@ -492,14 +492,14 @@ export async function updateVideoInTheParty(req, res) {
         }
 
         let updRes = await Party.findByIdAndUpdate(
-            { _id: mongoose.Types.ObjectId(body.partyId) },
+            { entityId: mongoose.Types.ObjectId(body.partyId) },
             {
                 $push: {
                     videoListHistory: {
                         videoId: body.oldVideoId,
                         videoSource: body.oldVideoSource,
                         mAt: new Date().getTime(),
-                        mBy: user._id,
+                        mBy: user.entityId,
                     },
                 },
                 $set: {
@@ -516,7 +516,7 @@ export async function updateVideoInTheParty(req, res) {
                 populate: {
                     path: "userId",
                     model: "User",
-                    select: "_id fullName email",
+                    select: "entityId fullName email",
                 },
             })) || {};
 
@@ -550,9 +550,9 @@ export async function inviteGuestsInTheParty(req, res) {
             guestsUserIds = [];
 
         for (let index = 0; index < body.guests.length; index++) {
-            let guestUserId = body.guests[index]._id;
-            let guestData = await UserLoginAuth.createGuestWithPartyId({ _id: guestUserId, partyId: body.partyId });
-            guestsData.push(mongoose.Types.ObjectId(guestData._id));
+            let guestUserId = body.guests[index].entityId;
+            let guestData = await UserLoginAuth.createGuestWithPartyId({ entityId: guestUserId, partyId: body.partyId });
+            guestsData.push(mongoose.Types.ObjectId(guestData.entityId));
             guestsUserIds.push(mongoose.Types.ObjectId(guestUserId));
         }
 
@@ -599,7 +599,7 @@ export async function inviteGuestsInTheParty(req, res) {
                 populate: {
                     path: "userId",
                     model: "User",
-                    select: "_id fullName email",
+                    select: "entityId fullName email",
                 },
             })) || {};
 

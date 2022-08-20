@@ -171,8 +171,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         };
         let launchPartyService = this.ps.launchParty(videoData).subscribe((res: any) => {
             if (res && res.data) {
-                if (res.data.videoId && res.data._id) {
-                    this.router.navigateByUrl("partyArea/" + res.data._id);
+                if (res.data.videoId && res.data.entityId) {
+                    this.router.navigateByUrl("partyArea/" + res.data.entityId);
                 }
             }
         });

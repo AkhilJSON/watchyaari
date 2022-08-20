@@ -78,7 +78,7 @@ export class LoginAuthService {
         let loggedInUserdId = this.cs.getItem("_uid");
 
         let costHost = <any>_.findIndex(this.partyData.guests, (guest: any) => {
-            return guest && guest.isCoHost && guest.userId && guest.userId._id == loggedInUserdId ? true : false;
+            return guest && guest.isCoHost && guest.userId && guest.userId.entityId == loggedInUserdId ? true : false;
         });
         costHost = costHost >= 0 ? true : false;
         return costHost;

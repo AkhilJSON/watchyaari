@@ -62,7 +62,7 @@ export class LaunchPartyComponent implements OnInit, OnDestroy, AfterViewInit {
         this.loggedInUserdId = this.cs.getItem("_uid");
 
         this.partyForm = this.fb.group({
-            _id: "",
+            entityId: "",
             title: "",
             guests: [],
             guestSearch: "",
@@ -116,7 +116,7 @@ export class LaunchPartyComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.partyForm.controls.status.setValue("CREATED");
                     this.partyForm.controls.videoSource.setValue(res.data.videoSource);
                     this.partyForm.controls.videoId.setValue(res.data.videoId);
-                    this.partyForm.controls._id.setValue(res.data._id);
+                    this.partyForm.controls.entityId.setValue(res.data.entityId);
                 } else {
                     this.router.navigateByUrl("/");
                 }
@@ -173,12 +173,12 @@ export class LaunchPartyComponent implements OnInit, OnDestroy, AfterViewInit {
                     if (!isSchedule) {
                         let token = this.cs.getItem("_tkn");
                         let expirationData = this.jwtHelper.getTokenExpirationDate(token);
-                        this.cs.setItem("crntPrtyId", res.data._id, expirationData, "/", null, null);
+                        this.cs.setItem("crntPrtyId", res.data.entityId, expirationData, "/", null, null);
                         this.ss.setPartyDetails({
                             partyData: res.data,
                         });
-                        if (res.data.videoId && res.data._id) {
-                            this.router.navigateByUrl("partyArea/" + res.data._id);
+                        if (res.data.videoId && res.data.entityId) {
+                            this.router.navigateByUrl("partyArea/" + res.data.entityId);
                         }
                     } else {
                         this.partyForm.reset();
@@ -195,7 +195,7 @@ export class LaunchPartyComponent implements OnInit, OnDestroy, AfterViewInit {
     remove(userId: any): void {
         let guests = this.partyForm.controls.guests.value || [];
         const index = _.findIndex(guests, function (o: any) {
-            return o._id === userId;
+            return o.entityId === userId;
         });
 
         if (index >= 0) {
@@ -209,7 +209,7 @@ export class LaunchPartyComponent implements OnInit, OnDestroy, AfterViewInit {
         let selectedGuest = <any>event.option.value;
 
         let alreadyExists = _.findIndex(guests, function (o: any) {
-            return o._id == selectedGuest._id;
+            return o.entityId == selectedGuest.entityId;
         });
         if (alreadyExists == -1) {
             guests.push(selectedGuest);

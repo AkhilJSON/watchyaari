@@ -105,7 +105,7 @@
                               class="p-0"
                               matTooltip="Unblocked users can be added back to active users"
                               matTooltipPosition="above"
-                              (click)="unblockUser(guest._id)"
+                              (click)="unblockUser(guest.entityId)"
                             >
                               <mat-icon class="icon-text-button-align">
                                 undo
@@ -245,7 +245,7 @@
                 *ngIf="!guest.isHost"
                 mat-icon-button
                 color="warn"
-                (click)="remove(guest._id)"
+                (click)="remove(guest.entityId)"
               >
                 <mat-icon
                   matTooltip="REMOVE/BLOCK user to revoke access to the party. Blocked users cannot have access to the party unless unblocked."

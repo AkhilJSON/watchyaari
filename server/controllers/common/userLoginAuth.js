@@ -176,7 +176,7 @@ export async function forgotPassword(req, res) {
 
         let user = await User.findOne(
             { email: body.email, isDeleted: { $ne: true } },
-            "_id email fullName passwordResetCode"
+            "entityId email fullName passwordResetCode"
         );
         if (!user) {
             return res.json({
@@ -192,7 +192,7 @@ export async function forgotPassword(req, res) {
         }
         sendForgotPasswordLink(user);
 
-        nLog.info(`${user._id} Forgot password requested`);
+        nLog.info(`${user.entityId} Forgot password requested`);
         return res.json({
             Success: true,
             Message: "Ok",
@@ -209,7 +209,7 @@ export async function resetPassword(req, res) {
     try {
         let body = req.body;
 
-        User.findOne({ _id: body.uid }, async function (err, user) {
+        User.findOne({ entityId: body.uid }, async function (err, user) {
             if (err) {
                 return res.json({
                     Success: false,
@@ -222,7 +222,7 @@ export async function resetPassword(req, res) {
                     user.password = body.password;
                     await user.save();
 
-                    nLog.info(`${user._id} reset successfully`);
+                    nLog.info(`${user.entityId} reset successfully`);
                     return res.json({
                         Success: true,
                         Message: "Ok",
@@ -261,7 +261,7 @@ export async function verifyResetPasswordLink(req, res) {
         }
 
         var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
+        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
             if (err) {
                 return res.json({
                     Success: false,
@@ -270,12 +270,12 @@ export async function verifyResetPasswordLink(req, res) {
             }
             if (user) {
                 if (user.passwordResetCode) {
-                    nLog.info(`${user._id} password reset successfully`);
+                    nLog.info(`${user.entityId} password reset successfully`);
 
                     return res.json({
                         Success: true,
                         Message: "Ok",
-                        uid: user._id,
+                        uid: user.entityId,
                     });
                 } else {
                     return res.json({
@@ -311,7 +311,7 @@ export async function verifyUserEmail(req, res) {
         }
 
         var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
+        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
             if (err) {
                 return res.json({
                     Success: false,
@@ -321,7 +321,7 @@ export async function verifyUserEmail(req, res) {
             if (user) {
                 if (!user.emailVerified) {
                     await User.findByIdAndUpdate(
-                        { _id: user._id },
+                        { entityId: user.entityId },
                         {
                             $set: {
                                 emailVerified: true,
@@ -331,7 +331,7 @@ export async function verifyUserEmail(req, res) {
                         }
                     );
 
-                    nLog.info(`${user._id} verified user email`);
+                    nLog.info(`${user.entityId} verified user email`);
                     return res.json({
                         Success: true,
                         Message: "Ok",
@@ -362,8 +362,8 @@ export async function createUserManually(req, res) {
         let Body = req.body;
         createUserValidations(Body, res);
 
-        // Body['createdBy'] = req.user._id;
-        // Body['modifiedBy'] = req.user._id;
+        // Body['createdBy'] = req.user.entityId;
+        // Body['modifiedBy'] = req.user.entityId;
 
         let user = new User(Body);
 
@@ -410,7 +410,7 @@ export async function getPartyDetails(req, res) {
             populate: {
                 path: "userId",
                 model: "User",
-                select: "_id fullName",
+                select: "entityId fullName",
             },
         });
 
@@ -424,11 +424,11 @@ export async function getPartyDetails(req, res) {
 
         partyData = JSON.parse(JSON.stringify(partyData));
 
-        if (partyData.hostedBy == user._id) {
+        if (partyData.hostedBy == user.entityId) {
             partyData.isHost = true;
         }
         if (partyData) {
-            nLog.info(`${partyData._id} partyDetails requested`);
+            nLog.info(`${partyData.entityId} partyDetails requested`);
 
             return res.json({
                 Success: true,
@@ -459,7 +459,7 @@ export const getVideoIdByURL = function (domain, videoURL) {
 export const verifyUser = function (token) {
     return new Promise((resolve, reject) => {
         var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
+        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
             if (err) {
                 return reject("USER_NOT_FOUND");
             }
@@ -571,15 +571,15 @@ function getVideoId(domain, videoURL) {
 
 function createGuest(data, res) {
     return new Promise(async (resolve, reject) => {
-        if (!data._id || !data.partyId) {
+        if (!data.entityId || !data.partyId) {
             resolve(null);
             return;
         }
         let guestData = await Guest.findOne({
             partyId: mongoose.Types.ObjectId(data.partyId),
-            userId: mongoose.Types.ObjectId(data._id),
+            userId: mongoose.Types.ObjectId(data.entityId),
         });
-        if (guestData && guestData._id) {
+        if (guestData && guestData.entityId) {
             guestData = JSON.parse(JSON.stringify(guestData));
             guestData.alreadyJoined = true;
             resolve(guestData);
@@ -587,7 +587,7 @@ function createGuest(data, res) {
         }
         guestData = new Guest();
         guestData.partyId = mongoose.Types.ObjectId(data.partyId);
-        guestData.userId = data._id;
+        guestData.userId = data.entityId;
         guestData
             .save()
             .then((val) => {
@@ -601,7 +601,7 @@ function createGuest(data, res) {
 
 function sendEmailVerificationLinkToUser(user) {
     return new Promise(async (resolve, reject) => {
-        let token = generateTokenForEmailVerification({ _id: user._id });
+        let token = generateTokenForEmailVerification({ entityId: user.entityId });
         let emailBody = {
             from: {
                 email: process.env.SENDGRID_FROM_EMAIL,
@@ -624,16 +624,16 @@ function sendEmailVerificationLinkToUser(user) {
         };
         EmailService.sendEmail(emailBody);
 
-        await User.findByIdAndUpdate({ _id: user._id }, { $set: { emailVerificationCode: token } });
+        await User.findByIdAndUpdate({ entityId: user.entityId }, { $set: { emailVerificationCode: token } });
 
-        nLog.info(`userId: ${user._id} Email sent`);
+        nLog.info(`userId: ${user.entityId} Email sent`);
         return resolve("Ok");
     });
 }
 
 function sendForgotPasswordLink(user) {
     return new Promise(async (resolve, reject) => {
-        let token = generateTokenForEmailVerification({ _id: user._id });
+        let token = generateTokenForEmailVerification({ entityId: user.entityId });
         let emailBody = {
             from: {
                 email: process.env.SENDGRID_FROM_EMAIL,
@@ -656,7 +656,7 @@ function sendForgotPasswordLink(user) {
         };
         EmailService.sendEmail(emailBody);
 
-        await User.findByIdAndUpdate({ _id: user._id }, { $set: { passwordResetCode: token } });
+        await User.findByIdAndUpdate({ entityId: user.entityId }, { $set: { passwordResetCode: token } });
         return resolve("Ok");
     });
 }

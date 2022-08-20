@@ -47,7 +47,7 @@ export default async function socketHandling(socket, io) {
                         // partyDuration + = lastStartTime - currentTime
                         let partyData = await Party.findOne(
                             mongoose.Types.ObjectId(partyId),
-                            "_id lastActiveTime status partyDuration"
+                            "entityId lastActiveTime status partyDuration"
                         );
 
                         let lastActiveTime = partyData.lastActiveTime,
@@ -61,21 +61,21 @@ export default async function socketHandling(socket, io) {
                         if (!["ENDED"].includes(partyData.status)) {
                             updateObj["status"] = "IN-ACTIVE";
                         }
-                        await Party.update({ _id: mongoose.Types.ObjectId(partyId) }, { $set: updateObj });
+                        await Party.update({ entityId: mongoose.Types.ObjectId(partyId) }, { $set: updateObj });
 
                         redis.delAsync(videoChatConnectionKey);
                     }
 
-                    if (Helper.checkIfExists(partySync.users, "userId", socket.user._id)) {
+                    if (Helper.checkIfExists(partySync.users, "userId", socket.user.entityId)) {
                         partySync.users = _.filter(partySync.users, function (o) {
-                            return o.userId != socket.user._id;
+                            return o.userId != socket.user.entityId;
                         });
                         partySync = JSON.stringify(partySync);
                         redis.set(partySyncKey, partySync);
                     }
                 });
 
-                socket.to(partyId).emit("USER_DISCONNECTED", socket.user._id);
+                socket.to(partyId).emit("USER_DISCONNECTED", socket.user.entityId);
             }
         });
 
@@ -142,9 +142,9 @@ export default async function socketHandling(socket, io) {
 
         socket.on("END_PARTY", async (data) => {
             data = JSON.parse(data);
-            let partyId = data._id;
-            delete data._id;
-            let updateRes = await Party.findOneAndUpdate({ _id: partyId }, data);
+            let partyId = data.entityId;
+            delete data.entityId;
+            let updateRes = await Party.findOneAndUpdate({ entityId: partyId }, data);
             socket.to(partyId).emit("END_THE_PARTY", JSON.stringify(data));
 
             //Remove party sync from redis
@@ -165,7 +165,7 @@ export default async function socketHandling(socket, io) {
         socket.on("MY_CURRENT_SEEK", async (seek) => {
             if (socket.user) {
                 //broadcast data to the room so that other users calculate the latest seek & keep synced
-                socket.to(partyId).emit("MY_CURRENT_SEEK", seek, socket.user._id);
+                socket.to(partyId).emit("MY_CURRENT_SEEK", seek, socket.user.entityId);
             }
         });
 
@@ -221,7 +221,7 @@ export default async function socketHandling(socket, io) {
         //Connection details TODO:: can be optimised
         socket.on("UPDATE_CONNECTION_DETAILS", (connection) => {
             if (socket.user) {
-                let userId = socket.user._id;
+                let userId = socket.user.entityId;
                 redis.get(videoChatConnectionKey, async (err, connectionMap) => {
                     connectionMap = (connectionMap && JSON.parse(connectionMap)) || {};
 
@@ -273,7 +273,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
         populate: {
             path: "userId",
             model: "User",
-            select: "_id fullName",
+            select: "entityId fullName",
         },
     });
 
@@ -308,7 +308,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
     }
 
     let guestAlreadyExists = _.findIndex(partyData.guests, (guest) => {
-        return guest.userId._id.toString() == loggedInUser;
+        return guest.userId.entityId.toString() == loggedInUser;
     });
     guestAlreadyExists = guestAlreadyExists >= 0 ? true : false;
 
@@ -318,26 +318,26 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
         return;
     }
 
-    let guestData = await commonController.createGuestWithPartyId({ _id: loggedInUser, partyId });
+    let guestData = await commonController.createGuestWithPartyId({ entityId: loggedInUser, partyId });
 
     if (!guestAlreadyExists) {
         await Party.update(
-            { _id: mongoose.Types.ObjectId(partyId) },
-            { $push: { guests: guestData._id, guestUserIds: loggedInUser } }
+            { entityId: mongoose.Types.ObjectId(partyId) },
+            { $push: { guests: guestData.entityId, guestUserIds: loggedInUser } }
         );
-        partyData = await Party.findById(partyData._id, "-videoListHistory").populate({
+        partyData = await Party.findById(partyData.entityId, "-videoListHistory").populate({
             path: "guests",
             model: "Guest",
             select: "-partyId",
             populate: {
                 path: "userId",
                 model: "User",
-                select: "_id fullName",
+                select: "entityId fullName",
             },
         });
     }
 
-    let userId = socket.user && socket.user._id;
+    let userId = socket.user && socket.user.entityId;
     let fullName = socket.user && socket.user.fullName;
     let isFirstToJoin = false;
 
@@ -391,9 +391,9 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
                 socket.emit("CURRENT_PLAYER_STATUS", partySync.currentSeek || 0, partySync.status || defaultStatus);
             }
 
-            if (!Helper.checkIfExists(partySync.users, "userId", socket.user._id)) {
+            if (!Helper.checkIfExists(partySync.users, "userId", socket.user.entityId)) {
                 partySync.users.push({
-                    userId: socket.user._id,
+                    userId: socket.user.entityId,
                 });
                 partySync = JSON.stringify(partySync);
                 redis.set(partySyncKey, partySync);
@@ -405,7 +405,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
                     status: "ACTIVE",
                     isStarted: true,
                 };
-                await Party.update({ _id: mongoose.Types.ObjectId(partyId) }, { $set: updateObj });
+                await Party.update({ entityId: mongoose.Types.ObjectId(partyId) }, { $set: updateObj });
             }
         });
     }

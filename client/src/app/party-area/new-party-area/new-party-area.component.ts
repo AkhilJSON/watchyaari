@@ -221,7 +221,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
                 return;
             }
 
-            this.partyInviteURL = `${window.location.origin}/joinParty?v=${this.partyData._id}`;
+            this.partyInviteURL = `${window.location.origin}/joinParty?v=${this.partyData.entityId}`;
 
             // console.log("PARTY DATA::", this.partyData)
             this.syncDataForVideoAudioChat();
@@ -459,7 +459,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
 
             //Remove guests who has been removed from party
             let allGuestIds = _.map(partyData.guests, (guest: any) => {
-                return guest.userId._id;
+                return guest.userId.entityId;
             });
             this.allParticipants = _.filter(this.allParticipants, (participant: any) => {
                 return allGuestIds.includes(participant.userId);
@@ -474,7 +474,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
 
         this.socket.on("UPDATE_VIDEO_CHAT_LIST", () => {
             let allGuestIds = _.map(this.partyData.guests, (guest: any) => {
-                return guest.userId._id;
+                return guest.userId.entityId;
             });
             this.allParticipants = _.filter(this.allParticipants, (participant: any) => {
                 return allGuestIds.includes(participant.userId);
@@ -825,7 +825,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
         let guestIndex =
             this.partyData &&
             _.findIndex(this.partyData.guests, function (o: any) {
-                return o._id === guestData._id;
+                return o.entityId === guestData.entityId;
             });
         if (this.partyData && guestIndex < 0) {
             this.partyData.guests.push(guestData);
@@ -836,7 +836,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
         }
 
         //Update participant staus as online
-        this.updateParticipantsData(guestData.userId._id, { online: true });
+        this.updateParticipantsData(guestData.userId.entityId, { online: true });
 
         //Send ack. signal
         this.socket.emit("USER_CONNECTED", this.loggedInUserdId, socketId);
@@ -846,9 +846,9 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
         let peers = [];
         if (this.partyData && this.partyData.guests) {
             _.each(this.partyData.guests, (guest: any) => {
-                if (guest.userId && guest.userId._id !== this.loggedInUserdId) {
+                if (guest.userId && guest.userId.entityId !== this.loggedInUserdId) {
                     peers.push({
-                        id: guest.userId._id,
+                        id: guest.userId.entityId,
                         value: guest.userId.fullName,
                     });
                 }
@@ -899,7 +899,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
             autoFocus: false,
             data: {
                 socket: this.socket,
-                partyId: this.partyData._id,
+                partyId: this.partyData.entityId,
                 isHost: this.isHost,
             },
         });
@@ -1075,7 +1075,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
 
                 // console.log("Triggering SAY_HELLO_TO_EVERYONE", this.partyData.guests);
                 let guestData = _.filter(this.partyData.guests, (guest: any) => {
-                    return guest.userId._id == this.loggedInUserdId;
+                    return guest.userId.entityId == this.loggedInUserdId;
                 });
                 // console.log('guestData::', guestData)
 
@@ -1120,7 +1120,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
         this.partyService
             .togglePartyPrivacy({
                 st: !this.partyData?.isPrivate,
-                partyId: this.partyData._id,
+                partyId: this.partyData.entityId,
             })
             .subscribe((response: any) => {
                 this.updatingPartyPrivacy = false;
@@ -1148,7 +1148,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
         }
 
         let endParty = {
-            _id: _self.partyData._id,
+            entityId: _self.partyData.entityId,
             endedOn: new Date().getTime(),
             isEnded: true,
             endedBy: _self.loggedInUserdId,
@@ -1485,9 +1485,9 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
                 return;
             }
             let existsingData = _.find(this.allParticipants, {
-                userId: guest.userId._id,
+                userId: guest.userId.entityId,
             });
-            let isLoggedInUser = guest.userId._id == this.loggedInUserdId;
+            let isLoggedInUser = guest.userId.entityId == this.loggedInUserdId;
             let layoutInfo = <any>this.getLayout(this.partyData.guests.length, isLoggedInUser);
 
             if (existsingData) {
@@ -1497,7 +1497,7 @@ export class NewPartyAreaComponent implements OnInit, OnDestroy, AfterViewInit, 
             } else {
                 let participant = {
                     name: guest.userId.fullName,
-                    userId: guest.userId._id,
+                    userId: guest.userId.entityId,
                     loggedInUser: isLoggedInUser,
                     hasVideo: existsingData ? existsingData.hasVideo : false,
                     cols: layoutInfo.cols,

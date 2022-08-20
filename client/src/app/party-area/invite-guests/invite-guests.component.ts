@@ -69,8 +69,8 @@ export class InviteGuestsComponent implements OnInit {
         });
 
         let profileSer = this.ss.loggedInUserProfile.subscribe((profile: any) => {
-            if (profile && profile._id) {
-                this.loggedInUserdId = profile._id;
+            if (profile && profile.entityId) {
+                this.loggedInUserdId = profile.entityId;
             }
         });
 
@@ -86,10 +86,10 @@ export class InviteGuestsComponent implements OnInit {
             let guests = [];
             _.each(this.partyData.guests, (guest: any) => {
                 if (guest && guest.userId) {
-                    guest.userId.isHost = guest.userId._id == this.partyData.hostedBy ? true : false;
-                    guest.userId.self = guest.userId._id == this.loggedInUserdId ? true : false;
+                    guest.userId.isHost = guest.userId.entityId == this.partyData.hostedBy ? true : false;
+                    guest.userId.self = guest.userId.entityId == this.loggedInUserdId ? true : false;
                     guest.userId.existing = true;
-                    guest.userId.guestId = guest._id;
+                    guest.userId.guestId = guest.entityId;
                     guest.userId.isCoHost = guest.isCoHost;
                     guests.push(guest.userId);
                 }
@@ -123,7 +123,7 @@ export class InviteGuestsComponent implements OnInit {
 
         this.modalData.socket.on("UNBLOCK_USER", (userId: any) => {
             this.blockedUsers = _.filter(this.blockedUsers, (user: any) => {
-                return user._id != userId;
+                return user.entityId != userId;
             });
 
             this.openSnackBar(`Host has updated the guest list.`, "", "bottom", "center");
@@ -142,7 +142,7 @@ export class InviteGuestsComponent implements OnInit {
 
         let guests = this.guestsForm.controls.guests.value || [];
         const index = _.findIndex(guests, function (o: any) {
-            return o._id === userId;
+            return o.entityId === userId;
         });
 
         if (index >= 0) {
@@ -157,12 +157,12 @@ export class InviteGuestsComponent implements OnInit {
         let selectedGuest = <any>event.option.value;
 
         let isAlreadyExists = <any>_.findIndex(guests, function (o: any) {
-            return o._id === selectedGuest._id;
+            return o.entityId === selectedGuest.entityId;
         });
         isAlreadyExists = isAlreadyExists >= 0;
 
         let isBlockedUser = <any>_.findIndex(this.blockedUsers, function (o: any) {
-            return o._id === selectedGuest._id;
+            return o.entityId === selectedGuest.entityId;
         });
         isBlockedUser = isBlockedUser >= 0;
 
@@ -174,7 +174,7 @@ export class InviteGuestsComponent implements OnInit {
             this.openSnackBar(`The Party Room is full.`, "close", "bottom", "center", 4000);
         } else {
             let alreadyExists = _.findIndex(guests, function (o: any) {
-                return o._id == selectedGuest._id;
+                return o.entityId == selectedGuest.entityId;
             });
             if (alreadyExists == -1) {
                 guests.push(selectedGuest);
@@ -214,7 +214,7 @@ export class InviteGuestsComponent implements OnInit {
             return !guest.existing;
         });
 
-        let allGuestsIds = _.map(allGuests, "_id");
+        let allGuestsIds = _.map(allGuests, "entityId");
         let existingGuests = this.partyData.guests;
         let removedIds = {
             guests: [],
@@ -222,12 +222,12 @@ export class InviteGuestsComponent implements OnInit {
         };
         let blockedUser = {};
         _.each(existingGuests, (guest: any) => {
-            if (!allGuestsIds.includes(guest.userId._id)) {
-                removedIds.guests.push(guest._id);
-                removedIds.userIds.push(guest.userId._id);
+            if (!allGuestsIds.includes(guest.userId.entityId)) {
+                removedIds.guests.push(guest.entityId);
+                removedIds.userIds.push(guest.userId.entityId);
 
                 blockedUser = {
-                    _id: guest.userId._id,
+                    entityId: guest.userId.entityId,
                     fullName: guest.userId.fullName,
                 };
                 this.blockedUsers.push(blockedUser);
@@ -237,7 +237,7 @@ export class InviteGuestsComponent implements OnInit {
         this.updatingParty = true;
         this.partyService
             .inviteGuestsInTheParty({
-                partyId: this.partyData._id,
+                partyId: this.partyData.entityId,
                 guests: newGuests,
                 removedIds,
             })
@@ -281,7 +281,7 @@ export class InviteGuestsComponent implements OnInit {
 
             if (response && response.Success) {
                 this.blockedUsers = _.filter(this.blockedUsers, (user: any) => {
-                    return user._id != userId;
+                    return user.entityId != userId;
                 });
 
                 this.openSnackBar(`User unblocked successfully.`, "", "bottom", "center");
@@ -325,9 +325,9 @@ export class InviteGuestsComponent implements OnInit {
             if (response && response.Success) {
                 //Update PartyData guests
                 this.partyData.guests = _.map(this.partyData.guests, (guest: any) => {
-                    if (guest._id == guestId) {
+                    if (guest.entityId == guestId) {
                         guest.isCoHost = add;
-                        guestUserId = guest.userId._id;
+                        guestUserId = guest.userId.entityId;
                     }
                     return guest;
                 });

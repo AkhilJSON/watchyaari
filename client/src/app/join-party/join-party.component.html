@@ -178,7 +178,7 @@
             mat-icon-button
             color="yellow"
             class="copy-invite-url m-r-10"
-            [cdkCopyToClipboard]="copyPartyInviteURL(party._id)"
+            [cdkCopyToClipboard]="copyPartyInviteURL(party.entityId)"
             (click)="onCopyingInviteURL()"
             matTooltip="COPY INVITE URL"
             matTooltipPosition="above"
@@ -189,7 +189,7 @@
           <button
             mat-stroked-button
             color="{{ getStatusColor(party.status, 'class') }}"
-            (click)="actionButton(party.status, party._id)"
+            (click)="actionButton(party.status, party.entityId)"
           >
             {{ partyLabel(party, "label") }}
           </button>

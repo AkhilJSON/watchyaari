@@ -214,7 +214,7 @@ export class ChangeVideoTrackComponent implements OnInit, OnDestroy {
                 videoSource: "YOUTUBE",
             };
         }
-        newVideoData.partyId = this.partyData._id;
+        newVideoData.partyId = this.partyData.entityId;
         this.updatingParty = true;
         let updateVideoService = this.ps.updateVideoInTheParty(newVideoData).subscribe((res: any) => {
             this.updatingParty = false;

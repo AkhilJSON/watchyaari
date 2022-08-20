@@ -165,7 +165,7 @@ export class JoinPartyComponent implements OnInit, AfterViewInit, OnDestroy {
                     return;
                 }
 
-                this.router.navigateByUrl("/partyArea/" + partyData._id);
+                this.router.navigateByUrl("/partyArea/" + partyData.entityId);
             }
         });
         this.subscription.add(joinPartyResource);
