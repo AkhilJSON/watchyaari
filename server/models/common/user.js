@@ -30,7 +30,6 @@ const userSchema = new Schema(User, {
     isAdmin: { type: "boolean" },
 });
 
-// TODO :: Generate password salt before saving user in the controllers itself
 const UserRepository = client.fetchRepository(userSchema);
 export default UserRepository;
 

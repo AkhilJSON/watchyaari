@@ -7,8 +7,8 @@ const videoData = {
 
 /**
  * Restores redisjson with necessary info
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  * @returns status response
  */
 export async function restoreData(req, res) {
