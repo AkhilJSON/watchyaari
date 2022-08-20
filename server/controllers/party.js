@@ -7,7 +7,7 @@ import nLog from "noogger";
 // models
 import Party from "../models/common/party.js";
 import User from "../models/common/user.js";
-import HomePageVideos from "../models/data/homePageVideos.js";
+import UserHomePageVideosRepository from "../models/data/homePageVideos.js";
 import Guest from "../models/common/guest.js";
 
 // controllers
@@ -393,44 +393,29 @@ export async function launchParty(req, res) {
     }
 }
 
+/**
+ * Fetches video data from redis or youtube
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns videos data
+ */
 export async function searchVideos(req, res) {
     try {
         let body = req.body;
-        //body.userMeta contains userId
-        //add item homescreen in redis
-        let defaultSearchKey = "DEFAULT_VIDEOS";
 
         //If default videos for home page, get from redis if exists.
         if (body.defaultSearch) {
-            redis.get(defaultSearchKey, async (err, results) => {
-                if (!results) {
-                    let homePageVideos = await HomePageVideos.findOne({ isDeleted: { $ne: true } });
+            let homePageVideos = await UserHomePageVideosRepository.search()
+                .where("isDeleted")
+                .is.not.equal(true)
+                .returnFirst();
 
-                    if (homePageVideos) {
-                        nLog.info("Fetching stored home page videos from db");
-
-                        //Store data in redis
-                        redis.set(defaultSearchKey, homePageVideos.data);
-
-                        return res.json({
-                            Success: true,
-                            message: "OK",
-                            code: 200,
-                            data: JSON.parse(homePageVideos.data),
-                        });
-                    } else {
-                        nLog.info("FETCHIG VIDEOS USING YAPI");
-                        fetchFromYoutube(true);
-                    }
-                } else {
-                    nLog.info("CACHED DEFAULT VIDEOS");
-                    return res.json({
-                        Success: true,
-                        message: "OK",
-                        code: 200,
-                        data: JSON.parse(results),
-                    });
-                }
+            return res.json({
+                Success: true,
+                message: "OK",
+                code: 200,
+                data: JSON.parse(homePageVideos.data),
             });
         } else {
             nLog.info(`SEARCH ${body.search}`);

@@ -21,11 +21,18 @@ import {
     trendVideos,
 } from "../controllers/party.js";
 
+import * as Migrations from "../migrations/restoreData.js";
+
 var router = Router();
 
+// User signup
 router.post("/userRegistration", userRegistration);
 
+// User signin
 router.post("/userAuthentication", userAuthentication);
+
+// To restored application default data
+router.get("/restoreData", Migrations.restoreData);
 
 /* router.post("/createUserManually", commonController.createUserManually);
 
