@@ -1,6 +1,6 @@
 import superagent from "superagent";
 
-export default async function sendEmail(data) {
+export async function sendEmail(data) {
     try {
         let url = `https://api.sendgrid.com/v3/mail/send`;
         await superagent

@@ -12,7 +12,7 @@ import PartyRepository from "../../models/common/party.js";
 import Guest from "../../models/common/guest.js";
 
 // services
-import EmailService from "../../controllers/common/emailService.js";
+import * as EmailService from "../../controllers/common/emailService.js";
 
 // helpers
 import Helper from "../helper.js";
@@ -178,13 +178,13 @@ export async function forgotPassword(req, res) {
     try {
         let body = req.body;
 
-        body.email = Body?.email?.trim()?.toLowerCase();
-        body.password = Body?.password?.trim();
+        body.email = body?.email?.trim()?.toLowerCase();
+        body.password = body?.password?.trim();
 
         let user = await UserRepository.search()
-            .where(email)
+            .where("email")
             .equals(body.email)
-            .and(isDeleted)
+            .and("isDeleted")
             .is.not.equal(true)
             .returnFirst();
 
@@ -666,7 +666,9 @@ function sendForgotPasswordLink(user) {
         };
         EmailService.sendEmail(emailBody);
 
-        await User.findByIdAndUpdate({ entityId: user.entityId }, { $set: { passwordResetCode: token } });
+        let userData = await UserRepository.fetch(user?.entityId);
+        userData.passwordResetCode = token;
+        await UserRepository.save(userData);
         return resolve("Ok");
     });
 }
