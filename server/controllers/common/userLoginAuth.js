@@ -103,12 +103,16 @@ export async function userAuthentication(req, res) {
     try {
         let Body = req.body;
 
+        Body.email = Body?.email?.trim()?.toLowerCase();
+        Body.password = Body?.password?.trim();
+
         if (!Body?.email?.length) {
             return res.json({
                 Success: false,
                 Message: "email should not be empty",
             });
         }
+
         if (!Body?.password?.length) {
             return res.json({
                 Success: false,
@@ -174,10 +178,16 @@ export async function forgotPassword(req, res) {
     try {
         let body = req.body;
 
-        let user = await User.findOne(
-            { email: body.email, isDeleted: { $ne: true } },
-            "entityId email fullName passwordResetCode"
-        );
+        body.email = Body?.email?.trim()?.toLowerCase();
+        body.password = Body?.password?.trim();
+
+        let user = await UserRepository.search()
+            .where(email)
+            .equals(body.email)
+            .and(isDeleted)
+            .is.not.equal(true)
+            .returnFirst();
+
         if (!user) {
             return res.json({
                 Success: false,

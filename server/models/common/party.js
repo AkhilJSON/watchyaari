@@ -22,13 +22,13 @@ const partySchema = new Schema(Party, {
         type: "string",
     },
     guests: {
-        type: "string[]"
+        type: "string[]",
     },
     guestUserIds: {
-        type: "string[]"
+        type: "string[]",
     },
     removedUsers: {
-        type: "string[]"
+        type: "string[]",
     },
     startedOn: {
         type: "date",

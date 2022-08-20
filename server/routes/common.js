@@ -3,7 +3,16 @@ import { Router } from "express";
 import passport from "passport";
 
 // controllers
-import { userRegistration, userAuthentication } from "../controllers/common/userLoginAuth.js";
+import {
+    userRegistration,
+    userAuthentication,
+    verifyUserEmail,
+    forgotPassword,
+    resetPassword,
+    verifyResetPasswordLink,
+    getUserDetails,
+    getPartyDetails
+} from "../controllers/common/userLoginAuth.js";
 import { getChatHistory } from "../controllers/chat.js";
 import {
     joinParty,
@@ -34,32 +43,31 @@ router.post("/userAuthentication", userAuthentication);
 // To restored application default data
 router.get("/restoreData", Migrations.restoreData);
 
-/* router.post("/createUserManually", commonController.createUserManually);
+// router.post("/createUserManually", createUserManually);
 
+router.post("/verifyUserEmail", verifyUserEmail);
 
-router.post("/verifyUserEmail", commonController.verifyUserEmail);
+router.post("/forgotPassword", forgotPassword);
 
-router.post("/forgotPassword", commonController.forgotPassword);
+router.post("/resetPassword", resetPassword);
 
-router.post("/resetPassword", commonController.resetPassword);
-
-router.post("/resetPasswordLink", commonController.verifyResetPasswordLink);
+router.post("/resetPasswordLink", verifyResetPasswordLink);
 
 router.post(
     "/getPartyDetails",
-    passport.passport.authenticate("user", {
+    passport.authenticate("user", {
         session: false,
     }),
-    commonController.getPartyDetails
+    getPartyDetails
 );
 
 router.post(
     "/getUserDetails",
-    passport.passport.authenticate("user", {
+    passport.authenticate("user", {
         session: false,
     }),
-    commonController.getUserDetails
-); */
+    getUserDetails
+);
 
 router.post(
     "/getChatHistory",

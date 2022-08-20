@@ -74,7 +74,10 @@ export async function getRecentPartyList(req, res) {
                                 $expr: {
                                     $and: [
                                         {
-                                            $or: [{ $in: ["$entityId", "$$userIds"] }, { $eq: ["$entityId", "$$createdBy"] }],
+                                            $or: [
+                                                { $in: ["$entityId", "$$userIds"] },
+                                                { $eq: ["$entityId", "$$createdBy"] },
+                                            ],
                                         },
                                         { $ne: ["$entityId", req.user.entityId] },
                                     ],
@@ -347,7 +350,10 @@ export async function launchParty(req, res) {
             delete partyData.entityId;
             await Party.updateOne({ entityId: mongoose.Types.ObjectId(body.entityId) }, { $set: partyData });
             let partyDetails =
-                (await Party.findById(mongoose.Types.ObjectId(body.entityId), "-videoListHistory -removedUsers").populate({
+                (await Party.findById(
+                    mongoose.Types.ObjectId(body.entityId),
+                    "-videoListHistory -removedUsers"
+                ).populate({
                     path: "guests",
                     model: "Guest",
                     select: "-partyId",
@@ -395,9 +401,9 @@ export async function launchParty(req, res) {
 
 /**
  * Fetches video data from redis or youtube
- * 
- * @param {*} req 
- * @param {*} res 
+ *
+ * @param {*} req
+ * @param {*} res
  * @returns videos data
  */
 export async function searchVideos(req, res) {
@@ -551,7 +557,10 @@ export async function inviteGuestsInTheParty(req, res) {
 
         for (let index = 0; index < body.guests.length; index++) {
             let guestUserId = body.guests[index].entityId;
-            let guestData = await UserLoginAuth.createGuestWithPartyId({ entityId: guestUserId, partyId: body.partyId });
+            let guestData = await UserLoginAuth.createGuestWithPartyId({
+                entityId: guestUserId,
+                partyId: body.partyId,
+            });
             guestsData.push(mongoose.Types.ObjectId(guestData.entityId));
             guestsUserIds.push(mongoose.Types.ObjectId(guestUserId));
         }
