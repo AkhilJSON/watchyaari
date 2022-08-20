@@ -3,7 +3,7 @@ import { Router } from "express";
 import passport from "passport";
 
 // controllers
-import { userRegistration } from "../controllers/common/userLoginAuth.js";
+import { userRegistration, userAuthentication } from "../controllers/common/userLoginAuth.js";
 import { getChatHistory } from "../controllers/chat.js";
 import {
     joinParty,
@@ -25,9 +25,10 @@ var router = Router();
 
 router.post("/userRegistration", userRegistration);
 
+router.post("/userAuthentication", userAuthentication);
+
 /* router.post("/createUserManually", commonController.createUserManually);
 
-router.post("/userAuthentication", commonController.userAuthentication);
 
 router.post("/verifyUserEmail", commonController.verifyUserEmail);
 

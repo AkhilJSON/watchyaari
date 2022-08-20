@@ -17,17 +17,31 @@ import EmailService from "../../controllers/common/emailService.js";
 // helpers
 import Helper from "../helper.js";
 
+/**
+ *
+ * @param {*} req
+ * @param {*} req.body
+ * @param {String} req.body.email
+ * @param {String} req.body.password
+ * @param {String} req.body.fullName
+ * @param {*} res
+ * @returns JWT token
+ */
 export async function userRegistration(req, res) {
     try {
-        let Body = req.body;
+        let Body = req?.body;
         createUserValidations(Body, res);
 
-        // Body['createdBy'] = req.user._id;
-        // Body['modifiedBy'] = req.user._id;
+        Body.email = Body?.email?.trim()?.toLowerCase();
+        Body.password = Body?.password?.trim();
 
-        let userCheck = await UserRepository.findOne({
-            $and: [{ email: Body.email }, { isDeleted: false }],
-        });
+        let userCheck =
+            (await UserRepository.search()
+                .where("email")
+                .equals(Body.email)
+                .and("isDeleted")
+                .is.not.equal(true)
+                .return.count()) || 0;
 
         if (userCheck) {
             return res.json({
@@ -36,43 +50,114 @@ export async function userRegistration(req, res) {
             });
         }
 
-        let userData = new User();
-        userData.email = Body.email.trim();
-        userData.password = Body.password;
-        userData.fullName = Body.fullName;
+        // Encrypt user password
+        const encryptedPassword = await Helper.generateEncryptedCode(Body.password);
 
-        userData
-            .save()
-            .then(async (user) => {
-                //SEND EMAIL TO THE USER
-                // sendEmailVerificationLinkToUser(user);
-
-                let userObj = _.pick(user, [
-                    "_id",
-                    "email",
-                    "fullName",
-                    "mobile",
-                    "createdOn",
-                    "status",
-                    "emailVerified",
-                    "phoneVerified",
-                ]);
-                var token = giveAuthTokenForLoggedInUser(userObj);
-
-                nLog.info(`${userObj._id} Registered successfully`);
-                res.json({
-                    Success: true,
-                    Message: "Registered successfully",
-                    Token: "JWT " + token,
-                    uid: userObj._id,
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-                Helper.catchException(JSON.stringify(err), res);
+        if (!encryptedPassword) {
+            return res.json({
+                Success: false,
+                Message: "invalid password",
             });
+        }
+
+        let userData = {
+            email: Body.email,
+            password: encryptedPassword,
+            fullName: Body.fullName,
+            isDeleted: false,
+            createdOn: Date.now(),
+            modifiedOn: Date.now(),
+            status: "ADDED",
+        };
+
+        // saves user data in the db
+        userData = await UserRepository.createAndSave(userData);
+
+        // creates JWT token and send to the client
+        const loginToken = prepareJWTToken(userData);
+
+        nLog.info(`${userData?.entityId} Registered successfully`);
+
+        res.json({
+            Success: true,
+            Message: "Registered successfully",
+            Token: loginToken,
+            uid: userData?.entityId,
+        });
     } catch (e) {
         console.log(e);
+        Helper.catchException(JSON.stringify(e), res);
+    }
+}
+
+/**
+ *
+ * @param {*} req
+ * @param {*} req.body
+ * @param {String} req.body.email
+ * @param {String} req.body.password
+ * @param {*} res
+ * @returns
+ */
+export async function userAuthentication(req, res) {
+    try {
+        let Body = req.body;
+
+        if (!Body?.email?.length) {
+            return res.json({
+                Success: false,
+                Message: "email should not be empty",
+            });
+        }
+        if (!Body?.password?.length) {
+            return res.json({
+                Success: false,
+                Message: "password should not be empty",
+            });
+        }
+
+        let userData = await UserRepository.search()
+            .where("email")
+            .equals(Body.email)
+            .and("isDeleted")
+            .is.not.equal(true)
+            .returnFirst();
+
+        if (userData?.entityId) {
+            if (userData?.status === "INACTIVE") {
+                return res.json({
+                    Success: false,
+                    Message: "Your Account is DeActivated",
+                });
+            }
+
+            // Verify user entered password
+            const isPasswordMatched = await Helper.compareEncryptedCode(req?.body?.password, userData?.password);
+
+            if (isPasswordMatched) {
+                // creates JWT token and send to the client
+                const loginToken = prepareJWTToken(userData);
+
+                nLog.info(`${userData.entityId} Authenticated successfuly`);
+                res.json({
+                    Success: true,
+                    Message: "Ok",
+                    Token: loginToken,
+                    uid: userData.entityId,
+                });
+            } else {
+                return res.json({
+                    Success: false,
+                    Message: "passwords did not match",
+                });
+            }
+        } else {
+            return res.json({
+                Success: false,
+                Message: "cannot find user",
+            });
+        }
+    } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
 }
@@ -300,78 +385,6 @@ export async function createUserManually(req, res) {
     }
 }
 
-export async function userAuthentication(req, res) {
-    try {
-        let Body = req.body;
-
-        if (!Body.email || (Body.email && Body.email.length == 0)) {
-            return res.json({
-                Success: false,
-                Message: "email should not be empty",
-            });
-        }
-        if (!Body.password || (Body.password && Body.password.length == 0)) {
-            return res.json({
-                Success: false,
-                Message: "password should not be empty",
-            });
-        }
-
-        User.findOne({
-            $and: [{ $or: [{ email: Body.email }, { mobile: Body.email }] }, { isDeleted: false }],
-        })
-            .then(async (val) => {
-                if (val) {
-                    if (val.status === "INACTIVE") {
-                        return res.json({
-                            Success: false,
-                            Message: "Your Account is DeActivated",
-                        });
-                    }
-                    val.comparePassword(req.body.password, async function (err, isMatch) {
-                        if (isMatch && !err) {
-                            let userObj = _.pick(val, [
-                                "_id",
-                                "email",
-                                "fullName",
-                                "mobile",
-                                "createdOn",
-                                "status",
-                                "emailVerified",
-                                "phoneVerified",
-                            ]);
-                            var token = giveAuthTokenForLoggedInUser(userObj);
-
-                            nLog.info(`${userObj._id} Authenticated successfuly`);
-                            res.json({
-                                Success: true,
-                                Message: "Ok",
-                                Token: "JWT " + token,
-                                uid: userObj._id,
-                            });
-                        } else {
-                            return res.json({
-                                Success: false,
-                                Message: "passwords did not match",
-                            });
-                        }
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "cannot find user",
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                Helper.catchException(JSON.stringify(err), res);
-            });
-    } catch (e) {
-        Helper.catchException(JSON.stringify(e), res);
-    }
-}
-
 export async function getPartyDetails(req, res) {
     try {
         let body = req.body;
@@ -477,6 +490,27 @@ export async function getUserDetails(req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
+}
+
+/**
+ * Generates JWT token
+ * @param {*} userData
+ * @returns
+ */
+function prepareJWTToken(userData) {
+    const userObj = _.pick(userData, [
+            "entityId",
+            "email",
+            "fullName",
+            "mobile",
+            "createdOn",
+            "status",
+            "emailVerified",
+            "phoneVerified",
+        ]),
+        token = giveAuthTokenForLoggedInUser(userObj);
+
+    return `JWT ${token}`;
 }
 
 function giveAuthTokenForLoggedInUser(val) {

@@ -1,11 +1,10 @@
 // packages
 import { Strategy as JwtStrategy } from "passport-jwt";
 import { ExtractJwt } from "passport-jwt";
-import mongoose from "mongoose";
 import _ from "lodash";
 
 // models
-import User from "../models/common/user.js";
+import UserRepository from "../models/common/user.js";
 
 // Setup work and export for the JWT passport strategy
 export default function (passport) {
@@ -15,31 +14,33 @@ export default function (passport) {
 
     passport.use(
         "user",
-        new JwtStrategy(opts, function (jwt_payload, done) {
-            let id = jwt_payload._id;
-            User.findOne({ _id: mongoose.Types.ObjectId(id) }, async function (err, user) {
-                if (err || !user) {
-                    return done(err, false);
+        new JwtStrategy(opts, async function (jwt_payload, done) {
+            let entityId = jwt_payload.entityId,
+                user = await UserRepository.fetch(entityId);
+
+            if (!user) {
+                return done(err, false);
+            }
+
+            user = _.pick(user, [
+                "entityId",
+                "fullName",
+                "email",
+                "emailVerified",
+                "emailVerificationCode",
+                "mobileVerified",
+                "isAdmin",
+            ]);
+
+            if (user) {
+                if (user.emailVerificationCode) {
+                    user.emailVerificationSent = true;
+                } else {
+                    user.emailVerificationSent = false;
                 }
-                user = _.pick(user, [
-                    "_id",
-                    "fullName",
-                    "email",
-                    "emailVerified",
-                    "emailVerificationCode",
-                    "mobileVerified",
-                    "isAdmin",
-                ]);
-                if (user) {
-                    if (user.emailVerificationCode) {
-                        user.emailVerificationSent = true;
-                    } else {
-                        user.emailVerificationSent = false;
-                    }
-                    delete user.emailVerificationCode;
-                    done(null, user);
-                }
-            });
+                delete user.emailVerificationCode;
+                done(null, user);
+            }
         })
     );
 }
