@@ -212,15 +212,19 @@ export async function unBlockUsers(req, res) {
     try {
         let { partyId, userId } = req.body || {};
 
-        partyId = mongoose.Types.ObjectId(partyId);
-        let updateRes = await Party.updateOne(
-            { entityId: partyId },
-            {
-                $pull: {
-                    removedUsers: { $in: [userId] },
-                },
-            }
-        );
+        // Fetch party data
+        let partyData = await PartyRepository.fetch(partyId);
+
+        if (partyData?.removedUsers?.length) {
+            partyData.removedUsers = _.filter(partyData?.removedUsers, (id) => {
+                if (id != userId) {
+                    return true;
+                }
+            });
+        }
+
+        // Save party data
+        await PartyRepository.save(partyData);
 
         return res.json({
             Success: true,
@@ -237,9 +241,12 @@ export async function updateCoHosts(req, res) {
     try {
         let { guestId, add } = req.body || {};
 
-        guestId = mongoose.Types.ObjectId(guestId);
+        // Fetch guest data
+        let guestData = await GuestRepository.fetch(guestId);
+        guestData.isCoHost = add;
 
-        let updateRes = await Guest.findOneAndUpdate({ entityId: guestId }, { isCoHost: add });
+        // Save guest data
+        await GuestRepository.save(guestData);
 
         return res.json({
             Success: true,
@@ -521,14 +528,14 @@ export async function inviteGuestsInTheParty(req, res) {
             if (body?.removedIds?.guests?.length) {
                 // Remove guests
                 partyData.guests = _.filter(partyData.guests, (guestId) => {
-                    if (body?.removedIds?.guests?.includes(guestId)) {
+                    if (!body?.removedIds?.guests?.includes(guestId)) {
                         return true;
                     }
                 });
 
                 // Remove guest userIds
                 partyData.guestUserIds = _.filter(partyData.guestUserIds, (userId) => {
-                    if (body?.removedIds?.userIds?.includes(userId)) {
+                    if (!body?.removedIds?.userIds?.includes(userId)) {
                         return true;
                     }
                 });
@@ -582,7 +589,10 @@ export async function togglePartyPrivacy(req, res) {
             });
         }
 
-        await Party.findByIdAndUpdate(mongoose.Types.ObjectId(body.partyId), { isPrivate: body.st });
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData.isPrivate = body.st;
+        await PartyRepository.save(partyData);
+
         return res.json({
             Success: true,
             message: "OK",

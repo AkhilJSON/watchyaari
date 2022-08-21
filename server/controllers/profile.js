@@ -11,10 +11,19 @@ export async function updateProfile(req, res) {
     try {
         let user = req.user;
 
-        let userData = await User.findById(user.entityId);
+        let userData = await UserRepository.fetch(user.entityId);
         userData = _.assignIn(userData, req.body);
+        userData.searchableEmail = userData.email;
+        userData.searchableFullName = userData.fullName;
 
-        await userData.save();
+        // Handle password change
+        if (req.body?.password) {
+            const encryptedPassword = await Helper.generateEncryptedCode(req.body?.password);
+            userData.password = encryptedPassword;
+        }
+
+        await UserRepository.save(userData);
+
         return res.json({
             Success: true,
             message: "OK",
