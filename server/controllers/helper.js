@@ -66,15 +66,17 @@ async function populateGuestDataOfParty(partyDetails) {
     try {
         partyDetails = partyDetails.toJSON();
 
-        for(let i=0; i<partyDetails?.guests?.length; i++){
+        for (let i = 0; i < partyDetails?.guests?.length; i++) {
             // populate Guest
             let guest = partyDetails?.guests?.[i],
-            guestDetails = await GuestRepository.fetch(guest);
+                guestDetails = await GuestRepository.fetch(guest);
             guestDetails = guestDetails.toJSON();
 
             // populate User
             if (guestDetails?.userId) {
                 guestDetails.userId = await UserRepository.fetch(guestDetails?.userId);
+
+                guestDetails.userId = _.pick(guestDetails.userId, ["entityId", "fullName", "email"]);
             }
 
             partyDetails.guests[i] = guestDetails;

@@ -286,9 +286,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
         //Implement Ended functionality
     }
 
-    if (
-        partyData?.guests?.length == (partyData?.maxGuestsAllowed || Constants.DEFAULT_MAX_GUESTS_ALLOWED)
-    ) {
+    if (partyData?.guests?.length == (partyData?.maxGuestsAllowed || Constants.DEFAULT_MAX_GUESTS_ALLOWED)) {
         let alreadyJoinedUsers = [partyData.hostedBy.toString()];
         alreadyJoinedUsers = alreadyJoinedUsers.concat(partyData.guestUserIds || []);
         alreadyJoinedUsers = _.map(alreadyJoinedUsers, (userId) => userId.toString());
@@ -323,7 +321,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
         partyDetails?.guests?.push(guestData.entityId);
         !partyDetails?.guestUserIds?.length && (partyDetails.guestUserIds = []);
         partyDetails?.guestUserIds?.push(loggedInUser);
-        
+
         await PartyRepository.save(partyDetails);
 
         // Populate latest party data

@@ -63,8 +63,10 @@ export async function userRegistration(req, res) {
 
         let userData = {
             email: Body.email,
+            searchableEmail: Body.email,
             password: encryptedPassword,
             fullName: Body.fullName,
+            searchableFullName: Body.fullName,
             isDeleted: false,
             createdOn: Date.now(),
             modifiedOn: Date.now(),
