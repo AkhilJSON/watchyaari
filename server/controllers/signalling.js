@@ -47,8 +47,7 @@ export default async function socketHandling(socket, io) {
                         // partyDuration + = lastStartTime - currentTime
                         let partyData = await PartyRepository.fetch(partyId),
                             lastActiveTime = partyData.lastActiveTime,
-                            partyDurationTillNow = partyData.partyDuration || 0,
-                            currentTime = moment().valueOf();
+                            partyDurationTillNow = partyData.partyDuration || 0;
 
                         let updateObj = {
                             partyDuration: partyDurationTillNow + moment().diff(moment(lastActiveTime), "seconds"),
@@ -391,15 +390,8 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
                 redis.set(partySyncKey, partySync);
 
                 // update lastActiveTime & status
-                let currentTime = moment().valueOf();
-                let updateObj = {
-                    lastActiveTime: currentTime,
-                    status: "ACTIVE",
-                    isStarted: true,
-                };
-
                 let partydetails = await PartyRepository.fetch(partyId);
-                partydetails.lastActiveTime = currentTime;
+                partydetails.lastActiveTime = Date.now();
                 partydetails.status = "ACTIVE";
                 partydetails.isStarted = true;
                 await PartyRepository.save(partydetails);

@@ -49,74 +49,42 @@ export async function joinParty(req, res) {
 
 export async function getRecentPartyList(req, res) {
     try {
-        let partyData = await Party.aggregate([
-            {
-                $match: {
-                    status: { $in: ["CREATED", "ACTIVE", "IN-ACTIVE", "ENDED"] },
-                    $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user.entityId)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user.entityId) },
-                    ],
-                },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    let: { userIds: "$guestUserIds", createdBy: "$hostedBy" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        {
-                                            $or: [
-                                                { $in: ["$entityId", "$$userIds"] },
-                                                { $eq: ["$entityId", "$$createdBy"] },
-                                            ],
-                                        },
-                                        { $ne: ["$entityId", req.user.entityId] },
-                                    ],
-                                },
-                            },
-                        },
-                        { $project: { entityId: 0, fullName: 1 } },
-                    ],
-                    as: "guestData",
-                },
-            },
-            {
-                $project: {
-                    cAt: 1,
-                    guestData: 1,
-                    videoSource: 1,
-                    videoId: 1,
-                    status: 1,
-                    endedOn: 1,
-                    title: 1,
-                    isEnded: 1,
-                    partyDuration: 1,
-                },
-            },
-            {
-                $sort: {
-                    cAt: -1,
-                },
-            },
-        ]);
+        let parties = await PartyRepository.search()
+            .where("guestUserIds")
+            .containOneOf(req.user.entityId)
+            .or("hostedBy")
+            .equals(req.user.entityId)
+            .and("status")
+            .is.not.equals("DELETED")
+            .sortDescending("cAt")
+            .returnAll();
 
-        partyData = _.map(partyData, (party) => {
-            party.guests = _.map(party.guestData || [], (party) => {
-                return party.fullName;
-            });
-            party.guests = `${party.guests.length ? "You, " : "Only you"} ${party.guests.join(", ")}`.toUpperCase();
-            delete party.guestData;
-            return party;
-        });
+        for(let i=0; i<parties?.length; i++){
+            let partyData = parties[i] = parties[i]?.toJSON();
+
+            let userIds = partyData?.guestUserIds?.length ? partyData?.guestUserIds?.concat?.([partyData?.hostedBy]) : [partyData?.hostedBy];
+
+            if(userIds?.length > 1){
+                // Remove loggedin user since we refer them as "You"
+                userIds = _.difference(userIds, [req.user.entityId]);
+
+                let userNames = [];
+                for(let j=0; j<userIds?.length; j++){
+                    const userData = await UserRepository.fetch(userIds[j]);
+                    userNames.push(userData?.fullName);
+                }
+
+                parties[i].guests = `You, ${userNames.join(", ")}`;
+            }else{
+                parties[i].guests = "Only you";
+            }
+        }
+
         return res.json({
             Success: true,
             message: "OK",
             code: 200,
-            data: partyData,
+            data: parties,
         });
     } catch (e) {
         console.log(e);
@@ -549,13 +517,15 @@ export async function inviteGuestsInTheParty(req, res) {
 
         if (guestsData?.length) {
             // Add guests
-            if (partyData?.guests?.length) {
-                partyData.guests = _.uniq(partyData?.guests?.concat(guestsData));
-            }
+            partyData.guests = _.uniq(partyData?.guests?.concat(guestsData));
 
             // Add guest userids
-            if (partyData?.guestUserIds?.length && guestsUserIds?.length) {
-                partyData.guestUserIds = _.uniq(partyData?.guestUserIds?.concat(guestsUserIds));
+            if (guestsUserIds?.length) {
+                if (partyData?.guestUserIds?.length) {
+                    partyData.guestUserIds = _.uniq(partyData?.guestUserIds?.concat(guestsUserIds));
+                } else {
+                    partyData.guestUserIds = guestsUserIds;
+                }
             }
         }
 
