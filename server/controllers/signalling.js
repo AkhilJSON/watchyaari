@@ -45,25 +45,18 @@ export default async function socketHandling(socket, io) {
 
                         // update Database with
                         // partyDuration + = lastStartTime - currentTime
-                        let partyData = await PartyRepository.fetch(partyId),
-                            lastActiveTime = partyData.lastActiveTime,
-                            partyDurationTillNow = partyData.partyDuration || 0;
-
-                        let updateObj = {
-                            partyDuration: partyDurationTillNow + moment().diff(moment(lastActiveTime), "seconds"),
-                        };
-
-                        if (!["ENDED"].includes(partyData.status)) {
-                            updateObj["status"] = "IN-ACTIVE";
-                        }
-
-                        let partData = await PartyRepository.fetch(partyId);
+                        let partData = await PartyRepository.fetch(partyId),
+                            lastActiveTime = partData.lastActiveTime,
+                            partyDurationTillNow = partData.partyDuration || 0;
 
                         if (partData?.entityId) {
                             partData.partyDuration =
                                 partyDurationTillNow + moment().diff(moment(lastActiveTime), "seconds");
                             partData.status = "IN-ACTIVE";
                         }
+
+                        // Save party data
+                        await PartyRepository.save(partData);
 
                         redis.delAsync(videoChatConnectionKey);
                     }

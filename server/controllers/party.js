@@ -59,23 +59,25 @@ export async function getRecentPartyList(req, res) {
             .sortDescending("cAt")
             .returnAll();
 
-        for(let i=0; i<parties?.length; i++){
-            let partyData = parties[i] = parties[i]?.toJSON();
+        for (let i = 0; i < parties?.length; i++) {
+            let partyData = (parties[i] = parties[i]?.toJSON());
 
-            let userIds = partyData?.guestUserIds?.length ? partyData?.guestUserIds?.concat?.([partyData?.hostedBy]) : [partyData?.hostedBy];
+            let userIds = partyData?.guestUserIds?.length
+                ? partyData?.guestUserIds?.concat?.([partyData?.hostedBy])
+                : [partyData?.hostedBy];
 
-            if(userIds?.length > 1){
+            if (userIds?.length > 1) {
                 // Remove loggedin user since we refer them as "You"
                 userIds = _.difference(userIds, [req.user.entityId]);
 
                 let userNames = [];
-                for(let j=0; j<userIds?.length; j++){
+                for (let j = 0; j < userIds?.length; j++) {
                     const userData = await UserRepository.fetch(userIds[j]);
                     userNames.push(userData?.fullName);
                 }
 
                 parties[i].guests = `You, ${userNames.join(", ")}`;
-            }else{
+            } else {
                 parties[i].guests = "Only you";
             }
         }

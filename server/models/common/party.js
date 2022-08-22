@@ -63,7 +63,7 @@ const partySchema = new Schema(Party, {
     },
     cAt: {
         type: "date",
-        sortable: true
+        sortable: true,
     },
     partyDuration: {
         //In seconds
