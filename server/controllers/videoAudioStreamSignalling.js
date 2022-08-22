@@ -1,8 +1,8 @@
 // packages
-const _ = require("lodash");
-const btoa = require("btoa");
+import _ from "lodash";
+import btoa from "btoa";
 
-exports.videoAudioSocketHandling = async function (socket, io) {
+export default async function videoAudioSocketHandling(socket, io) {
     try {
         let partyId = socket.handshake.query && socket.handshake.query.partyId;
 
@@ -34,48 +34,48 @@ exports.videoAudioSocketHandling = async function (socket, io) {
         });
 
         socket.on("hi_some_one_there", () => {
-            socket.user && socket.to(partyId).emit("watcher", socket.id, socket.user._id);
+            socket.user && socket.to(partyId).emit("watcher", socket.id, socket.user.entityId);
         });
 
         socket.on("watcher", (broadcaster) => {
             // console.log("\n watcher", "\n");
-            socket.user && socket.to(broadcaster).emit("watcher", socket.id, socket.user._id);
+            socket.user && socket.to(broadcaster).emit("watcher", socket.id, socket.user.entityId);
         });
 
         socket.on("candidate", (id, message) => {
             // console.log("\n candidate", "\n");
 
-            socket.user && socket.to(id).emit("candidate", socket.id, message, socket.user._id);
+            socket.user && socket.to(id).emit("candidate", socket.id, message, socket.user.entityId);
         });
 
         socket.on("offer", (id, message) => {
             // console.log("\n offer", "\n");
-            socket.user && socket.to(id).emit("offer", socket.id, message, socket.user._id);
+            socket.user && socket.to(id).emit("offer", socket.id, message, socket.user.entityId);
         });
 
         socket.on("answer", (id, message) => {
             // console.log("\n answer", "\n");
-            socket.user && socket.to(id).emit("answer", socket.id, message, socket.user._id);
+            socket.user && socket.to(id).emit("answer", socket.id, message, socket.user.entityId);
         });
 
         socket.on("broadcastData", (data) => {
-            socket.user && socket.to(partyId).emit("broadcastData", socket.user._id, data);
+            socket.user && socket.to(partyId).emit("broadcastData", socket.user.entityId, data);
         });
 
         socket.on("disconnect", () => {
             // console.log("\n disconnect", "\n");
-            socket.user && socket.to(partyId).emit("disconnectPeer", socket.id, socket.user._id);
+            socket.user && socket.to(partyId).emit("disconnectPeer", socket.id, socket.user.entityId);
         });
 
         socket.on("disableVideo", () => {
             // console.log("\n disconnect", "\n");
-            socket.user && socket.to(partyId).emit("disconnectPeer", socket.id, socket.user._id);
+            socket.user && socket.to(partyId).emit("disconnectPeer", socket.id, socket.user.entityId);
         });
     } catch (e) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function log() {
     var array = ["Message from server:"];

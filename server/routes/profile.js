@@ -1,19 +1,19 @@
 // packages
-var express = require("express");
-var passport = require("passport");
+import { Router } from "express";
+import passport from "passport";
 
 // controllers
-var profileController = require("../controllers/profile");
-var userLoginAuthController = require("../controllers/common/userLoginAuth");
+import { updateProfile, fetchProfile } from "../controllers/profile.js";
+// import { verifyMyEmail } from "../controllers/common/userLoginAuth.js";
 
-var router = express.Router();
+var router = Router();
 
 router.post(
     "/updateProfile",
     passport.authenticate("user", {
         session: false,
     }),
-    profileController.updateProfile
+    updateProfile
 );
 
 router.get(
@@ -21,15 +21,15 @@ router.get(
     passport.authenticate("user", {
         session: false,
     }),
-    profileController.fetchProfile
+    fetchProfile
 );
 
-router.get(
+/* router.get(
     "/verifyMyEmail",
     passport.authenticate("user", {
         session: false,
     }),
-    userLoginAuthController.verifyMyEmail
-);
+    verifyMyEmail
+); */
 
-module.exports = router;
+export default router;

@@ -41,7 +41,7 @@
                                 "
                                 [selectable]="true"
                                 [removable]="true"
-                                (removed)="remove(guest._id)"
+                                (removed)="remove(guest.entityId)"
                               >
                                 {{ guest.fullName }}
                                 <mat-icon matChipRemove>cancel</mat-icon>
@@ -154,7 +154,7 @@
                                 "
                                 [selectable]="true"
                                 [removable]="true"
-                                (removed)="remove(guest._id)"
+                                (removed)="remove(guest.entityId)"
                               >
                                 {{ guest.fullName }}
                                 <mat-icon matChipRemove>cancel</mat-icon>

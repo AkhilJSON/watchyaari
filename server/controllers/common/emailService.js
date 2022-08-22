@@ -1,7 +1,7 @@
-exports.sendEmail = async function (data) {
-    try {
-        const superagent = require("superagent");
+import superagent from "superagent";
 
+export async function sendEmail(data) {
+    try {
         let url = `https://api.sendgrid.com/v3/mail/send`;
         await superagent
             .post(url)
@@ -19,4 +19,4 @@ exports.sendEmail = async function (data) {
     } catch (e) {
         // Helper.catchException(JSON.stringify(e), res)
     }
-};
+}

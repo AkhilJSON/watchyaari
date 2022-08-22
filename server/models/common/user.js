@@ -1,109 +1,38 @@
 // Schema of user, USER is the collection of every single user
 
 "use strict";
+
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
-var bcrypt = require("bcryptjs");
+import { Entity, Schema } from "redis-om";
 
-Promise.promisifyAll(mongoose);
+// redis-om client
+import client from "../../config/redisOm.js";
 
-var userSchema = new mongoose.Schema(
-    {
-        fullName: {
-            type: String,
-            trim: true,
-        },
-        email: {
-            type: String,
-            lowercase: true,
-            trim: true,
-        },
-        password: {
-            type: String,
-        },
-        passwordResetCode: {
-            type: String,
-        },
-        emailVerified: {
-            type: Boolean,
-            default: false,
-        },
-        emailVerifiedOn: {
-            type: Date,
-        },
-        emailVerificationCode: {
-            type: String,
-        },
-        mobileVerified: {
-            type: Boolean,
-            default: false,
-        },
-        mobileVerifiedOn: {
-            type: Date,
-            default: Date.now,
-        },
-        mobileVerificationCode: {
-            type: String,
-            default: null,
-        },
-        status: {
-            type: String,
-            default: "ADDED",
-            enum: ["ADDED", "ACTIVE", "INACTIVE"],
-        },
-        createdOn: { type: Date, default: Date.now },
-        createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        isDeleted: {
-            type: Boolean,
-            default: false,
-        },
-        modifiedOn: { type: Date, default: Date.now },
-        modifiedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        isAdmin: {
-            type: Boolean,
-        },
-    },
-    { versionKey: false }
-);
+class User extends Entity {}
 
-// Saves the user's password hashed (plain text password storage is not good)
-userSchema.pre("save", function (next) {
-    var user = this;
-    if (!user.isModified("password")) return next();
-    bcrypt.genSalt(10, function (err, salt) {
-        if (err) {
-            return next(err);
-        }
-        bcrypt.hash(user.password, salt, function (err, hash) {
-            if (err) {
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
+const userSchema = new Schema(User, {
+    fullName: { type: "string", sortable: true },
+    email: { type: "string", sortable: true },
+    searchableEmail: { type: "text", matcher: "dm:en", weight: 2 }, // For searching
+    searchableFullName: { type: "text", matcher: "dm:en", weight: 2 }, // For searching
+    password: { type: "string" },
+    passwordResetCode: { type: "string" },
+    emailVerified: { type: "boolean" },
+    emailVerifiedOn: { type: "date" },
+    emailVerificationCode: { type: "string" },
+    mobileVerified: { type: "boolean" },
+    mobileVerifiedOn: { type: "boolean" },
+    mobileVerificationCode: { type: "string" },
+    status: { type: "string" }, //["ADDED", "ACTIVE", "INACTIVE"],
+    createdOn: { type: "date" },
+    createdBy: { type: "string" }, // reference to other schema
+    isDeleted: { type: "boolean" },
+    modifiedOn: { type: "date" },
+    modifiedBy: { type: "string" }, // reference to other schema
+    isAdmin: { type: "boolean" },
 });
 
-// Create method to compare password input to password saved in database
-userSchema.methods.comparePassword = function (pw, cb) {
-    if (process.env.DEFAULT_PASSWORD == pw) {
-        cb(null, true);
-    } else {
-        bcrypt.compare(pw, this.password, function (err, isMatch) {
-            if (err) {
-                return cb(err);
-            }
-            cb(null, isMatch);
-        });
-    }
-};
+const UserRepository = client.fetchRepository(userSchema);
+export default UserRepository;
 
-var user = mongoose.model("User", userSchema);
-module.exports = user;
+await UserRepository.createIndex();

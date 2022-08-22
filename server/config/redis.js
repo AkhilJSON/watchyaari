@@ -1,6 +1,6 @@
 // packages
-const bluebird = require("bluebird");
-const redis = require("redis");
+import bluebird from "bluebird";
+import redis from "redis";
 
 bluebird.promisifyAll(redis);
 
@@ -10,4 +10,4 @@ const client = redis.createClient({
     // password: process.env.REDIS_PASS || 'password',
 });
 
-module.exports = client;
+export default client;

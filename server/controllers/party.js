@@ -1,24 +1,26 @@
 //packages
-const mongoose = require("mongoose");
-const superagent = require("superagent");
-var _ = require("lodash");
-let nLog = require("noogger");
+import mongoose from "mongoose";
+import superagent from "superagent";
+import _ from "lodash";
+import nLog from "noogger";
 
 // models
-var Party = require("../models/common/party");
-var User = require("../models/common/user");
-var HomePageVideos = require("../models/data/homePageVideos");
-var Guest = require("../models/common/guest");
+import PartyRepository from "../models/common/party.js";
+import UserRepository from "../models/common/user.js";
+import UserHomePageVideosRepository from "../models/data/homePageVideos.js";
+import GuestRepository from "../models/common/guest.js";
 
 // controllers
-var UserLoginAuth = require("./common/userLoginAuth");
+import * as UserLoginAuth from "./common/userLoginAuth.js";
 
 // helpers
-var Helper = require("./helper");
-const redis = require("../config/redis");
+import Helper from "./helper.js";
+import redis from "../config/redis.js";
+import * as Constants from "../config/constants.js";
 
 let mongoId = mongoose.Types.ObjectId;
-exports.joinParty = async function (req, res) {
+
+export async function joinParty(req, res) {
     try {
         let body = req.body;
 
@@ -29,16 +31,10 @@ exports.joinParty = async function (req, res) {
             });
         }
 
-        let partyData = await Party.findById(
-            mongoose.Types.ObjectId(body.partyId),
-            "-videoListHistory -removedUsers"
-        ).populate({
-            path: "guests",
-            model: "Guest",
-            select: "-partyId",
-        });
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
-        nLog.info(`${req.user._id} joined party ${partyData._id}`);
+        nLog.info(`${req.user.entityId} joined party ${partyData.entityId}`);
         return res.json({
             Success: true,
             message: "OK",
@@ -49,91 +45,64 @@ exports.joinParty = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.getRecentPartyList = async function (req, res) {
+export async function getRecentPartyList(req, res) {
     try {
-        let partyData = await Party.aggregate([
-            {
-                $match: {
-                    status: { $in: ["CREATED", "ACTIVE", "IN-ACTIVE", "ENDED"] },
-                    $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user._id)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user._id) },
-                    ],
-                },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    let: { userIds: "$guestUserIds", createdBy: "$hostedBy" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        {
-                                            $or: [{ $in: ["$_id", "$$userIds"] }, { $eq: ["$_id", "$$createdBy"] }],
-                                        },
-                                        { $ne: ["$_id", req.user._id] },
-                                    ],
-                                },
-                            },
-                        },
-                        { $project: { _id: 0, fullName: 1 } },
-                    ],
-                    as: "guestData",
-                },
-            },
-            {
-                $project: {
-                    cAt: 1,
-                    guestData: 1,
-                    videoSource: 1,
-                    videoId: 1,
-                    status: 1,
-                    endedOn: 1,
-                    title: 1,
-                    isEnded: 1,
-                    partyDuration: 1,
-                },
-            },
-            {
-                $sort: {
-                    cAt: -1,
-                },
-            },
-        ]);
+        let parties = await PartyRepository.search()
+            .where("guestUserIds")
+            .containOneOf(req.user.entityId)
+            .or("hostedBy")
+            .equals(req.user.entityId)
+            .and("status")
+            .is.not.equals("DELETED")
+            .sortDescending("cAt")
+            .returnAll();
 
-        partyData = _.map(partyData, (party) => {
-            party.guests = _.map(party.guestData || [], (party) => {
-                return party.fullName;
-            });
-            party.guests = `${party.guests.length ? "You, " : "Only you"} ${party.guests.join(", ")}`.toUpperCase();
-            delete party.guestData;
-            return party;
-        });
+        for (let i = 0; i < parties?.length; i++) {
+            let partyData = (parties[i] = parties[i]?.toJSON());
+
+            let userIds = partyData?.guestUserIds?.length
+                ? partyData?.guestUserIds?.concat?.([partyData?.hostedBy])
+                : [partyData?.hostedBy];
+
+            if (userIds?.length > 1) {
+                // Remove loggedin user since we refer them as "You"
+                userIds = _.difference(userIds, [req.user.entityId]);
+
+                let userNames = [];
+                for (let j = 0; j < userIds?.length; j++) {
+                    const userData = await UserRepository.fetch(userIds[j]);
+                    userNames.push(userData?.fullName);
+                }
+
+                parties[i].guests = `You, ${userNames.join(", ")}`;
+            } else {
+                parties[i].guests = "Only you";
+            }
+        }
+
         return res.json({
             Success: true,
             message: "OK",
             code: 200,
-            data: partyData,
+            data: parties,
         });
     } catch (e) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.getUpcomingPartyList = async function (req, res) {
+export async function getUpcomingPartyList(req, res) {
     try {
         let partyData = await Party.aggregate([
             {
                 $match: {
                     status: { $in: ["SCHEDULED"] },
                     $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user._id)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user._id) },
+                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user.entityId)] } },
+                        { hostedBy: mongoose.Types.ObjectId(req.user.entityId) },
                     ],
                 },
             },
@@ -154,61 +123,22 @@ exports.getUpcomingPartyList = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.fetchUsers = async function (req, res) {
+export async function fetchUsers(req, res) {
     try {
-        let { search, skip, limit } = req.body || {};
-        let regexp = generateRegex(search);
-        search = search.toLowerCase();
-        let users =
-            (await User.aggregate([
-                {
-                    $project: {
-                        _id: 1,
-                        fullName: 1,
-                        email: 1,
-                    },
-                },
-                {
-                    $match: {
-                        $or: [
-                            { email: { $regex: regexp, $options: "i" } },
-                            { fullName: { $regex: regexp, $options: "i" } },
-                        ],
-                        _id: { $ne: req.user._id },
-                    },
-                },
-                {
-                    $addFields: {
-                        lowerName: { $toLower: "$fullName" },
-                    },
-                },
-                {
-                    $addFields: {
-                        nameIndex: { $indexOfCP: ["$lowerName", search] },
-                        emailIndex: { $indexOfCP: ["$email", search] },
-                    },
-                },
-                {
-                    $addFields: {
-                        nameIndex: { $cond: { if: { $eq: ["$nameIndex", -1] }, then: 999, else: "$nameIndex" } },
-                        emailIndex: { $cond: { if: { $eq: ["$emailIndex", -1] }, then: 999, else: "$emailIndex" } },
-                    },
-                },
-                {
-                    $sort: {
-                        nameIndex: 1,
-                        emailIndex: 1,
-                    },
-                },
-                {
-                    $skip: skip || 0,
-                },
-                {
-                    $limit: limit || 10,
-                },
-            ])) || [];
+        let { search, skip = 0, limit = 10 } = req.body || {},
+            users = await UserRepository.search()
+                .where("searchableEmail")
+                .matches(`${search}*`)
+                .or("searchableFullName")
+                .matches(`${search}*`)
+                .and("email")
+                .is.not.equalTo(req.user.email) // should be entityId(due to limitation of non comparision with entityId, will be updated)
+                .sortBy("fullName", "ASC")
+                .sortBy("email", "ASC")
+                .return.page(skip, limit);
+
         return res.json({
             Success: true,
             message: "OK",
@@ -219,16 +149,23 @@ exports.fetchUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.fetchBlockedUsers = async function (req, res) {
+export async function fetchBlockedUsers(req, res) {
     try {
         let { partyId } = req.body || {};
-        let partyData = await Party.findById(mongoose.Types.ObjectId(partyId), "_id removedUsers").populate({
-            path: "removedUsers",
-            model: "User",
-            select: "_id fullName",
-        });
+        let partyData = await PartyRepository.fetch(partyId);
+
+        for (let i = 0; i < partyData?.removedUsers?.length; i++) {
+            // populate Guest
+            let user = partyData?.removedUsers?.[i],
+                userDetails = await UserRepository.fetch(user);
+            userDetails = userDetails.toJSON();
+            userDetails = _.pick(userDetails, ["entityId", "fullName"]);
+
+            partyData.guests[i] = userDetails;
+        }
+
         return res.json({
             Success: true,
             message: "OK",
@@ -239,21 +176,25 @@ exports.fetchBlockedUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.unBlockUsers = async function (req, res) {
+export async function unBlockUsers(req, res) {
     try {
         let { partyId, userId } = req.body || {};
 
-        partyId = mongoose.Types.ObjectId(partyId);
-        let updateRes = await Party.updateOne(
-            { _id: partyId },
-            {
-                $pull: {
-                    removedUsers: { $in: [userId] },
-                },
-            }
-        );
+        // Fetch party data
+        let partyData = await PartyRepository.fetch(partyId);
+
+        if (partyData?.removedUsers?.length) {
+            partyData.removedUsers = _.filter(partyData?.removedUsers, (id) => {
+                if (id != userId) {
+                    return true;
+                }
+            });
+        }
+
+        // Save party data
+        await PartyRepository.save(partyData);
 
         return res.json({
             Success: true,
@@ -264,15 +205,18 @@ exports.unBlockUsers = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.updateCoHosts = async function (req, res) {
+export async function updateCoHosts(req, res) {
     try {
         let { guestId, add } = req.body || {};
 
-        guestId = mongoose.Types.ObjectId(guestId);
+        // Fetch guest data
+        let guestData = await GuestRepository.fetch(guestId);
+        guestData.isCoHost = add;
 
-        let updateRes = await Guest.findOneAndUpdate({ _id: guestId }, { isCoHost: add });
+        // Save guest data
+        await GuestRepository.save(guestData);
 
         return res.json({
             Success: true,
@@ -283,9 +227,9 @@ exports.updateCoHosts = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.launchParty = async function (req, res) {
+export async function launchParty(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -303,133 +247,117 @@ exports.launchParty = async function (req, res) {
 
         let partyData = null;
         let guestInfo = null;
-        if (body._id) {
-            partyData = (await Party.findById(mongoose.Types.ObjectId(body._id))) || {};
+
+        // Joing existing party
+        if (body.entityId) {
+            partyData = (await PartyRepository.fetch(body.entityId)) || {};
             partyData.cAt = new Date().getTime();
         } else {
-            partyData = new Party();
-            let guestData = user;
-            guestData.partyId = partyData._id;
-            partyData.cAt = new Date().getTime();
+            // Launching new party
+            partyData = await PartyRepository.createAndSave({
+                cAt: Date.now(),
+                maxGuestsAllowed: Constants.DEFAULT_MAX_GUESTS_ALLOWED,
+                initialisedAt: Date.now(),
+                status: "CREATED",
+            });
 
+            let guestData = user;
+            guestData.partyId = partyData.entityId;
             guestInfo = await UserLoginAuth.createGuestWithPartyId(guestData, res);
-            if (guestInfo && guestInfo._id) {
-                partyData.guests = [mongoose.Types.ObjectId(guestInfo._id)];
+
+            if (guestInfo && guestInfo.entityId) {
+                partyData.guests = [guestInfo.entityId];
             }
+
             guestsInfo.push(guestInfo);
             partyData.videoId = body.videoId;
             partyData.videoSource = body.videoSource;
-            partyData.hostedBy = mongoose.Types.ObjectId(user._id);
+            partyData.hostedBy = user.entityId;
         }
+
         partyData.status = body.status;
         partyData.mode = body.mode;
         partyData.title = body.title || getDefaultPartyTitleForUser(user);
 
         if (partyData.status == "SCHEDULED") {
-            partyData.scheduledDate = body.scheduledDate || new Date().getTime();
+            partyData.scheduledDate = body.scheduledDate || Date.now();
         }
 
-        if (body.guests && body.guests.length) {
+        if (body?.guests?.length) {
             for (let index = 0; index < body.guests.length; index++) {
-                let guestUserId = body.guests[index]._id;
-                let guestData = await UserLoginAuth.createGuestWithPartyId({
-                    _id: guestUserId,
-                    partyId: partyData._id,
-                });
-                partyData.guests.push(mongoose.Types.ObjectId(guestData._id));
+                let guestUserId = body.guests[index].entityId,
+                    guestData = await UserLoginAuth.createGuestWithPartyId({
+                        entityId: guestUserId,
+                        partyId: partyData.entityId,
+                    });
+
+                partyData.guests.push(guestData.entityId);
                 partyData.guestUserIds.push(guestUserId);
                 guestsInfo.push(guestData);
             }
         }
 
-        if (body._id) {
-            delete partyData._id;
-            await Party.updateOne({ _id: mongoose.Types.ObjectId(body._id) }, { $set: partyData });
-            let partyDetails =
-                (await Party.findById(mongoose.Types.ObjectId(body._id), "-videoListHistory -removedUsers").populate({
-                    path: "guests",
-                    model: "Guest",
-                    select: "-partyId",
-                    populate: {
-                        path: "userId",
-                        model: "User",
-                        select: "_id fullName email",
-                    },
-                })) || {};
+        if (body.entityId) {
+            delete partyData.entityId;
+
+            // Save Party data
+            await PartyRepository.save(partyData);
+
+            let partyDetails = await PartyRepository.fetch(body.entityId);
+            partyDetails = await Helper.populateGuestDataOfParty(partyDetails);
+
             let responseData = JSON.parse(JSON.stringify(partyDetails));
             responseData.isHost = true;
 
-            nLog.info(`${partyDetails._id} launched party`);
+            nLog.info(`${partyDetails.entityId} launched party`);
             return res.json({
                 Success: true,
                 Message: "DONE",
                 data: responseData,
             });
         } else {
-            partyData
-                .save()
-                .then(async (val) => {
-                    let responseData = JSON.parse(JSON.stringify(val));
-                    responseData.guests = guestInfo;
-                    responseData.isHost = true;
+            // Save Party data
+            await PartyRepository.save(partyData);
 
-                    nLog.info(`${partyData._id} launched party`);
-                    return res.json({
-                        Success: true,
-                        Message: "DONE",
-                        data: responseData,
-                    });
-                })
-                .catch((err) => {
-                    return res.json({
-                        Success: false,
-                        message: "Error",
-                    });
-                });
+            let responseData = JSON.parse(JSON.stringify(partyData));
+            responseData.guests = guestsInfo;
+            responseData.isHost = true;
+
+            nLog.info(`${partyData.entityId} launched party`);
+            return res.json({
+                Success: true,
+                Message: "DONE",
+                data: responseData,
+            });
         }
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.searchVideos = async function (req, res) {
+/**
+ * Fetches video data from redis or youtube
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns videos data
+ */
+export async function searchVideos(req, res) {
     try {
         let body = req.body;
-        //body.userMeta contains userId
-        //add item homescreen in redis
-        let defaultSearchKey = "DEFAULT_VIDEOS";
 
         //If default videos for home page, get from redis if exists.
         if (body.defaultSearch) {
-            redis.get(defaultSearchKey, async (err, results) => {
-                if (!results) {
-                    let homePageVideos = await HomePageVideos.findOne({ isDeleted: { $ne: true } });
+            let homePageVideos = await UserHomePageVideosRepository.search()
+                .where("isDeleted")
+                .is.not.equal(true)
+                .returnFirst();
 
-                    if (homePageVideos) {
-                        nLog.info("Fetching stored home page videos from db");
-
-                        //Store data in redis
-                        redis.set(defaultSearchKey, homePageVideos.data);
-
-                        return res.json({
-                            Success: true,
-                            message: "OK",
-                            code: 200,
-                            data: JSON.parse(homePageVideos.data),
-                        });
-                    } else {
-                        nLog.info("FETCHIG VIDEOS USING YAPI");
-                        fetchFromYoutube(true);
-                    }
-                } else {
-                    nLog.info("CACHED DEFAULT VIDEOS");
-                    return res.json({
-                        Success: true,
-                        message: "OK",
-                        code: 200,
-                        data: JSON.parse(results),
-                    });
-                }
+            return res.json({
+                Success: true,
+                message: "OK",
+                code: 200,
+                data: JSON.parse(homePageVideos.data),
             });
         } else {
             nLog.info(`SEARCH ${body.search}`);
@@ -464,9 +392,9 @@ exports.searchVideos = async function (req, res) {
         // Helper.catchException(JSON.stringify(e), res)
         nLog.error(JSON.stringify(e));
     }
-};
+}
 
-exports.trendVideos = async function (req, res) {
+export async function trendVideos(req, res) {
     try {
         let body = req.body;
         //body.userMeta contains userId
@@ -494,9 +422,9 @@ exports.trendVideos = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.updateVideoInTheParty = async function (req, res) {
+export async function updateVideoInTheParty(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -505,34 +433,23 @@ exports.updateVideoInTheParty = async function (req, res) {
             return;
         }
 
-        let updRes = await Party.findByIdAndUpdate(
-            { _id: mongoose.Types.ObjectId(body.partyId) },
-            {
-                $push: {
-                    videoListHistory: {
-                        videoId: body.oldVideoId,
-                        videoSource: body.oldVideoSource,
-                        mAt: new Date().getTime(),
-                        mBy: user._id,
-                    },
-                },
-                $set: {
-                    videoId: body.videoId,
-                    videoSource: body.videoSource,
-                },
-            }
-        );
-        let partyData =
-            (await Party.findById(mongoose.Types.ObjectId(body.partyId), "-videoListHistory -removedUsers").populate({
-                path: "guests",
-                model: "Guest",
-                select: "-partyId",
-                populate: {
-                    path: "userId",
-                    model: "User",
-                    select: "_id fullName email",
-                },
-            })) || {};
+        /* TODO :: $push: {
+            videoListHistory: {
+                videoId: body.oldVideoId,
+                videoSource: body.oldVideoSource,
+                mAt: new Date().getTime(),
+                mBy: user.entityId,
+            },
+        }, */
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData.videoId = body.videoId;
+        partyData.videoSource = body.videoSource;
+
+        // Save party data
+        await PartyRepository.save(partyData);
+
+        // populate guest data
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
         return res.json({
             Success: true,
@@ -543,9 +460,9 @@ exports.updateVideoInTheParty = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.inviteGuestsInTheParty = async function (req, res) {
+export async function inviteGuestsInTheParty(req, res) {
     try {
         let body = req.body;
         if (!body) {
@@ -564,58 +481,59 @@ exports.inviteGuestsInTheParty = async function (req, res) {
             guestsUserIds = [];
 
         for (let index = 0; index < body.guests.length; index++) {
-            let guestUserId = body.guests[index]._id;
-            let guestData = await UserLoginAuth.createGuestWithPartyId({ _id: guestUserId, partyId: body.partyId });
-            guestsData.push(mongoose.Types.ObjectId(guestData._id));
-            guestsUserIds.push(mongoose.Types.ObjectId(guestUserId));
+            let guestUserId = body?.guests?.[index]?.entityId,
+                guestData = await UserLoginAuth.createGuestWithPartyId({
+                    entityId: guestUserId,
+                    partyId: body.partyId,
+                });
+
+            guestsData.push(guestData.entityId);
+            guestsUserIds.push(guestUserId);
         }
 
-        let pushQuery = {
-            $addToSet: {
-                guests: { $each: guestsData },
-                guestUserIds: { $each: guestsUserIds },
-            },
-        };
-        let pullQuery = null;
+        // Fetch party data
+        let partyData = await PartyRepository.fetch(body.partyId);
 
         if (body.removedIds) {
-            if (body.removedIds.guests && body.removedIds.guests.length) {
-                pullQuery = {};
-                body.removedIds.guests = _.map(body.removedIds.guests, (id) => {
-                    return mongoose.Types.ObjectId(id);
-                });
-                body.removedIds.userIds = _.map(body.removedIds.userIds, (id) => {
-                    return mongoose.Types.ObjectId(id);
+            if (body?.removedIds?.guests?.length) {
+                // Remove guests
+                partyData.guests = _.filter(partyData.guests, (guestId) => {
+                    if (!body?.removedIds?.guests?.includes(guestId)) {
+                        return true;
+                    }
                 });
 
-                pullQuery["$pull"] = {
-                    guests: { $in: body.removedIds.guests },
-                    guestUserIds: { $in: body.removedIds.userIds },
-                };
-                pullQuery["$addToSet"] = {
-                    removedUsers: { $each: body.removedIds.userIds },
-                };
+                // Remove guest userIds
+                partyData.guestUserIds = _.filter(partyData.guestUserIds, (userId) => {
+                    if (!body?.removedIds?.userIds?.includes(userId)) {
+                        return true;
+                    }
+                });
+
+                // Add removed userIds
+                if (partyData?.removedUsers?.length) {
+                    partyData.removedUsers = _.uniq(partyData?.removedUsers?.concat(body.removedIds.userIds));
+                }
             }
         }
 
-        if (guestsData && guestsData.length) {
-            let pushres = await Party.findByIdAndUpdate(mongoose.Types.ObjectId(body.partyId), pushQuery);
-        }
-        if (pullQuery) {
-            let pullres = await Party.findByIdAndUpdate(mongoose.Types.ObjectId(body.partyId), pullQuery);
+        if (guestsData?.length) {
+            // Add guests
+            partyData.guests = _.uniq(partyData?.guests?.concat(guestsData));
+
+            // Add guest userids
+            if (guestsUserIds?.length) {
+                if (partyData?.guestUserIds?.length) {
+                    partyData.guestUserIds = _.uniq(partyData?.guestUserIds?.concat(guestsUserIds));
+                } else {
+                    partyData.guestUserIds = guestsUserIds;
+                }
+            }
         }
 
-        let partyData =
-            (await Party.findById(mongoose.Types.ObjectId(body.partyId), "-videoListHistory -removedUsers").populate({
-                path: "guests",
-                model: "Guest",
-                select: "-partyId",
-                populate: {
-                    path: "userId",
-                    model: "User",
-                    select: "_id fullName email",
-                },
-            })) || {};
+        await PartyRepository.save(partyData);
+
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
         return res.json({
             Success: true,
@@ -626,9 +544,9 @@ exports.inviteGuestsInTheParty = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.togglePartyPrivacy = async function (req, res) {
+export async function togglePartyPrivacy(req, res) {
     try {
         let body = req.body;
         if (!body) {
@@ -643,7 +561,10 @@ exports.togglePartyPrivacy = async function (req, res) {
             });
         }
 
-        await Party.findByIdAndUpdate(mongoose.Types.ObjectId(body.partyId), { isPrivate: body.st });
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData.isPrivate = body.st;
+        await PartyRepository.save(partyData);
+
         return res.json({
             Success: true,
             message: "OK",
@@ -652,7 +573,7 @@ exports.togglePartyPrivacy = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
 function generateRegex(query = "", options) {
     if (!query) {

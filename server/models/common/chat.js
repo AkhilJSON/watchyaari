@@ -1,34 +1,22 @@
-// Schema of Chat
 "use strict";
+
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import { Entity, Schema } from "redis-om";
 
-Promise.promisifyAll(mongoose);
+// redis-om client
+import client from "../../config/redisOm.js";
 
-var chatSchema = new mongoose.Schema(
-    {
-        partyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Party",
-        },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        message: {
-            type: String,
-        },
-        userName: {
-            type: String,
-        },
-        cAt: {
-            type: Date,
-            default: Date.now,
-        },
-    },
-    { versionKey: false }
-);
+class Chat extends Entity {}
 
-var Chat = mongoose.model("Chat", chatSchema);
-module.exports = Chat;
+const chatSchema = new Schema(Chat, {
+    partyId: { type: "string" },
+    userId: { type: "string" },
+    message: { type: "string" },
+    userName: { type: "string" },
+    cAt: { type: "date", sortable: true },
+});
+
+const ChatRepository = client.fetchRepository(chatSchema);
+export default ChatRepository;
+
+await ChatRepository.createIndex();

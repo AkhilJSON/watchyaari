@@ -1,33 +1,48 @@
 // packages
-var jwt = require("jsonwebtoken");
-var _ = require("lodash");
-var randomstring = require("randomstring");
-var jwtDecode = require("jwt-decode");
-let nLog = require("noogger");
-const mongoose = require("mongoose");
+import jwt from "jsonwebtoken";
+import _ from "lodash";
+import randomstring from "randomstring";
+import jwtDecode from "jwt-decode";
+import nLog from "noogger";
+import mongoose from "mongoose";
 
 // models
-var User = require("../../models/common/user");
-var Party = require("../../models/common/party");
-var Guest = require("../../models/common/guest");
+import UserRepository from "../../models/common/user.js";
+import PartyRepository from "../../models/common/party.js";
+import Guest from "../../models/common/guest.js";
 
 // services
-var EmailService = require("../../controllers/common/emailService");
+import * as EmailService from "../../controllers/common/emailService.js";
 
 // helpers
-var Helper = require("../helper");
+import Helper from "../helper.js";
+import GuestRepository from "../../models/common/guest.js";
 
-exports.userRegistration = async function (req, res) {
+/**
+ *
+ * @param {*} req
+ * @param {*} req.body
+ * @param {String} req.body.email
+ * @param {String} req.body.password
+ * @param {String} req.body.fullName
+ * @param {*} res
+ * @returns JWT token
+ */
+export async function userRegistration(req, res) {
     try {
-        let Body = req.body;
+        let Body = req?.body;
         createUserValidations(Body, res);
 
-        // Body['createdBy'] = req.user._id;
-        // Body['modifiedBy'] = req.user._id;
+        Body.email = Body?.email?.trim()?.toLowerCase();
+        Body.password = Body?.password?.trim();
 
-        let userCheck = await User.findOne({
-            $and: [{ email: Body.email }, { isDeleted: false }],
-        });
+        let userCheck =
+            (await UserRepository.search()
+                .where("email")
+                .equals(Body.email)
+                .and("isDeleted")
+                .is.not.equal(true)
+                .return.count()) || 0;
 
         if (userCheck) {
             return res.json({
@@ -36,63 +51,146 @@ exports.userRegistration = async function (req, res) {
             });
         }
 
-        let userData = new User();
-        userData.email = Body.email.trim();
-        userData.password = Body.password;
-        userData.fullName = Body.fullName;
+        // Encrypt user password
+        const encryptedPassword = await Helper.generateEncryptedCode(Body.password);
 
-        userData
-            .save()
-            .then(async (user) => {
-                //SEND EMAIL TO THE USER
-                // sendEmailVerificationLinkToUser(user);
-
-                let userObj = _.pick(user, [
-                    "_id",
-                    "email",
-                    "fullName",
-                    "mobile",
-                    "createdOn",
-                    "status",
-                    "emailVerified",
-                    "phoneVerified",
-                ]);
-                var token = giveAuthTokenForLoggedInUser(userObj);
-
-                nLog.info(`${userObj._id} Registered successfully`);
-                res.json({
-                    Success: true,
-                    Message: "Registered successfully",
-                    Token: "JWT " + token,
-                    uid: userObj._id,
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-                Helper.catchException(JSON.stringify(err), res);
+        if (!encryptedPassword) {
+            return res.json({
+                Success: false,
+                Message: "invalid password",
             });
+        }
+
+        let userData = {
+            email: Body.email,
+            searchableEmail: Body.email,
+            password: encryptedPassword,
+            fullName: Body.fullName,
+            searchableFullName: Body.fullName,
+            isDeleted: false,
+            createdOn: Date.now(),
+            modifiedOn: Date.now(),
+            status: "ADDED",
+        };
+
+        // saves user data in the db
+        userData = await UserRepository.createAndSave(userData);
+
+        // creates JWT token and send to the client
+        const loginToken = prepareJWTToken(userData);
+
+        nLog.info(`${userData?.entityId} Registered successfully`);
+
+        res.json({
+            Success: true,
+            Message: "Registered successfully",
+            Token: loginToken,
+            uid: userData?.entityId,
+        });
     } catch (e) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.verifyMyEmail = async function (req, res) {
+/**
+ *
+ * @param {*} req
+ * @param {*} req.body
+ * @param {String} req.body.email
+ * @param {String} req.body.password
+ * @param {*} res
+ * @returns
+ */
+export async function userAuthentication(req, res) {
+    try {
+        let Body = req.body;
+
+        Body.email = Body?.email?.trim()?.toLowerCase();
+        Body.password = Body?.password?.trim();
+
+        if (!Body?.email?.length) {
+            return res.json({
+                Success: false,
+                Message: "email should not be empty",
+            });
+        }
+
+        if (!Body?.password?.length) {
+            return res.json({
+                Success: false,
+                Message: "password should not be empty",
+            });
+        }
+
+        let userData = await UserRepository.search()
+            .where("email")
+            .equals(Body.email)
+            .and("isDeleted")
+            .is.not.equal(true)
+            .returnFirst();
+
+        if (userData?.entityId) {
+            if (userData?.status === "INACTIVE") {
+                return res.json({
+                    Success: false,
+                    Message: "Your Account is DeActivated",
+                });
+            }
+
+            // Verify user entered password
+            const isPasswordMatched = await Helper.compareEncryptedCode(req?.body?.password, userData?.password);
+
+            if (isPasswordMatched) {
+                // creates JWT token and send to the client
+                const loginToken = prepareJWTToken(userData);
+
+                nLog.info(`${userData.entityId} Authenticated successfuly`);
+                res.json({
+                    Success: true,
+                    Message: "Ok",
+                    Token: loginToken,
+                    uid: userData.entityId,
+                });
+            } else {
+                return res.json({
+                    Success: false,
+                    Message: "passwords did not match",
+                });
+            }
+        } else {
+            return res.json({
+                Success: false,
+                Message: "cannot find user",
+            });
+        }
+    } catch (e) {
+        Helper.catchException(JSON.stringify(e), res);
+    }
+}
+
+export async function verifyMyEmail(req, res) {
     await sendEmailVerificationLinkToUser(req.user);
     return res.json({
         Success: true,
         Message: "Sent",
     });
-};
+}
 
-exports.forgotPassword = async function (req, res) {
+export async function forgotPassword(req, res) {
     try {
         let body = req.body;
 
-        let user = await User.findOne(
-            { email: body.email, isDeleted: { $ne: true } },
-            "_id email fullName passwordResetCode"
-        );
+        body.email = body?.email?.trim()?.toLowerCase();
+        body.password = body?.password?.trim();
+
+        let user = await UserRepository.search()
+            .where("email")
+            .equals(body.email)
+            .and("isDeleted")
+            .is.not.equal(true)
+            .returnFirst();
+
         if (!user) {
             return res.json({
                 Success: false,
@@ -107,7 +205,7 @@ exports.forgotPassword = async function (req, res) {
         }
         sendForgotPasswordLink(user);
 
-        nLog.info(`${user._id} Forgot password requested`);
+        nLog.info(`${user.entityId} Forgot password requested`);
         return res.json({
             Success: true,
             Message: "Ok",
@@ -118,52 +216,93 @@ exports.forgotPassword = async function (req, res) {
             Message: "Invalid user",
         });
     }
-};
+}
 
-exports.resetPassword = async function (req, res) {
+export async function resetPassword(req, res) {
     try {
         let body = req.body;
 
-        User.findOne({ _id: body.uid }, async function (err, user) {
-            if (err) {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-            if (user) {
-                if (user.passwordResetCode) {
-                    user.passwordResetCode = "";
-                    user.password = body.password;
-                    await user.save();
+        let user = await UserRepository.fetch(body.uid);
 
-                    nLog.info(`${user._id} reset successfully`);
-                    return res.json({
-                        Success: true,
-                        Message: "Ok",
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "Invalid user",
-                    });
-                }
-            } else {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-        });
+        if (!user?.entityId) {
+            return res.json({
+                Success: false,
+                Message: "User not Found",
+            });
+        }
+
+        if (user.passwordResetCode) {
+            const encryptedPassword = await Helper.generateEncryptedCode(body.password);
+
+            user.passwordResetCode = "";
+            user.password = encryptedPassword;
+
+            await UserRepository.save(user);
+
+            nLog.info(`${user.entityId} reset successfully`);
+            return res.json({
+                Success: true,
+                Message: "Ok",
+            });
+        } else {
+            return res.json({
+                Success: false,
+                Message: "Invalid user",
+            });
+        }
     } catch (e) {
         return res.json({
             Success: false,
             Message: "Invalid verification token",
         });
     }
-};
+}
 
-exports.verifyResetPasswordLink = async function (req, res) {
+export async function verifyResetPasswordLink(req, res) {
+    try {
+        let body = req.body;
+        let token = body.token || null;
+
+        if (!token) {
+            return res.json({
+                Success: false,
+                Message: "Invalid verification token",
+            });
+        }
+
+        let decoded = jwtDecode(token),
+            user = await UserRepository.fetch(decoded.entityId);
+
+        if (!user?.entityId) {
+            return res.json({
+                Success: false,
+                Message: "User not Found",
+            });
+        }
+
+        if (user.passwordResetCode) {
+            nLog.info(`${user.entityId} password reset successfully`);
+
+            return res.json({
+                Success: true,
+                Message: "Ok",
+                uid: user.entityId,
+            });
+        } else {
+            return res.json({
+                Success: false,
+                Message: "Invalid request",
+            });
+        }
+    } catch (e) {
+        return res.json({
+            Success: false,
+            Message: "Invalid verification token",
+        });
+    }
+}
+
+export async function verifyUserEmail(req, res) {
     try {
         let body = req.body;
         let token = body.token || null;
@@ -176,57 +315,7 @@ exports.verifyResetPasswordLink = async function (req, res) {
         }
 
         var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
-            if (err) {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-            if (user) {
-                if (user.passwordResetCode) {
-                    nLog.info(`${user._id} password reset successfully`);
-
-                    return res.json({
-                        Success: true,
-                        Message: "Ok",
-                        uid: user._id,
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "Invalid request",
-                    });
-                }
-            } else {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-        });
-    } catch (e) {
-        return res.json({
-            Success: false,
-            Message: "Invalid verification token",
-        });
-    }
-};
-
-exports.verifyUserEmail = async function (req, res) {
-    try {
-        let body = req.body;
-        let token = body.token || null;
-
-        if (!token) {
-            return res.json({
-                Success: false,
-                Message: "Invalid verification token",
-            });
-        }
-
-        var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
+        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
             if (err) {
                 return res.json({
                     Success: false,
@@ -236,7 +325,7 @@ exports.verifyUserEmail = async function (req, res) {
             if (user) {
                 if (!user.emailVerified) {
                     await User.findByIdAndUpdate(
-                        { _id: user._id },
+                        { entityId: user.entityId },
                         {
                             $set: {
                                 emailVerified: true,
@@ -246,7 +335,7 @@ exports.verifyUserEmail = async function (req, res) {
                         }
                     );
 
-                    nLog.info(`${user._id} verified user email`);
+                    nLog.info(`${user.entityId} verified user email`);
                     return res.json({
                         Success: true,
                         Message: "Ok",
@@ -270,15 +359,15 @@ exports.verifyUserEmail = async function (req, res) {
             Message: "Invalid verification token",
         });
     }
-};
+}
 
-exports.createUserManually = async function (req, res) {
+export async function createUserManually(req, res) {
     try {
         let Body = req.body;
         createUserValidations(Body, res);
 
-        // Body['createdBy'] = req.user._id;
-        // Body['modifiedBy'] = req.user._id;
+        // Body['createdBy'] = req.user.entityId;
+        // Body['modifiedBy'] = req.user.entityId;
 
         let user = new User(Body);
 
@@ -298,81 +387,9 @@ exports.createUserManually = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.userAuthentication = async function (req, res) {
-    try {
-        let Body = req.body;
-
-        if (!Body.email || (Body.email && Body.email.length == 0)) {
-            return res.json({
-                Success: false,
-                Message: "email should not be empty",
-            });
-        }
-        if (!Body.password || (Body.password && Body.password.length == 0)) {
-            return res.json({
-                Success: false,
-                Message: "password should not be empty",
-            });
-        }
-
-        User.findOne({
-            $and: [{ $or: [{ email: Body.email }, { mobile: Body.email }] }, { isDeleted: false }],
-        })
-            .then(async (val) => {
-                if (val) {
-                    if (val.status === "INACTIVE") {
-                        return res.json({
-                            Success: false,
-                            Message: "Your Account is DeActivated",
-                        });
-                    }
-                    val.comparePassword(req.body.password, async function (err, isMatch) {
-                        if (isMatch && !err) {
-                            let userObj = _.pick(val, [
-                                "_id",
-                                "email",
-                                "fullName",
-                                "mobile",
-                                "createdOn",
-                                "status",
-                                "emailVerified",
-                                "phoneVerified",
-                            ]);
-                            var token = giveAuthTokenForLoggedInUser(userObj);
-
-                            nLog.info(`${userObj._id} Authenticated successfuly`);
-                            res.json({
-                                Success: true,
-                                Message: "Ok",
-                                Token: "JWT " + token,
-                                uid: userObj._id,
-                            });
-                        } else {
-                            return res.json({
-                                Success: false,
-                                Message: "passwords did not match",
-                            });
-                        }
-                    });
-                } else {
-                    return res.json({
-                        Success: false,
-                        Message: "cannot find user",
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                Helper.catchException(JSON.stringify(err), res);
-            });
-    } catch (e) {
-        Helper.catchException(JSON.stringify(e), res);
-    }
-};
-
-exports.getPartyDetails = async function (req, res) {
+export async function getPartyDetails(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -387,19 +404,8 @@ exports.getPartyDetails = async function (req, res) {
             });
         }
 
-        let partyData = await Party.findById(
-            mongoose.Types.ObjectId(body.partyId),
-            "-videoListHistory -removedUsers"
-        ).populate({
-            path: "guests",
-            model: "Guest",
-            select: "-partyId",
-            populate: {
-                path: "userId",
-                model: "User",
-                select: "_id fullName",
-            },
-        });
+        let partyData = await PartyRepository.fetch(body.partyId);
+        partyData = await Helper.populateGuestDataOfParty(partyData);
 
         if (!partyData) {
             return res.json({
@@ -411,11 +417,11 @@ exports.getPartyDetails = async function (req, res) {
 
         partyData = JSON.parse(JSON.stringify(partyData));
 
-        if (partyData.hostedBy == user._id) {
+        if (partyData.hostedBy == user.entityId) {
             partyData.isHost = true;
         }
         if (partyData) {
-            nLog.info(`${partyData._id} partyDetails requested`);
+            nLog.info(`${partyData.entityId} partyDetails requested`);
 
             return res.json({
                 Success: true,
@@ -433,33 +439,23 @@ exports.getPartyDetails = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.createGuestWithPartyId = async function (guestData) {
-    return createGuest(guestData);
-};
+export async function createGuestWithPartyId(guestData) {
+    return await createGuest(guestData);
+}
 
-exports.getVideoIdByURL = function (domain, videoURL) {
+export const getVideoIdByURL = function (domain, videoURL) {
     return getVideoId(domain, videoURL);
 };
 
-exports.verifyUser = function (token) {
-    return new Promise((resolve, reject) => {
-        var decoded = jwtDecode(token);
-        User.findOne({ _id: mongoose.Types.ObjectId(decoded._id) }, async function (err, user) {
-            if (err) {
-                return reject("USER_NOT_FOUND");
-            }
-            if (user) {
-                return resolve(user);
-            } else {
-                return reject("USER_NOT_FOUND");
-            }
-        });
-    });
+export const verifyUser = async function (token) {
+    let decoded = jwtDecode(token),
+        user = await UserRepository.fetch(decoded.entityId);
+    return user;
 };
 
-exports.getUserDetails = async function (req, res) {
+export async function getUserDetails(req, res) {
     try {
         let body = req.body;
         let user = req.user;
@@ -477,7 +473,28 @@ exports.getUserDetails = async function (req, res) {
     } catch (e) {
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
+
+/**
+ * Generates JWT token
+ * @param {*} userData
+ * @returns
+ */
+function prepareJWTToken(userData) {
+    const userObj = _.pick(userData, [
+            "entityId",
+            "email",
+            "fullName",
+            "mobile",
+            "createdOn",
+            "status",
+            "emailVerified",
+            "phoneVerified",
+        ]),
+        token = giveAuthTokenForLoggedInUser(userObj);
+
+    return `JWT ${token}`;
+}
 
 function giveAuthTokenForLoggedInUser(val) {
     let temp = Object.assign(val, {
@@ -535,39 +552,44 @@ function getVideoId(domain, videoURL) {
     }
 }
 
-function createGuest(data, res) {
-    return new Promise(async (resolve, reject) => {
-        if (!data._id || !data.partyId) {
-            resolve(null);
-            return;
-        }
-        let guestData = await Guest.findOne({
-            partyId: mongoose.Types.ObjectId(data.partyId),
-            userId: mongoose.Types.ObjectId(data._id),
-        });
-        if (guestData && guestData._id) {
-            guestData = JSON.parse(JSON.stringify(guestData));
-            guestData.alreadyJoined = true;
-            resolve(guestData);
-            return;
-        }
-        guestData = new Guest();
-        guestData.partyId = mongoose.Types.ObjectId(data.partyId);
-        guestData.userId = data._id;
-        guestData
-            .save()
-            .then((val) => {
-                resolve(val);
-            })
-            .catch((err) => {
-                resolve(null);
-            });
-    });
+/**
+ * returns Guest data, creates if doesn't exists
+ * @param {*} data
+ * @param {*} res
+ * @returns
+ */
+async function createGuest(data, res) {
+    if (!data.entityId || !data.partyId) {
+        resolve(null);
+        return;
+    }
+
+    let guestData = await GuestRepository.search()
+        .where("partyId")
+        .equals(data.partyId)
+        .and("userId")
+        .equals(data.entityId)
+        .returnFirst();
+
+    // Return existing
+    if (guestData && guestData.entityId) {
+        guestData = JSON.parse(JSON.stringify(guestData));
+        guestData.alreadyJoined = true;
+        return guestData;
+    }
+
+    // Create new Guest
+    guestData = {};
+    guestData.partyId = data.partyId;
+    guestData.userId = data.entityId;
+    guestData = await GuestRepository.createAndSave(guestData);
+
+    return guestData;
 }
 
 function sendEmailVerificationLinkToUser(user) {
     return new Promise(async (resolve, reject) => {
-        let token = generateTokenForEmailVerification({ _id: user._id });
+        let token = generateTokenForEmailVerification({ entityId: user.entityId });
         let emailBody = {
             from: {
                 email: process.env.SENDGRID_FROM_EMAIL,
@@ -590,16 +612,16 @@ function sendEmailVerificationLinkToUser(user) {
         };
         EmailService.sendEmail(emailBody);
 
-        await User.findByIdAndUpdate({ _id: user._id }, { $set: { emailVerificationCode: token } });
+        await User.findByIdAndUpdate({ entityId: user.entityId }, { $set: { emailVerificationCode: token } });
 
-        nLog.info(`userId: ${user._id} Email sent`);
+        nLog.info(`userId: ${user.entityId} Email sent`);
         return resolve("Ok");
     });
 }
 
 function sendForgotPasswordLink(user) {
     return new Promise(async (resolve, reject) => {
-        let token = generateTokenForEmailVerification({ _id: user._id });
+        let token = generateTokenForEmailVerification({ entityId: user.entityId });
         let emailBody = {
             from: {
                 email: process.env.SENDGRID_FROM_EMAIL,
@@ -622,7 +644,9 @@ function sendForgotPasswordLink(user) {
         };
         EmailService.sendEmail(emailBody);
 
-        await User.findByIdAndUpdate({ _id: user._id }, { $set: { passwordResetCode: token } });
+        let userData = await UserRepository.fetch(user?.entityId);
+        userData.passwordResetCode = token;
+        await UserRepository.save(userData);
         return resolve("Ok");
     });
 }

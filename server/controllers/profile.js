@@ -1,20 +1,29 @@
 // packages
-var _ = require("lodash");
+import _ from "lodash";
 
 // models
-var User = require("../models/common/user");
+import UserRepository from "../models/common/user.js";
 
 // helpers
-var Helper = require("./helper");
+import Helper from "./helper.js";
 
-exports.updateProfile = async function (req, res) {
+export async function updateProfile(req, res) {
     try {
         let user = req.user;
 
-        let userData = await User.findById(user._id);
+        let userData = await UserRepository.fetch(user.entityId);
         userData = _.assignIn(userData, req.body);
+        userData.searchableEmail = userData.email;
+        userData.searchableFullName = userData.fullName;
 
-        await userData.save();
+        // Handle password change
+        if (req.body?.password) {
+            const encryptedPassword = await Helper.generateEncryptedCode(req.body?.password);
+            userData.password = encryptedPassword;
+        }
+
+        await UserRepository.save(userData);
+
         return res.json({
             Success: true,
             message: "OK",
@@ -24,9 +33,9 @@ exports.updateProfile = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}
 
-exports.fetchProfile = async function (req, res) {
+export async function fetchProfile(req, res) {
     try {
         let user = req.user;
 
@@ -40,4 +49,4 @@ exports.fetchProfile = async function (req, res) {
         console.log(e);
         Helper.catchException(JSON.stringify(e), res);
     }
-};
+}

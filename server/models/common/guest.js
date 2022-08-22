@@ -1,27 +1,20 @@
-// Schema of Guest
 "use strict";
+
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import { Entity, Schema } from "redis-om";
 
-Promise.promisifyAll(mongoose);
+// redis-om client
+import client from "../../config/redisOm.js";
 
-var guestSchema = new mongoose.Schema(
-    {
-        partyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Party",
-        },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        isCoHost: {
-            type: Boolean,
-        },
-    },
-    { versionKey: false }
-);
+class Guest extends Entity {}
 
-var Guest = mongoose.model("Guest", guestSchema);
-module.exports = Guest;
+const guestSchema = new Schema(Guest, {
+    partyId: { type: "string" },
+    userId: { type: "string" },
+    isCoHost: { type: "boolean" },
+});
+
+const GuestRepository = client.fetchRepository(guestSchema);
+export default GuestRepository;
+
+await GuestRepository.createIndex();

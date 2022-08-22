@@ -1,23 +1,19 @@
-// Schema of Home page videos
-
 "use strict";
+
 // packages
-var mongoose = require("mongoose");
-var Promise = require("bluebird");
+import { Entity, Schema } from "redis-om";
 
-Promise.promisifyAll(mongoose);
+// redis-om client
+import client from "../../config/redisOm.js";
 
-var homePageVideosSchema = new mongoose.Schema(
-    {
-        data: {
-            type: String,
-        },
-        isDeleted: {
-            type: Boolean,
-        },
-    },
-    { versionKey: false }
-);
+class UserHomePageVideos extends Entity {}
 
-var HomePageVideo = mongoose.model("HomePageVideo", homePageVideosSchema);
-module.exports = HomePageVideo;
+const userHomePageVideosSchema = new Schema(UserHomePageVideos, {
+    data: { type: "string" },
+    isDeleted: { type: "boolean" },
+});
+
+const UserHomePageVideosRepository = client.fetchRepository(userHomePageVideosSchema);
+export default UserHomePageVideosRepository;
+
+await UserHomePageVideosRepository.createIndex();

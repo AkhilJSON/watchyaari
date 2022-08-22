@@ -1,34 +1,64 @@
 // packages
-var express = require("express");
-var passport = require("passport");
+import { Router } from "express";
+import passport from "passport";
 
 // controllers
-var commonController = require("../controllers/common/userLoginAuth");
-var chatController = require("../controllers/chat");
-var partyController = require("../controllers/party");
+import {
+    userRegistration,
+    userAuthentication,
+    verifyUserEmail,
+    forgotPassword,
+    resetPassword,
+    verifyResetPasswordLink,
+    getUserDetails,
+    getPartyDetails,
+} from "../controllers/common/userLoginAuth.js";
+import { getChatHistory } from "../controllers/chat.js";
+import {
+    joinParty,
+    getRecentPartyList,
+    getUpcomingPartyList,
+    togglePartyPrivacy,
+    fetchUsers,
+    fetchBlockedUsers,
+    unBlockUsers,
+    updateCoHosts,
+    launchParty,
+    updateVideoInTheParty,
+    inviteGuestsInTheParty,
+    searchVideos,
+    trendVideos,
+} from "../controllers/party.js";
 
-var router = express.Router();
+import * as Migrations from "../migrations/restoreData.js";
 
-router.post("/userRegistration", commonController.userRegistration);
+var router = Router();
 
-router.post("/createUserManually", commonController.createUserManually);
+// User signup
+router.post("/userRegistration", userRegistration);
 
-router.post("/userAuthentication", commonController.userAuthentication);
+// User signin
+router.post("/userAuthentication", userAuthentication);
 
-router.post("/verifyUserEmail", commonController.verifyUserEmail);
+// To restored application default data
+router.get("/restoreData", Migrations.restoreData);
 
-router.post("/forgotPassword", commonController.forgotPassword);
+// router.post("/createUserManually", createUserManually);
 
-router.post("/resetPassword", commonController.resetPassword);
+router.post("/verifyUserEmail", verifyUserEmail);
 
-router.post("/resetPasswordLink", commonController.verifyResetPasswordLink);
+router.post("/forgotPassword", forgotPassword);
+
+router.post("/resetPassword", resetPassword);
+
+router.post("/resetPasswordLink", verifyResetPasswordLink);
 
 router.post(
     "/getPartyDetails",
     passport.authenticate("user", {
         session: false,
     }),
-    commonController.getPartyDetails
+    getPartyDetails
 );
 
 router.post(
@@ -36,7 +66,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    commonController.getUserDetails
+    getUserDetails
 );
 
 router.post(
@@ -44,7 +74,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    chatController.getChatHistory
+    getChatHistory
 );
 
 router.post(
@@ -52,7 +82,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.joinParty
+    joinParty
 );
 
 router.post(
@@ -60,7 +90,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.getRecentPartyList
+    getRecentPartyList
 );
 
 router.post(
@@ -68,7 +98,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.getUpcomingPartyList
+    getUpcomingPartyList
 );
 
 router.post(
@@ -76,7 +106,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.togglePartyPrivacy
+    togglePartyPrivacy
 );
 
 router.post(
@@ -84,7 +114,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.fetchUsers
+    fetchUsers
 );
 
 router.post(
@@ -92,7 +122,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.fetchBlockedUsers
+    fetchBlockedUsers
 );
 
 router.post(
@@ -100,7 +130,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.unBlockUsers
+    unBlockUsers
 );
 
 router.post(
@@ -108,7 +138,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.updateCoHosts
+    updateCoHosts
 );
 
 router.post(
@@ -116,7 +146,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.launchParty
+    launchParty
 );
 
 router.post(
@@ -124,7 +154,7 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.updateVideoInTheParty
+    updateVideoInTheParty
 );
 
 router.post(
@@ -132,10 +162,10 @@ router.post(
     passport.authenticate("user", {
         session: false,
     }),
-    partyController.inviteGuestsInTheParty
+    inviteGuestsInTheParty
 );
 
-router.post("/serchVids", partyController.searchVideos);
-router.post("/trendVids", partyController.trendVideos);
+router.post("/serchVids", searchVideos);
+router.post("/trendVids", trendVideos);
 
-module.exports = router;
+export default router;
