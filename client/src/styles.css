@@ -1247,6 +1247,10 @@ html body .font-20 {
   border-radius: 4px;
 }
 
+.home-video-search-results-container{
+  padding: 0px 120px;
+}
+
 .home-video-search-results-container .video-card-grid {
   border-radius: 4px !important;
 }
