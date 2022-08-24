@@ -1,8 +1,20 @@
 # WatchYaari - Watch videos together with your friends
 
-[Insert description of app]
+Platform where users can watch youtube videos while on a video chat. Basically a digital party where users can enjoy watching videos together.
+Separated by distance, brought together by WatchYaari.
 
-[Insert app screenshots](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#uploading-assets)
+
+<img width="1440" alt="Screenshot 2022-08-24 at 9 52 55 PM" src="https://user-images.githubusercontent.com/26838762/186484887-8f5361ba-e309-49bb-af05-f82a28a977e6.png"> 
+<img width="1440" alt="Screenshot 2022-08-24 at 9 53 28 PM" src="https://user-images.githubusercontent.com/26838762/186484922-de0fcb3c-6f29-4b10-9417-8068ad4d4805.png">
+<img width="1440" alt="Screenshot 2022-08-24 at 10 00 39 PM" src="https://user-images.githubusercontent.com/26838762/186473611-184617fe-01d8-48cf-b6f2-6c9b2a83ec17.png">
+<img width="1440" alt="Screenshot 2022-08-24 at 10 01 06 PM" src="https://user-images.githubusercontent.com/26838762/186485907-9caf871b-40ad-4f19-9642-13545d0bb428.png">
+<img width="1440" alt="Screenshot 2022-08-24 at 10 00 23 PM" src="https://user-images.githubusercontent.com/26838762/186484722-109020aa-fc22-4e4a-8f6e-f0a127599907.png">
+<img width="1440" alt="Screenshot 2022-08-24 at 10 00 51 PM" src="https://user-images.githubusercontent.com/26838762/186484785-19041544-ca3d-473c-8126-89da5f1f96c7.png">
+<img width="1315" alt="Screenshot 2022-08-24 at 9 52 19 PM" src="https://user-images.githubusercontent.com/26838762/186486192-0e5bcbce-7c6b-45f9-b115-c02cd0559b80.png">
+<img width="1440" alt="Screenshot 2022-08-24 at 10 01 28 PM" src="https://user-images.githubusercontent.com/26838762/186486403-ed2edb93-5e0e-48a5-bd37-8d8a7815e12e.png">
+
+
+
 
 # Overview video (Optional)
 
