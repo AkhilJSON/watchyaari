@@ -1,5 +1,4 @@
 //packages
-import mongoose from "mongoose";
 import superagent from "superagent";
 import _ from "lodash";
 import nLog from "noogger";
@@ -17,8 +16,6 @@ import * as UserLoginAuth from "./common/userLoginAuth.js";
 import Helper from "./helper.js";
 import redis from "../config/redis.js";
 import * as Constants from "../config/constants.js";
-
-let mongoId = mongoose.Types.ObjectId;
 
 export async function joinParty(req, res) {
     try {
@@ -87,37 +84,6 @@ export async function getRecentPartyList(req, res) {
             message: "OK",
             code: 200,
             data: parties,
-        });
-    } catch (e) {
-        console.log(e);
-        Helper.catchException(JSON.stringify(e), res);
-    }
-}
-
-export async function getUpcomingPartyList(req, res) {
-    try {
-        let partyData = await Party.aggregate([
-            {
-                $match: {
-                    status: { $in: ["SCHEDULED"] },
-                    $or: [
-                        { guestUserIds: { $in: [mongoose.Types.ObjectId(req.user.entityId)] } },
-                        { hostedBy: mongoose.Types.ObjectId(req.user.entityId) },
-                    ],
-                },
-            },
-            {
-                $sort: {
-                    cAt: -1,
-                },
-            },
-        ]);
-
-        return res.json({
-            Success: true,
-            message: "OK",
-            code: 200,
-            data: partyData,
         });
     } catch (e) {
         console.log(e);

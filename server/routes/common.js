@@ -6,7 +6,6 @@ import passport from "passport";
 import {
     userRegistration,
     userAuthentication,
-    verifyUserEmail,
     forgotPassword,
     resetPassword,
     verifyResetPasswordLink,
@@ -17,7 +16,6 @@ import { getChatHistory } from "../controllers/chat.js";
 import {
     joinParty,
     getRecentPartyList,
-    getUpcomingPartyList,
     togglePartyPrivacy,
     fetchUsers,
     fetchBlockedUsers,
@@ -44,8 +42,6 @@ router.post("/userAuthentication", userAuthentication);
 router.get("/restoreData", Migrations.restoreData);
 
 // router.post("/createUserManually", createUserManually);
-
-router.post("/verifyUserEmail", verifyUserEmail);
 
 router.post("/forgotPassword", forgotPassword);
 
@@ -91,14 +87,6 @@ router.post(
         session: false,
     }),
     getRecentPartyList
-);
-
-router.post(
-    "/getUPrtyList",
-    passport.authenticate("user", {
-        session: false,
-    }),
-    getUpcomingPartyList
 );
 
 router.post(

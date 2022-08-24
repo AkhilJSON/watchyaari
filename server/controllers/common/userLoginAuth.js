@@ -4,7 +4,6 @@ import _ from "lodash";
 import randomstring from "randomstring";
 import jwtDecode from "jwt-decode";
 import nLog from "noogger";
-import mongoose from "mongoose";
 
 // models
 import UserRepository from "../../models/common/user.js";
@@ -294,65 +293,6 @@ export async function verifyResetPasswordLink(req, res) {
                 Message: "Invalid request",
             });
         }
-    } catch (e) {
-        return res.json({
-            Success: false,
-            Message: "Invalid verification token",
-        });
-    }
-}
-
-export async function verifyUserEmail(req, res) {
-    try {
-        let body = req.body;
-        let token = body.token || null;
-
-        if (!token) {
-            return res.json({
-                Success: false,
-                Message: "Invalid verification token",
-            });
-        }
-
-        var decoded = jwtDecode(token);
-        User.findOne({ entityId: mongoose.Types.ObjectId(decoded.entityId) }, async function (err, user) {
-            if (err) {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-            if (user) {
-                if (!user.emailVerified) {
-                    await User.findByIdAndUpdate(
-                        { entityId: user.entityId },
-                        {
-                            $set: {
-                                emailVerified: true,
-                                emailVerifiedOn: new Date().getTime(),
-                                emailVerificationCode: "",
-                            },
-                        }
-                    );
-
-                    nLog.info(`${user.entityId} verified user email`);
-                    return res.json({
-                        Success: true,
-                        Message: "Ok",
-                    });
-                } else {
-                    return res.json({
-                        Success: true,
-                        Message: "Already verified",
-                    });
-                }
-            } else {
-                return res.json({
-                    Success: false,
-                    Message: "User not Found",
-                });
-            }
-        });
     } catch (e) {
         return res.json({
             Success: false,

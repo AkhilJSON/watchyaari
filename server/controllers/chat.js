@@ -1,5 +1,4 @@
 // packages
-import mongoose from "mongoose";
 import _ from "lodash";
 
 // models

@@ -182,17 +182,6 @@ export class JoinPartyComponent implements OnInit, AfterViewInit, OnDestroy {
         this.subscription.add(getPartyListResource);
     }
 
-    getUpcomingPartyList() {
-        this.fetchingUpcomingList = true;
-        let getPartyListResource = this.ps.getUpcomingPartyList({}).subscribe((response: any) => {
-            this.fetchingUpcomingList = false;
-            if (response && response.Success) {
-                this.upcomingList = response.data;
-            }
-        });
-        this.subscription.add(getPartyListResource);
-    }
-
     openSnackBar(message: any, action: any, verticalPosition?: any, horizontalPosition?: any) {
         this._snackBar.open(message, action || "close", {
             duration: 2000,

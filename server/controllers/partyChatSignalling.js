@@ -1,6 +1,3 @@
-// packages
-import mongoose from "mongoose";
-
 // models
 import ChatRepository from "../models/common/chat.js";
 

@@ -7,7 +7,6 @@ import path from "path";
 import url from "url";
 import exphbs from "express-handlebars";
 import _ from "lodash";
-import mongoose from "mongoose";
 import passport from "passport";
 import nLog from "noogger";
 import io from "socket.io";
@@ -53,21 +52,10 @@ const redisAdapter = adapter({
     // password: process.env.REDIS_PASS || 'password',
 });
 
-mongoose.Promise = global.Promise;
 const option = {
     socketTimeoutMS: 0,
     connectTimeoutMS: 0,
 };
-
-// DB connection
-mongoose.set("useNewUrlParser", true);
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
-mongoose.set("useUnifiedTopology", true);
-mongoose.connect(process.env.DB_CONNECTION, option, function (err) {
-    if (err) console.log(err);
-    else console.log("connected..");
-});
 
 //Use CORS
 app.use(cors());

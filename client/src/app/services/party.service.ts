@@ -70,10 +70,6 @@ export class PartyService {
         return this.http.post(environment.common + "getRPrtyList", body);
     }
 
-    getUpcomingPartyList(body: any) {
-        return this.http.post(environment.common + "getUPrtyList", body);
-    }
-
     fetchUsers(body: any): any {
         if (!body.search) {
             return empty();

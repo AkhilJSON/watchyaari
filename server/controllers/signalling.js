@@ -1,7 +1,6 @@
 // packages
 import os from "os";
 import moment from "moment";
-import mongoose from "mongoose";
 import _ from "lodash";
 import nLog from "noogger";
 
@@ -289,7 +288,7 @@ var createOrJoinPartyRoom = async function (socket, clientData, io, partyId, par
     }
 
     if (partyData && partyData.removedUsers && partyData.removedUsers.length) {
-        if (partyData.removedUsers.includes(mongoose.Types.ObjectId(loggedInUser))) {
+        if (partyData.removedUsers.includes(loggedInUser)) {
             socket.emit("NO_LONGER_ACCESS_TO_PARTY");
             return;
         }

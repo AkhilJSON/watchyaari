@@ -108,10 +108,6 @@ export class LoginAuthService {
         return this.http.post(environment.common + "sendOTP", body);
     }
 
-    verifyUserEmail(body: any) {
-        return this.http.post(environment.common + "verifyUserEmail", body);
-    }
-
     forgotPassword(body: any) {
         return this.http.post(environment.common + "forgotPassword", body);
     }
