@@ -41,9 +41,6 @@ Refer to [this example](https://github.com/redis-developer/basic-analytics-dashb
 
 ## How to run it locally?
 
-- Clone the repository
-- 
-
 ### Prerequisites
 - Node - v14.16.0
 - Angular: 9.1.9
