@@ -41,15 +41,26 @@ Refer to [this example](https://github.com/redis-developer/basic-analytics-dashb
 
 ## How to run it locally?
 
-[Make sure you test this with a fresh clone of your repo, these instructions will be used to judge your app.]
+- Clone the repository
+- 
 
 ### Prerequisites
-
-[Fill out with any prerequisites (e.g. Node, Docker, etc.). Specify minimum versions]
+- Node - v14.16.0
+- Angular: 9.1.9
+- Angular CLI: 9.1.4
+- NPM - v8.3.0
+- Redisstack server
 
 ### Local installation
 
-[Insert instructions for local installation]
+- Navigate inside **/client** & run **npm i**
+- Run **ng serv**e inside **/client** to run the Client App
+- Check if Client app is up & running by accessing http://localhost:4200
+- Install nodemon globally for running nodejs server
+- Navigate inside **/server** & run **npm i**
+- Run nodemon inside **/server** to run the Express.js server
+- Check if Server app is up & running by accessing http://localhost:3000, You should see **All set!.** response
+- Run the [GET] http://localhost:3000/common/restoreData API from browser/curl/postman to restore necessary data into RedisJSON
 
 ## Deployment
 
