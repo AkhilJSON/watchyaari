@@ -56,31 +56,12 @@ Refer to [this example](https://github.com/redis-developer/basic-analytics-dashb
 - Navigate inside **/client** & run **npm i**
 - Run **ng serv**e inside **/client** to run the Client App
 - Check if Client app is up & running by accessing http://localhost:4200
-- Install nodemon globally for running nodejs server
+- Install nodemon globally for running nodejs server - **npm i -g nodemon**
 - Navigate inside **/server** & run **npm i**
-- Run nodemon inside **/server** to run the Express.js server
+- Run **nodemon** inside **/server** to run the Express.js server
 - Check if Server app is up & running by accessing http://localhost:3000, You should see **All set!.** response
 - Run the [GET] http://localhost:3000/common/restoreData API from browser/curl/postman to restore necessary data into RedisJSON
 
-## Deployment
-
-To make deploys work, you need to create free account on [Redis Cloud](https://redis.info/try-free-dev-to)
-
-### Google Cloud Run
-
-[Insert Run on Google button](https://cloud.google.com/blog/products/serverless/introducing-cloud-run-button-click-to-deploy-your-git-repos-to-google-cloud)
-
-### Heroku
-
-[Insert Deploy on Heroku button](https://devcenter.heroku.com/articles/heroku-button)
-
-### Netlify
-
-[Insert Deploy on Netlify button](https://www.netlify.com/blog/2016/11/29/introducing-the-deploy-to-netlify-button/)
-
-### Vercel
-
-[Insert Deploy on Vercel button](https://vercel.com/docs/deploy-button)
 
 ## More Information about Redis Stack
 
