@@ -1,4 +1,4 @@
-# [Insert your hackathon title or the app's title (keep it short)]
+# WatchYaari - Watch videos together with your friends
 
 [Insert description of app]
 
@@ -24,7 +24,8 @@ Refer to [this example](https://github.com/redis-developer/basic-analytics-dashb
 
 ### Performance Benchmarks
 
-[If you migrated an existing app to use Redis, please put performance benchmarks here to show the performance improvements.]
+### Architecture diagram 
+![WatchYaariBeforeAfterRedisHacathon drawio](https://user-images.githubusercontent.com/26838762/186468420-7d427406-71a4-4df9-a8db-624701e62a3f.png)
 
 ## How to run it locally?
 
