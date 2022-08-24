@@ -51,7 +51,7 @@ export class YoutubePlayerComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     onYouTubeIframeAPIReady() {
-        this.player = new YT.Player("youtubePlayer", {
+        YT?.Player && (this.player = new YT.Player("youtubePlayer", {
             videoId: this.videoId,
             playerVars: {
                 controls: 0,
@@ -72,7 +72,7 @@ export class YoutubePlayerComponent implements OnInit, OnChanges, OnDestroy {
                     this.onPlayerStateChange.emit({ event, player: this.player });
                 },
             },
-        });
+        }))
     }
 
     /*  onPlayerReady(event) {
