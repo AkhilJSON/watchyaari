@@ -1,7 +1,7 @@
 <div fxLayout="column" fxFlexFill class="home-wrapper">
   <div fxFlex="100">
     <div fxLayout="column" fxFlexFill>
-      <div fxFlex="10" class="m-t-10">
+      <div fxFlex="10" class="m-t-30">
         <!-- DESKTOP SEARCH BAR -->
         <div
           fxLayout="row"
@@ -10,6 +10,8 @@
           fxHide.sm="true"
           fxHide.md="true"
         >
+
+        <div fxFlex="10"></div>
           <!-- Back button -->
           <div
             fxFlex="10"
@@ -45,7 +47,7 @@
 
           <!-- Search box or URL box -->
           <div
-            [fxFlex]="isSearchPreview ? 70 : 80"
+            [fxFlex]="isSearchPreview ? 60 : 70"
             fxLayoutAlign="center center"
           >
             <mat-form-field
@@ -112,6 +114,8 @@
               Fetch preview
             </button>
           </div>
+
+        <div fxFlex="5"></div>
         </div>
 
         <!-- MOBILE SEARCH BAR -->

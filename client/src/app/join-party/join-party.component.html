@@ -2,7 +2,7 @@
   <div fxFlex="100" class="join-party-container">
     <div fxLayout="column" fxFlexFill>
       <div fxFlex="10" fxLayoutAlign="center center">
-        <div fxLayout="row" fxFlexFill fxLayoutGap="40px">
+        <div fxLayout="row" fxFlexFill fxLayoutGap="44px">
           <div fxFlex="10"></div>
           <div fxFlex="65" fxLayoutAlign="right center" class="m-l-40">
             <form
@@ -60,6 +60,7 @@
           <div fxFlex="10"></div>
         </div>
       </div>
+
       <div fxFlex="90">
         <perfect-scrollbar [config]="config">
           <div fxLayout="column" fxFlexFill>
@@ -68,7 +69,14 @@
               fxLayoutAlign.xs="center center"
               fxLayoutAlign.gt-xs="start center"
             >
-              <h1>Recent parties</h1>
+            <div
+            fxLayout.xs="column"
+            fxLayout.gt-xs="row"
+            fxFlexFill>
+            <div fxFlex="16"></div>
+            <div fxFlex="85"><h1>Recent parties</h1></div>
+              
+            </div>
             </div>
 
             <div fxFlex="90">
@@ -126,11 +134,12 @@
     fxLayoutGap="10px"
     *ngFor="let party of recentList"
   >
+  <div fxFlex="15"></div>
     <!-- Party Thumbnail -->
     <div
-      fxFlex.xs="60"
-      fxFlex.sm="25"
-      fxFlex.gt-sm="20"
+      fxFlex.xs="35"
+      fxFlex.sm="20"
+      fxFlex.gt-sm="15"
       fxLayoutAlign="start center"
     >
       <img
@@ -144,8 +153,8 @@
     <!-- Party details -->
     <div
       fxFlex.xs="40"
-      fxFlex.sm="75"
-      fxFlex.gt-sm="80"
+      fxFlex.sm="55"
+      fxFlex.gt-sm="60"
       fxLayoutAlign="start start"
     >
       <div fxLayout="column">
@@ -196,5 +205,6 @@
         </div>
       </div>
     </div>
+  <div fxFlex="10"></div>
   </div>
 </ng-template>
