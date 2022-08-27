@@ -28,11 +28,30 @@ Here's a short video that explains the project and how it uses Redis:
 
 ### How the data is stored:
 
-Refer to [this example](https://github.com/redis-developer/basic-analytics-dashboard-redis-bitmaps-nodejs#how-the-data-is-stored) for a more detailed example of what you need for this section.
+Data is stored & accessed through redis-om.
 
 ### How the data is accessed:
 
 Refer to [this example](https://github.com/redis-developer/basic-analytics-dashboard-redis-bitmaps-nodejs#how-the-data-is-accessed) for a more detailed example of what you need for this section.
+
+### Keys changes while moving from MongoDB to Redis as primary database 
+- Changed MongoDB ObjectId dependecies to RedisJSON entityId
+- Changed Mongoose models to RedisJSON schema
+
+  Mongoose Model
+  <img width="1440" alt="Screenshot 2022-08-27 at 10 33 17 PM" src="https://user-images.githubusercontent.com/26838762/187040521-d42cf882-d0fb-4729-a00b-96736bb69600.png">  
+  
+  RedisJSON Schema
+  <img width="1440" alt="Screenshot 2022-08-27 at 10 32 48 PM" src="https://user-images.githubusercontent.com/26838762/187040537-949b1428-c926-4934-9cc7-e71038298b30.png">
+
+- Changed queries
+    
+  Mongoose aggregate query  
+  <img width="710" alt="Screenshot 2022-08-27 at 10 39 26 PM" src="https://user-images.githubusercontent.com/26838762/187040727-acaf900d-f177-45db-bec2-405e54346522.png">
+
+  RedisSearch query  
+  <img width="660" alt="Screenshot 2022-08-27 at 10 40 16 PM" src="https://user-images.githubusercontent.com/26838762/187040751-ba176261-be22-4490-848e-64d4662895d5.png">
+
 
 ### Performance Benchmarks
 
