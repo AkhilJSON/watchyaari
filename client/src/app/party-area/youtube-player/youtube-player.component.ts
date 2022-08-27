@@ -46,7 +46,9 @@ export class YoutubePlayerComponent implements OnInit, OnChanges, OnDestroy {
             if (this.player) {
                 this.player.destroy();
             }
-            this.onYouTubeIframeAPIReady();
+            setTimeout(()=>{
+                this.onYouTubeIframeAPIReady();
+            }, 1000)
         }
     }
 
