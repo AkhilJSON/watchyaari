@@ -63,6 +63,9 @@ export async function getRecentPartyList(req, res) {
                 ? partyData?.guestUserIds?.concat?.([partyData?.hostedBy])
                 : [partyData?.hostedBy];
 
+            partyData?.endedOn && (partyData.endedOn = new Date(partyData.endedOn).getTime()/1000)
+            partyData?.cAt && (partyData.cAt = new Date(partyData.cAt).getTime()/1000)
+
             if (userIds?.length > 1) {
                 // Remove loggedin user since we refer them as "You"
                 userIds = _.difference(userIds, [req.user.entityId]);
