@@ -29,10 +29,11 @@ Here's a short video that explains the project and how it uses Redis:
 ### How the data is stored:
 
 Data is stored & accessed through redis-om.
+Used RedisJSON for save JSON data in Redis.
 
 ### How the data is accessed:
 
-Refer to [this example](https://github.com/redis-developer/basic-analytics-dashboard-redis-bitmaps-nodejs#how-the-data-is-accessed) for a more detailed example of what you need for this section.
+Used RedisSearch to query data stored in Redis.
 
 ### Keys changes while moving from MongoDB to Redis as primary database 
 - Changed MongoDB ObjectId dependecies to RedisJSON entityId
