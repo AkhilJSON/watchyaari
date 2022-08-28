@@ -65,8 +65,6 @@ Used RedisSearch to query data stored in Redis with the help of redis-om nodejs 
   <img width="660" alt="Screenshot 2022-08-27 at 10 40 16 PM" src="https://user-images.githubusercontent.com/26838762/187040751-ba176261-be22-4490-848e-64d4662895d5.png">
 
 
-### Performance Benchmarks
-
 ### Architecture diagram 
 ![WatchYaariBeforeAfterRedisHacathon drawio](https://user-images.githubusercontent.com/26838762/186468420-7d427406-71a4-4df9-a8db-624701e62a3f.png)
 
