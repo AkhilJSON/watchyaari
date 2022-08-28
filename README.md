@@ -21,7 +21,8 @@ Separated by distance, brought together by WatchYaari.
 
 Here's a short video that explains the project and how it uses Redis:
 
-[![Embed your YouTube video]([https://i.ytimg.com/vi/vyxdC1qK4NE/maxresdefault.jpg](https://user-images.githubusercontent.com/26838762/186484887-8f5361ba-e309-49bb-af05-f82a28a977e6.png))](https://youtu.be/h9V-9zfZmUc)
+
+[![Embed your YouTube video](https://user-images.githubusercontent.com/26838762/186484887-8f5361ba-e309-49bb-af05-f82a28a977e6.png)](https://www.youtube.com/watch?v=h9V-9zfZmUc)
 
 ## How it works
 
