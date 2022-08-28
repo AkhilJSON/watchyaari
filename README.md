@@ -81,14 +81,14 @@ Used RedisSearch to query data stored in Redis with the help of redis-om nodejs 
 
 ### Local installation
 
-- Navigate inside **/client** & run **npm i**
-- Run **ng serv**e inside **/client** to run the Client App
-- Check if Client app is up & running by accessing http://localhost:4200
-- Install nodemon globally for running nodejs server - **npm i -g nodemon**
-- Navigate inside **/server** & run **npm i**
-- Run **nodemon** inside **/server** to run the Express.js server
-- Check if Server app is up & running by accessing http://localhost:3000, You should see **All set!.** response
-- Run the [GET] http://localhost:3000/common/restoreData API from browser/curl/postman to restore necessary data into RedisJSON
+- Navigate inside **/client** & run **npm i** to install dependencies.
+- Run **ng serv**e inside **/client** to run the Client App.
+- Check if Client app is up & running by accessing http://localhost:4200, You should be able to see app home page.
+- Install nodemon globally for running nodejs server - **npm i -g nodemon**.
+- Navigate inside **/server** & run **npm i** to install dependencies.
+- Run **nodemon** inside **/server** to run the Express.js server.
+- Check if Server app is up & running by accessing http://localhost:3000, You should see **All set!.** response.
+- Run the [GET] http://localhost:3000/common/restoreData API from browser/curl/postman to restore necessary data into RedisJSON.
 
 
 ## More Information about Redis Stack
