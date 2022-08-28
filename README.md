@@ -77,6 +77,9 @@ Used RedisSearch to query data stored in Redis with the help of redis-om nodejs 
 - NPM - v8.3.0
 - Redisstack server
 
+- **Not in scope**
+  - Coturn server - Free open source implementation of TURN and STUN server in case if peer-to-peer connection between clients is not established. 
+
 ### Local installation
 
 - Navigate inside **/client** & run **npm i** to install dependencies.
