@@ -29,12 +29,22 @@ Here's a short video that explains the project and how it uses Redis:
 
 ### How the data is stored:
 
-Data is stored & accessed through redis-om.
-Used RedisJSON for save JSON data in Redis.
+Used RedisJSON for saving JSON data in Redis with the help of redis-om nodejs library.
+
+<img width="1440" alt="Screenshot 2022-08-28 at 4 18 35 PM" src="https://user-images.githubusercontent.com/26838762/187070194-aa559fca-2b5a-4f0f-9b17-f938fab5905c.png">
+
+<img width="1440" alt="Screenshot 2022-08-28 at 4 20 22 PM" src="https://user-images.githubusercontent.com/26838762/187070287-4ec7631a-b45f-4458-97fb-83b4fd8b82b0.png">
+
+
 
 ### How the data is accessed:
 
-Used RedisSearch to query data stored in Redis.
+Used RedisSearch to query data stored in Redis with the help of redis-om nodejs library.
+
+<img width="1440" alt="Screenshot 2022-08-28 at 4 27 31 PM" src="https://user-images.githubusercontent.com/26838762/187070624-7c080a65-ef2d-4037-9b12-5c3677d0dcce.png">
+
+<img width="1440" alt="Screenshot 2022-08-28 at 4 24 48 PM" src="https://user-images.githubusercontent.com/26838762/187070556-68fcb458-ebc4-4675-93bd-4d628296a4b8.png">
+
 
 ### Keys changes while moving from MongoDB to Redis as primary database 
 - Changed MongoDB ObjectId dependecies to RedisJSON entityId
