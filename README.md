@@ -12,6 +12,7 @@ Separated by distance, brought together by WatchYaari.
 <img width="1440" alt="Screenshot 2022-08-24 at 10 00 51 PM" src="https://user-images.githubusercontent.com/26838762/186484785-19041544-ca3d-473c-8126-89da5f1f96c7.png">
 <img width="1315" alt="Screenshot 2022-08-24 at 9 52 19 PM" src="https://user-images.githubusercontent.com/26838762/186486192-0e5bcbce-7c6b-45f9-b115-c02cd0559b80.png">
 <img width="1440" alt="Screenshot 2022-08-24 at 10 01 28 PM" src="https://user-images.githubusercontent.com/26838762/186486403-ed2edb93-5e0e-48a5-bd37-8d8a7815e12e.png">
+<img width="1440" alt="Screenshot 2022-08-28 at 9 22 02 AM" src="https://user-images.githubusercontent.com/26838762/187056564-db66a18e-4010-416a-a989-34838c8f337f.png">
 
 
 
