@@ -22,7 +22,7 @@
         "https://user-images.githubusercontent.com/26838762/186486403-ed2edb93-5e0e-48a5-bd37-8d8a7815e12e.png",
         "https://user-images.githubusercontent.com/26838762/187056564-db66a18e-4010-416a-a989-34838c8f337f.png"
     ],
-    "youtube_url": "", //Provide a Youtube link to your app's video
+    "youtube_url": "https://youtu.be/h9V-9zfZmUc",
     "special_tags": ["Hackathon", "Redis Hackathon on DEV"],
     "verticals": ["Watch Party", "Others"],
     "markdown": "https://raw.githubusercontent.com/AkhilJSON/watchyaari/master/README.md"
